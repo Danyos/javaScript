@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8">
+    <title>Բանկոմատ համակարգ</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --atm-bg: #020617;
+            --atm-shell: #0f172a;
+            --atm-shell-border: #1e293b;
+            --atm-screen-bg: #e5e7eb;
+            --atm-screen-text: #0f172a;
+            --primary: #22c55e;
+            --primary-soft: rgba(34,197,94,.12);
+            --danger-soft: rgba(239,68,68,.12);
+            --card-blue: #2563eb;
+            --card-blue-soft: #60a5fa;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: radial-gradient(circle at top, #1e293b 0, #020617 55%, #000 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #e5e7eb;
+        }
+
+        .atm-wrapper {
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .atm-shell {
+            background: radial-gradient(circle at top, #111827 0, #020617 60%);
+            border-radius: 30px;
+            border: 1px solid var(--atm-shell-border);
+            box-shadow:
+                    0 30px 80px rgba(0,0,0,.85),
+                    0 0 0 1px rgba(148,163,184,.15);
+            padding: 32px 28px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .atm-shell::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 0 0, rgba(56,189,248,.18), transparent 55%);
+            opacity: .6;
+            pointer-events: none;
+        }
+
+        .atm-header {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .atm-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .atm-logo-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 999px;
+            background: conic-gradient(
+                    from 180deg,
+                    #22c55e,
+                    #22c55e,
+                    #0ea5e9,
+                    #22c55e
+            );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 25px rgba(34,197,94,.65);
+        }
+
+        .atm-logo-circle span {
+            font-weight: 800;
+            font-size: 18px;
+            color: #020617;
+        }
+
+        .atm-brand-text {
+            line-height: 1.2;
+        }
+
+        .atm-brand-text .title {
+            font-weight: 600;
+            letter-spacing: .04em;
+            font-size: 13px;
+            text-transform: uppercase;
+            color: #e5e7eb;
+        }
+
+        .atm-brand-text .subtitle {
+            font-size: 11px;
+            color: #9ca3af;
+        }
+
+        .atm-status {
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(15,118,110,.12);
+            border: 1px solid rgba(34,197,94,.45);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .atm-status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+            background: #22c55e;
+            box-shadow: 0 0 10px rgba(34,197,94,.9);
+        }
+
+        .atm-main {
+            position: relative;
+            z-index: 2;
+        }
+
+        .atm-screen-wrapper {
+            background: linear-gradient(135deg, #0b1120, #020617);
+            border-radius: 20px;
+            padding: 16px 18px 18px;
+            border: 1px solid rgba(148,163,184,.35);
+            box-shadow: inset 0 0 0 1px rgba(15,23,42,.9);
+            margin-bottom: 14px;
+        }
+
+        .atm-screen-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .atm-screen-top span {
+            font-size: 11px;
+            color: #9ca3af;
+        }
+
+        .atm-screen {
+            background-color: var(--atm-screen-bg);
+            color: var(--atm-screen-text);
+            height: 170px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            overflow-y: auto;
+            font-size: 14px;
+            box-shadow:
+                    inset 0 0 0 1px rgba(148,163,184,.5),
+                    inset 0 18px 24px rgba(15,23,42,.18);
+        }
+
+        .atm-screen code {
+            font-size: 13px;
+            background: rgba(15,23,42,.08);
+            padding: 2px 6px;
+            border-radius: 6px;
+        }
+
+        .atm-card-slot {
+            margin-top: 10px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .atm-card-slot-inner {
+            width: 140px;
+            height: 12px;
+            border-radius: 999px;
+            background: radial-gradient(circle at 50% 10%, rgba(148,163,184,.6), #020617);
+            box-shadow:
+                    inset 0 1px 0 rgba(255,255,255,.04),
+                    0 10px 25px rgba(0,0,0,.85);
+            position: relative;
+        }
+
+        .atm-card-slot-inner::before {
+            content: "";
+            position: absolute;
+            inset: 2px 16px;
+            border-radius: 999px;
+            background: linear-gradient(to right, #020617, #020617, #111827);
+        }
+
+        .atm-buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .atm-btn-main {
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 999px;
+            padding: 8px 10px;
+            border-width: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .atm-btn-main span {
+            position: relative;
+            z-index: 2;
+        }
+
+        .atm-btn-main::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity .18s ease-out;
+        }
+
+        .atm-btn-main:hover::before {
+            opacity: .24;
+        }
+
+        .atm-btn-secondary {
+            background: rgba(15,23,42,1);
+            color: #e5e7eb;
+            box-shadow:
+                    0 0 0 1px rgba(148,163,184,.45),
+                    0 10px 18px rgba(15,23,42,.9);
+        }
+
+        .atm-btn-secondary::before {
+            background: radial-gradient(circle at top, rgba(148,163,184,1), transparent 70%);
+        }
+
+        .atm-btn-primary {
+            background: radial-gradient(circle at top, #22c55e, #16a34a);
+            color: #022c22;
+            box-shadow:
+                    0 0 0 1px rgba(22,163,74,.4),
+                    0 18px 28px rgba(22,163,74,.75);
+        }
+
+        .atm-btn-primary::before {
+            background: radial-gradient(circle at top, #bbf7d0, transparent 65%);
+        }
+
+        .atm-btn-danger {
+            background: radial-gradient(circle at top, #ef4444, #b91c1c);
+            color: #fef2f2;
+            box-shadow:
+                    0 0 0 1px rgba(248,113,113,.5),
+                    0 18px 28px rgba(127,29,29,.85);
+        }
+
+        .atm-btn-danger::before {
+            background: radial-gradient(circle at top, #fecaca, transparent 65%);
+        }
+
+        /* Cards side panel */
+        .card-panel {
+            background: radial-gradient(circle at top left, rgba(56,189,248,.25), #020617);
+            border-radius: 22px;
+            border: 1px solid rgba(148,163,184,.4);
+            padding: 18px 16px 16px;
+            height: 100%;
+            box-shadow:
+                    0 24px 60px rgba(15,23,42,.95),
+                    inset 0 0 0 1px rgba(15,23,42,.85);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-panel::before {
+            content: "";
+            position: absolute;
+            inset: -30%;
+            background: radial-gradient(circle at 115% -15%, rgba(56,189,248,.3), transparent 55%);
+            opacity: .75;
+            pointer-events: none;
+        }
+
+        .card-panel-headline {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .card-panel-headline h5 {
+            font-size: 14px;
+            margin: 0;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: #e5e7eb;
+        }
+
+        .card-panel-headline span {
+            font-size: 11px;
+            color: #9ca3af;
+        }
+
+        .card-list {
+            position: relative;
+            z-index: 2;
+            max-height: 380px;
+            overflow-y: auto;
+            padding-right: 4px;
+            margin-top: 6px;
+        }
+
+        .bank-card {
+            background: linear-gradient(135deg, #1d4ed8, #22c55e);
+            color: white;
+            padding: 10px 12px;
+            border-radius: 14px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow:
+                    0 12px 26px rgba(15,23,42,.8),
+                    inset 0 0 0 1px rgba(15,23,42,.55);
+        }
+
+        .bank-card::before {
+            content: "";
+            position: absolute;
+            inset: -20%;
+            background: radial-gradient(circle at 0 0, rgba(248,250,252,.7), transparent 60%);
+            opacity: 0;
+            transition: opacity .18s ease-out;
+        }
+
+        .bank-card:hover::before {
+            opacity: .55;
+        }
+
+        .bank-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            margin-bottom: 4px;
+            opacity: .9;
+        }
+
+        .bank-card-number {
+            font-weight: 600;
+            letter-spacing: .06em;
+            font-size: 13px;
+        }
+
+        .bank-card-name {
+            font-size: 12px;
+            opacity: .9;
+        }
+
+        .bank-card-footer {
+            font-size: 11px;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-top: 4px;
+            opacity: .9;
+        }
+
+        .bank-card .badge-status {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 999px;
+            border: 1px solid rgba(248,250,252,.7);
+            backdrop-filter: blur(4px);
+        }
+
+        .bank-card.active {
+            box-shadow:
+                    0 0 0 1px rgba(250,250,250,.8),
+                    0 0 0 3px rgba(34,197,94,.7),
+                    0 18px 32px rgba(22,163,74,.8);
+            transform: translateY(-1px);
+        }
+
+        .bank-card.blocked {
+            background: linear-gradient(135deg, #7f1d1d, #b91c1c);
+            opacity: .8;
+        }
+
+        .bank-card.blocked .badge-status {
+            border-color: rgba(254,202,202,1);
+            background: rgba(127,29,29,.5);
+        }
+
+        .income { color: #16a34a; }
+        .expense { color: #dc2626; }
+
+        /* Scrollbars */
+        .atm-screen::-webkit-scrollbar,
+        .card-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .atm-screen::-webkit-scrollbar-thumb,
+        .card-list::-webkit-scrollbar-thumb {
+            background: rgba(148,163,184,.9);
+            border-radius: 999px;
+        }
+
+        @media (max-width: 992px) {
+            .atm-shell {
+                padding: 22px 18px;
+                border-radius: 24px;
+            }
+            .atm-card-slot {
+                justify-content: center;
+            }
+            .atm-wrapper {
+                padding: 16px;
+            }
+            .card-panel {
+                margin-top: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="atm-wrapper">
+    <div class="atm-shell">
+        <div class="atm-header">
+            <div class="atm-brand">
+                <div class="atm-logo-circle">
+                    <span>DS</span>
+                </div>
+                <div class="atm-brand-text">
+                    <div class="title">Danisoft ATM</div>
+                    <div class="subtitle">Secure • Instant • Smart</div>
+                </div>
+            </div>
+            <div class="atm-status">
+                <span class="atm-status-dot"></span>
+                <span>Օնլայն ռեժիմ</span>
+            </div>
+        </div>
+
+        <div class="atm-main">
+            <div class="row g-3">
+                <!-- ATM left side -->
+                <div class="col-lg-8">
+                    <div class="atm-screen-wrapper">
+                        <div class="atm-screen-top">
+                            <span>Տեղեկատվություն</span>
+                            <span id="atmUserHint">Քարտ ընտրելուց հետո մուտքագրեք PIN</span>
+                        </div>
+                        <div class="atm-screen" id="atmScreen">
+                            Խնդրում ենք ընտրել քարտ՝ աջ կողքի ցուցակից։
+                        </div>
+                    </div>
+
+                    <div class="atm-card-slot">
+                        <div class="atm-card-slot-inner"></div>
+                    </div>
+
+                    <div class="atm-buttons-grid mt-3">
+                        <button class="atm-btn-main atm-btn-secondary" onclick="handleAction('balance')">
+                            <span>Մնացորդ</span>
+                        </button>
+                        <button class="atm-btn-main atm-btn-secondary" onclick="handleAction('withdraw')">
+                            <span>Կանխիկացնել</span>
+                        </button>
+                        <button class="atm-btn-main atm-btn-secondary" onclick="handleAction('changepin')">
+                            <span>Փոխել PIN</span>
+                        </button>
+                        <button class="atm-btn-main atm-btn-secondary" onclick="handleAction('date')">
+                            <span>Թողարկման ամսաթիվ</span>
+                        </button>
+                        <button class="atm-btn-main atm-btn-secondary" onclick="handleAction('history')">
+                            <span>Պատմություն</span>
+                        </button>
+                        <button class="atm-btn-main atm-btn-danger" onclick="resetATM()">
+                            <span>Ելք / Չեղարկել</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Cards right side -->
+                <div class="col-lg-4">
+                    <div class="card-panel">
+                        <div class="card-panel-headline">
+                            <h5>ՁԵՐ ՔԱՐՏԵՐԸ</h5>
+                            <span>Ընտրեք քարտ՝ մուտք գործելու համար</span>
+                        </div>
+                        <div class="card-list" id="cardList"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const users = [
+        {
+            id: 1,
+            cardNumber: "VISA •••• 1234",
+            pin: "1111",
+            name: "Անի Գրիգորյան",
+            balance: "95000",
+            issueDate: "2022-02-01",
+            pinStep: 0,
+            status: true,
+            transactions: [
+                { type: "expense", amount: 5000, date: "2025-03-25", description: "Սուպերմարկետ" },
+                { type: "income", amount: 100000, date: "2025-03-20", description: "Փոխանցում ընկերոջից" }
+            ]
+        },
+        {
+            id: 2,
+            cardNumber: "MASTERCARD •••• 5678",
+            pin: "2222",
+            name: "Գևորգ Կարապետյան",
+            balance: "120000",
+            issueDate: "2021-08-15",
+            pinStep: 0,
+            status: true,
+            transactions: [
+                { type: "expense", amount: 20000, date: "2025-03-21", description: "Բենզալցակայան" },
+                { type: "income", amount: 150000, date: "2025-03-10", description: "Աշխատավարձ" }
+            ]
+        },
+        {
+            id: 3,
+            cardNumber: "ARCA •••• 7777",
+            pin: "3333",
+            name: "Լիլիթ Հովհաննիսյան",
+            balance: "78500",
+            issueDate: "2023-01-10",
+            pinStep: 0,
+            status: true,
+            transactions: [
+                { type: "expense", amount: 3000, date: "2025-03-26", description: "Սուրճ" },
+                { type: "expense", amount: 15000, date: "2025-03-22", description: "Գրասենյակային նյութեր" },
+                { type: "income", amount: 90000, date: "2025-03-15", description: "Պարգևավճար" }
+            ]
+        },
+        {
+            id: 4,
+            cardNumber: "VISA •••• 8888",
+            pin: "4444",
+            name: "Հասմիկ Մանուկյան",
+            balance: "42000",
+            issueDate: "2020-06-01",
+            pinStep: 0,
+            status: true,
+            transactions: [
+                { type: "expense", amount: 10000, date: "2025-03-23", description: "Հագուստ" },
+                { type: "income", amount: 50000, date: "2025-03-18", description: "Ծնողներից" }
+            ]
+        },
+        {
+            id: 5,
+            cardNumber: "MASTERCARD •••• 9999",
+            pin: "5555",
+            name: "Սուրեն Դավթյան",
+            balance: "330000",
+            issueDate: "2024-03-05",
+            pinStep: 0,
+            status: true,
+            transactions: [
+                { type: "income", amount: 300000, date: "2025-03-01", description: "Նախագիծից շահույթ" },
+                { type: "expense", amount: 20000, date: "2025-03-19", description: "Տեխնիկա" },
+                { type: "expense", amount: 5000, date: "2025-03-21", description: "Ճաշարան" }
+            ]
+        }
+    ];
+
+    let selectedUser = null;
+
+    function renderCards() {
+        const cardList = document.getElementById('cardList');
+        cardList.innerHTML = "";
+        users.forEach(user => {
+            const div = document.createElement('div');
+            div.className = `bank-card ${!user.status ? 'blocked' : ''}`;
+
+            div.innerHTML = `
+                <div class="bank-card-header">
+                    <span>${user.cardNumber.split(" ")[0]}</span>
+                    <span class="badge-status">${user.status ? 'Ակտիվ' : 'Բլոկավորված'}</span>
+                </div>
+                <div class="bank-card-number">${user.cardNumber}</div>
+                <div class="bank-card-name">${user.name}</div>
+                <div class="bank-card-footer">
+                    <span>Մնացորդ՝ <strong>${Number(user.balance).toLocaleString('hy-AM')} ֏</strong></span>
+                    <span>Սկիզբ՝ ${user.issueDate}</span>
+                </div>
+            `;
+            div.onclick = (e) => selectCard(user.cardNumber, e);
+            cardList.appendChild(div);
+        });
+    }
+
+    function selectCard(cardNumber, event) {
+        selectedUser = users.find(u => u.cardNumber === cardNumber);
+        const screen = document.getElementById('atmScreen');
+        const hint = document.getElementById('atmUserHint');
+
+        if (!selectedUser.status) {
+            screen.innerHTML = `<span class="text-danger">Քարտը բլոկավորված է։</span>`;
+            hint.textContent = "Ընտրեք ակտիվ քարտ կամ դիմեք բանկ";
+            document.querySelectorAll('.bank-card').forEach(card => card.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            return;
+        }
+
+        document.querySelectorAll('.bank-card').forEach(card => card.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+
+        hint.textContent = "Մուտքագրեք PIN և սպասեք հաստատման հաղորդագրությանը";
+
+        screen.innerHTML = `
+            Ընտրված քարտ՝ <strong>${cardNumber}</strong><br>
+            Մուտքագրեք PIN՝<br>
+            <input type="password" id="pinInput" class="form-control form-control-sm mt-2" maxlength="4" placeholder="****" oninput="checkPIN()">
+        `;
+    }
+
+    function checkPIN() {
+        const screen = document.getElementById('atmScreen');
+        const hint = document.getElementById('atmUserHint');
+        const pinInput = document.getElementById('pinInput');
+        if (!pinInput) return;
+
+        const pin = pinInput.value;
+
+        if (!selectedUser || !selectedUser.status) {
+            screen.innerHTML = `<span class="text-danger">Քարտը բլոկավորված է։</span>`;
+            hint.textContent = "Ընտրեք այլ քարտ՝ շարունակելու համար";
+            return;
+        }
+
+        if (pin.length === 4) {
+            if (pin === selectedUser.pin) {
+                selectedUser.pinStep = 0;
+                selectedUser.status = true;
+                screen.innerHTML = `Բարի գալուստ, <strong>${selectedUser.name}</strong> 🟢<br>Ընտրեք ծառայություն ներքևի կոճակներից։`;
+                hint.textContent = "Ընտրեք ծառայություն՝ մնացորդ, կանխիկացում և այլն";
+            } else {
+                selectedUser.pinStep++;
+                if (selectedUser.pinStep >= 3) {
+                    selectedUser.status = false;
+                    screen.innerHTML = `<span class="text-danger">Քարտը բլոկավորվեց։ 3 սխալ փորձ։</span>`;
+                    hint.textContent = "Քարտը բլոկված է, փորձեք այլ քարտ կամ դիմեք բանկ";
+                    renderCards();
+                } else {
+                    screen.innerHTML = `
+                        Սխալ PIN (${selectedUser.pinStep}/3)<br>
+                        Կրկին մուտքագրեք՝<br>
+                        <input type="password" id="pinInput" class="form-control form-control-sm mt-2" maxlength="4" placeholder="****" oninput="checkPIN()">
+                    `;
+                    hint.textContent = "Ուշադիր մուտքագրեք PIN-ը (3 սխալից հետո քարտը կբլոկվի)";
+                }
+            }
+        }
+    }
+
+    function handleAction(action) {
+        const screen = document.getElementById('atmScreen');
+        const hint = document.getElementById('atmUserHint');
+
+        if (!selectedUser || selectedUser.pinStep >= 3 || !selectedUser.status) {
+            screen.innerHTML = `<span class="text-danger">Դուք մուտք չեք գործել կամ քարտը բլոկված է։</span>`;
+            hint.textContent = "Նախ ընտրեք ակտիվ քարտ և մուտք գործեք PIN-ով";
+            return;
+        }
+
+        const actions = {
+            balance: `
+                <div class="alert alert-success py-2 px-3 mb-2" style="background: ${'var(--primary-soft)'};">
+                    Ձեր ընթացիկ մնացորդը՝ <strong>${Number(selectedUser.balance).toLocaleString('hy-AM')} դրամ</strong>
+                </div>
+            `,
+            withdraw: `
+                <div class="mb-2">Մուտքագրեք կանխիկացման գումարը (դրամ)</div>
+                <input type="number" class="form-control form-control-sm mt-1" placeholder="Օրինակ՝ 10000" min="0">
+                <button class="btn btn-success btn-sm mt-2" onclick="confirmWithdraw()">Հաստատել կանխիկացումը</button>
+            `,
+            changepin: `
+                <div class="mb-1">PIN փոփոխություն</div>
+                <small class="text-muted d-block mb-1">Ապահովության համար մուտքագրեք հին PIN-ը և կրկնեք նոր PIN-ը։</small>
+                Հին PIN:<br>
+                <input type="password" id="oldPin" class="form-control form-control-sm mt-1" maxlength="4"><br>
+                Նոր PIN:<br>
+                <input type="password" id="newPin" class="form-control form-control-sm mt-1" maxlength="4"><br>
+                Կրկնեք նոր PIN:<br>
+                <input type="password" id="repeatPin" class="form-control form-control-sm mt-1" maxlength="4"><br>
+                <button class="btn btn-success btn-sm mt-2" onclick="confirmPinChange()">Հաստատել փոփոխությունը</button>
+            `,
+            date: `
+                Քարտի թողարկման ամսաթիվ՝ <strong>${selectedUser.issueDate}</strong>
+            `,
+            history: `
+                Վերջին գործարքներ՝
+                <ul class="mt-2 mb-0">
+                    ${selectedUser.transactions.map(tx => `
+                        <li class="${tx.type}">
+                            ${tx.date} — ${tx.type === 'income' ? '+' : '-'}${Number(tx.amount).toLocaleString('hy-AM')} դրամ — ${tx.description}
+                        </li>`).join('')}
+                </ul>
+            `
+        };
+
+        screen.innerHTML = actions[action] || '';
+        if (action === 'withdraw') {
+            hint.textContent = "Մուտքագրեք գումարը և սեղմեք «Հաստատել կանխիկացումը»";
+        } else if (action === 'changepin') {
+            hint.textContent = "Մուտքագրեք հին և նոր PIN-ը, հետո սեղմեք հաստատում";
+        } else {
+            hint.textContent = "Կարող եք ընտրել այլ ծառայություն կամ դուրս գալ համակարգից";
+        }
+    }
+
+    function confirmWithdraw() {
+        const screen = document.getElementById('atmScreen');
+        const input = screen.querySelector('input[type="number"]');
+
+        if (!input) return;
+
+        const amount = parseInt(input.value);
+
+        if (!amount || amount <= 0) {
+            screen.innerHTML = `
+                <div class="alert alert-danger mt-2" style="background: var(--danger-soft); color:#f87171;">
+                    Մուտքագրեք վավեր գումար։
+                </div>
+            `;
+            return;
+        }
+
+        const balance = parseInt(selectedUser.balance);
+        if (amount > balance) {
+            screen.innerHTML = `
+                <div class="alert alert-danger mt-2" style="background: var(--danger-soft); color:#f87171;">
+                    Մնացորդը բավարար չէ կանխիկացման համար։
+                </div>
+            `;
+            return;
+        }
+
+        selectedUser.balance = (balance - amount).toString();
+        const today = new Date().toISOString().split('T')[0];
+        selectedUser.transactions.push({ type: "expense", amount: amount, date: today, description: "Կանխիկացում" });
+
+        screen.innerHTML = `
+            <div class="alert alert-success mt-2" style="background: var(--primary-soft); color:#22c55e;">
+                Դուք հաջողությամբ կանխիկացրեցիք <strong>${amount.toLocaleString('hy-AM')} դրամ</strong><br>
+                Նոր մնացորդը՝ <strong>${Number(selectedUser.balance).toLocaleString('hy-AM')} դրամ</strong>
+            </div>
+        `;
+        renderCards();
+    }
+
+    function confirmPinChange() {
+        const oldPin = document.getElementById('oldPin')?.value || "";
+        const newPin = document.getElementById('newPin')?.value || "";
+        const repeatPin = document.getElementById('repeatPin')?.value || "";
+        const screen = document.getElementById('atmScreen');
+
+        let message = "";
+        let alertType = "danger";
+        let colorBg = "var(--danger-soft)";
+        let colorText = "#f87171";
+
+        if (oldPin !== selectedUser.pin) {
+            message = "Հին PIN-ը սխալ է։";
+        } else if (newPin !== repeatPin) {
+            message = "Նոր PIN-ները չեն համընկնում։";
+        } else if (newPin.length !== 4 || isNaN(newPin)) {
+            message = "Նոր PIN-ը պետք է լինի 4 նիշ թվային արժեք։";
+        } else {
+            selectedUser.pin = newPin;
+            message = "PIN-ը հաջողությամբ փոխվեց։";
+            alertType = "success";
+            colorBg = "var(--primary-soft)";
+            colorText = "#22c55e";
+        }
+
+        screen.innerHTML = `
+            <div class="alert alert-${alertType} mt-2" style="background:${colorBg}; color:${colorText};">
+                ${message}
+            </div>
+        `;
+    }
+
+    function resetATM() {
+        selectedUser = null;
+        users.forEach(u => u.pinStep = 0);
+        document.getElementById('atmScreen').innerHTML = 'Խնդրում ենք ընտրել քարտ՝ աջ կողքի ցուցակից։';
+        document.getElementById('atmUserHint').textContent = 'Քարտ ընտրելուց հետո մուտքագրեք PIN';
+        document.querySelectorAll('.bank-card').forEach(card => card.classList.remove('active'));
+        renderCards();
+    }
+
+    renderCards();
+</script>
+</body>
+</html>

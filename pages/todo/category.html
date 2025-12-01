@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Սննդամթերքի կատեգորիաներ — Ժամանակակից UI</title>
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root{
+            --bg:  #0b1220;
+            --panel: #0f172a;
+            --card: #111827;
+            --text: #e5e7eb;
+            --muted:#9ca3af;
+            --accent:#22d3ee;
+            --accent-2:#06b6d4;
+            --radius: 16px;
+            --shadow: 0 10px 30px rgba(0,0,0,.25);
+        }
+        [data-theme="light"]{
+            --bg:  #f6f7fb;
+            --panel: #ffffff;
+            --card: #ffffff;
+            --text: #0f172a;
+            --muted:#6b7280;
+            --accent:#0ea5e9;
+            --accent-2:#22c55e;
+            --shadow: 0 8px 24px rgba(2,6,23,.08);
+        }
+
+        html, body{height:100%}
+        body{
+            background: radial-gradient(1200px 600px at 10% -10%, rgba(34,211,238,.12), transparent 60%),
+            radial-gradient(1200px 600px at 100% 0%, rgba(34,197,94,.10), transparent 60%),
+            var(--bg);
+            color: var(--text);
+            font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        }
+
+        .glass{
+            background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .app-header{
+            position: sticky; top: 0; z-index: 1030;
+            background: linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,0));
+        }
+
+        .brand-badge{
+            display:inline-flex; align-items:center; gap:.5rem; font-weight:800; letter-spacing:.3px;
+            padding:.6rem .9rem; border-radius:999px; background: var(--panel); color: var(--text);
+            border:1px solid rgba(255,255,255,.08);
+        }
+
+        .sidebar{
+            min-height: calc(100vh - 72px);
+            position: sticky; top: 72px;
+        }
+
+        .category-item{
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 12px;
+            padding:.65rem .8rem;
+            transition: transform .15s ease, background .15s ease, border-color .15s ease;
+            cursor: pointer;
+            user-select: none;
+            background: var(--panel);
+        }
+        .category-item:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.18); }
+        .category-item.active{ outline: 2px solid var(--accent); background: linear-gradient(180deg, rgba(34,211,238,.12), transparent); }
+
+        .product-card{
+            background: var(--card);
+            border:1px solid rgba(255,255,255,.08);
+            border-radius: 16px;
+            padding: 1rem; height:100%;
+            transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+        }
+        .product-card:hover{ transform: translateY(-2px); border-color: rgba(255,255,255,.18); box-shadow: var(--shadow); }
+
+        .pill{
+            background: rgba(34,211,238,.15); color: var(--text);
+            border: 1px solid rgba(34,211,238,.35);
+            padding:.25rem .6rem; border-radius:999px; font-size:.8rem;
+        }
+
+        .searchbox{
+            border-radius: 999px; border:1px solid rgba(255,255,255,.12);
+            background: var(--panel); color: var(--text);
+        }
+        .searchbox:focus{ box-shadow:0 0 0 4px rgba(34,211,238,.25); border-color:var(--accent) }
+
+        .btn-accent{
+            --bs-btn-bg: var(--accent);
+            --bs-btn-border-color: var(--accent);
+            --bs-btn-hover-bg: var(--accent-2);
+            --bs-btn-hover-border-color: var(--accent-2);
+            color:#002b36;
+        }
+
+        .muted{ color: var(--muted); }
+        .divider{ border-top:1px dashed rgba(255,255,255,.15); }
+
+        .offcanvas{ background: var(--panel); color: var(--text); }
+        .dropdown-menu{ background: var(--panel); color: var(--text); border:1px solid rgba(255,255,255,.12); }
+        .dropdown-item{ color: var(--text); }
+        .dropdown-item:hover{ background: rgba(34,211,238,.15) }
+
+        .footer-note{ color: var(--muted); font-size:.9rem }
+    </style>
+</head>
+<body>
+<!-- Header -->
+<header class="app-header py-3">
+    <div class="container d-flex align-items-center gap-3">
+        <span class="brand-badge"><i class="bi bi-basket2"></i> Սննդամթերք</span>
+        <div class="ms-auto d-flex align-items-center gap-2">
+            <div class="input-group" style="max-width:480px;">
+                <span class="input-group-text searchbox"><i class="bi bi-search"></i></span>
+                <input id="search" type="search" class="form-control searchbox" placeholder="Որոնել ապրանք… (օր. Խնձոր)" />
+            </div>
+            <button id="themeToggle" class="btn btn-outline-light rounded-pill"><i class="bi bi-moon-stars"></i></button>
+            <button class="btn btn-accent rounded-pill d-md-none" data-bs-toggle="offcanvas" data-bs-target="#catCanvas"><i class="bi bi-ui-radios-grid me-1"></i> Կատեգորիաներ</button>
+        </div>
+    </div>
+</header>
+
+<main class="container my-4">
+    <div class="row g-4">
+        <!-- Sidebar / Offcanvas -->
+        <aside class="col-md-3">
+            <div class="d-none d-md-block sidebar glass p-3">
+                <h6 class="text-uppercase fw-bold mb-3 muted">Կատեգորիաներ</h6>
+                <div id="categoryList" class="vstack gap-2"></div>
+                <div class="divider my-3"></div>
+                <button id="resetFilter" class="btn btn-sm btn-outline-secondary rounded-pill w-100"><i class="bi bi-x-circle"></i> Ցույց տալ բոլորը</button>
+            </div>
+        </aside>
+
+        <section class="col-md-9">
+            <!-- Pills row -->
+            <div id="pillRow" class="d-flex flex-wrap gap-2 mb-3"></div>
+
+            <!-- Products grid -->
+            <div id="productGrid" class="row g-3"></div>
+
+            <p class="footer-note mt-4">Տվյալները պահվում են բրաուզերում (LocalStorage), որպեսզի փոփոխությունները չկորչեն even refresh-ից հետո։</p>
+        </section>
+    </div>
+</main>
+
+<!-- Offcanvas for categories (mobile) -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="catCanvas">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title"><i class="bi bi-ui-radios-grid me-2"></i>Կատեգորիաներ</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <div id="categoryListCanvas" class="vstack gap-2"></div>
+        <div class="divider my-3"></div>
+        <button id="resetFilterCanvas" class="btn btn-sm btn-outline-secondary rounded-pill w-100" data-bs-dismiss="offcanvas"><i class="bi bi-x-circle"></i> Ցույց տալ բոլորը</button>
+    </div>
+</div>
+
+<template id="tpl-category">
+    <div class="category-item d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-folder2-open"></i>
+            <span class="label fw-semibold"></span>
+        </div>
+        <span class="badge text-bg-info"></span>
+    </div>
+</template>
+
+<template id="tpl-product">
+    <div class="col-12 col-sm-6 col-lg-4">
+        <article class="product-card h-100 d-flex flex-column">
+            <div class="d-flex align-items-center justify-content-between">
+                <h6 class="fw-bold mb-0 title"></h6>
+                <span class="pill small cat-pill"></span>
+            </div>
+            <p class="muted small mt-2 mb-3 desc">—</p>
+            <div class="mt-auto d-flex align-items-center gap-2">
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-light rounded-pill dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-arrow-left-right me-1"></i> Տեղափոխել
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end move-menu"></ul>
+                </div>
+                <button class="btn btn-sm btn-outline-danger rounded-pill remove-btn"><i class="bi bi-trash3"></i></button>
+            </div>
+        </article>
+    </div>
+</template>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // ======== Initial Data (restored from your file) ========
+    const DEFAULT_CATEGORIES = [
+        {id: 1, name: 'Մրգեր'},
+        {id: 2, name: 'Բանջարեղեն'},
+        {id: 3, name: 'Միսեր'},
+        {id: 4, name: 'Հացամթերք'},
+        {id: 5, name: 'Կաթնամթերք'},
+        {id: 6, name: 'Ըմպելիքներ'}
+    ];
+
+    const DEFAULT_PRODUCTS = [
+        {id: 1, name: 'Խնձոր', cat_id: 1},
+        {id: 2, name: 'Բանան', cat_id: 1},
+        {id: 3, name: 'Նարինջ', cat_id: 1},
+        {id: 4, name: 'Դեղձ', cat_id: 1},
+        {id: 5, name: 'Կիվի', cat_id: 1},
+        {id: 6, name: 'Ելակ', cat_id: 1},
+        {id: 7, name: 'Կաղամբ', cat_id: 2},
+        {id: 8, name: 'Բրոկկոլի', cat_id: 2},
+        {id: 9, name: 'Սոխ', cat_id: 2},
+        {id: 10, name: 'Գազար', cat_id: 2},
+        {id: 11, name: 'Պղպեղ', cat_id: 2},
+        {id: 12, name: 'Վարունգ', cat_id: 2},
+        {id: 13, name: 'Լոլիկ', cat_id: 2},
+        {id: 14, name: 'Սպանախ', cat_id: 2},
+        {id: 15, name: 'Ծաղկակաղամբ', cat_id: 2},
+        {id: 16, name: 'Բազուկ', cat_id: 2},
+        {id: 17, name: 'Կարտոֆիլ', cat_id: 2},
+        {id: 18, name: 'Մաղադանոս', cat_id: 2},
+        {id: 19, name: 'Սմբուկ', cat_id: 2},
+        {id: 20, name: 'Խոզի միս', cat_id: 3},
+        {id: 21, name: 'Տավարի միս', cat_id: 3},
+        {id: 22, name: 'Հավի միս', cat_id: 3},
+        {id: 23, name: 'Հորթի միս', cat_id: 3},
+        {id: 24, name: 'Ձկան միս', cat_id: 3},
+        {id: 25, name: 'Խոզի կողիկներ', cat_id: 3},
+        {id: 26, name: 'Հաց', cat_id: 4},
+        {id: 27, name: 'Պանիր', cat_id: 5},
+        {id: 28, name: 'Կաթ', cat_id: 5},
+        {id: 29, name: 'Մածուն', cat_id: 5},
+        {id: 30, name: 'Հյութ', cat_id: 6}
+    ];
+    const LS_KEY="food-catalog-state-v1",themeKey="food-catalog-theme",state=loadState();let filterCat=null,query="";function loadState(){return JSON.parse(localStorage.getItem(LS_KEY)||"null")??{categories:DEFAULT_CATEGORIES,products:DEFAULT_PRODUCTS}}function saveState(){localStorage.setItem(LS_KEY,JSON.stringify(state))}const $=(e,t=document)=>t.querySelector(e),$$=(e,t=document)=>Array.from(t.querySelectorAll(e)),byId=e=>state.products.find((t=>t.id===e)),catById=e=>state.categories.find((t=>t.id===e));function countByCategory(){const e=new Map(state.categories.map((e=>[e.id,0])));for(const t of state.products)e.set(t.cat_id,(e.get(t.cat_id)||0)+1);return e}function renderCategories(){const e=$("#categoryList"),t=$("#categoryListCanvas");e.innerHTML="",t.innerHTML="";const r=$("#tpl-category"),n=countByCategory();for(const o of state.categories)for(const a of[e,t]){const e=r.content.cloneNode(!0),t=e.querySelector(".category-item");t.dataset.catId=o.id,e.querySelector(".label").textContent=o.name,e.querySelector(".badge").textContent=n.get(o.id)||0,filterCat===o.id&&t.classList.add("active"),t.addEventListener("click",(()=>{filterCat=filterCat===o.id?null:o.id,renderCategories(),renderPills(),renderProducts()})),a.appendChild(e)}}function renderPills(){const e=$("#pillRow");if(e.innerHTML="",filterCat){const t=document.createElement("span");t.className="pill",t.textContent=catById(filterCat)?.name||"Կատեգորիա",e.appendChild(t)}if(query){const t=document.createElement("span");t.className="pill",t.textContent=`Որոնում՝ "${query}"`,e.appendChild(t)}}function renderProducts(){const e=$("#productGrid");e.innerHTML="";const t=$("#tpl-product");let r=state.products.slice();if(filterCat&&(r=r.filter((e=>e.cat_id===filterCat))),query&&(r=r.filter((e=>e.name.toLowerCase().includes(query.toLowerCase())))),0!==r.length)for(const n of r){const r=t.content.cloneNode(!0);r.querySelector(".title").textContent=n.name,r.querySelector(".desc").textContent="Տվյալ ապրանքի կարճ նկարագրությունը (ըստ ցանկության կարող եք դնել գին/քաշ/բրենդ)";const o=catById(n.cat_id);r.querySelector(".cat-pill").textContent=o?.name??"—";const a=r.querySelector(".move-menu");for(const e of state.categories){if(e.id===n.cat_id)continue;const t=document.createElement("li"),r=document.createElement("a");r.className="dropdown-item",r.href="#",r.textContent=e.name,r.addEventListener("click",(t=>{t.preventDefault(),n.cat_id=e.id,saveState(),renderCategories(),renderProducts()})),t.appendChild(r),a.appendChild(t)}r.querySelector(".remove-btn").addEventListener("click",(()=>{state.products=state.products.filter((e=>e.id!==n.id)),saveState(),renderCategories(),renderProducts()})),e.appendChild(r)}else e.innerHTML='<div class="col-12"><div class="glass p-4 text-center">Չկան արդյունքներ։ Փորձիր մաքրել ֆիլտրերը կամ փոխել որոնումը։</div></div>'}function updateThemeIcon(){const e="light"===document.documentElement.getAttribute("data-theme");$("#themeToggle").innerHTML=e?'<i class="bi bi-brightness-high"></i>':'<i class="bi bi-moon-stars"></i>',$("#themeToggle").classList.toggle("btn-outline-dark",e),$("#themeToggle").classList.toggle("btn-outline-light",!e)}$("#search").addEventListener("input",(e=>{query=e.target.value.trim(),renderPills(),renderProducts()})),$("#resetFilter").addEventListener("click",(()=>{filterCat=null,query="",$("#search").value="",renderCategories(),renderPills(),renderProducts()})),$("#resetFilterCanvas").addEventListener("click",(()=>{filterCat=null,query="",$("#search").value="",renderCategories(),renderPills(),renderProducts()})),"light"===(localStorage.getItem(themeKey)||"dark")&&document.documentElement.setAttribute("data-theme","light"),updateThemeIcon(),$("#themeToggle").addEventListener("click",(()=>{const e="light"===document.documentElement.getAttribute("data-theme");document.documentElement.setAttribute("data-theme",e?"dark":"light"),localStorage.setItem(themeKey,e?"dark":"light"),updateThemeIcon()})),renderCategories(),renderPills(),renderProducts();
+</script>
+
+</body>
+</html>

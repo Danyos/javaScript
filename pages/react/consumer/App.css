@@ -1,0 +1,212 @@
+:root {
+    --bg-dark: #0f1216;
+    --fg-dark: #e6e9ee;
+    --card-dark: #131922;
+    --line-dark: #1f2630;
+    --muted-dark: #9aa3b2;
+
+    --bg-light: #f7f9fc;
+    --fg-light: #111827;
+    --card-light: #ffffff;
+    --line-light: #e5e7eb;
+    --muted-light: #6b7280;
+
+    --ring: #3b82f61a;
+    --ring-strong: #3b82f666;
+}
+
+.app-root {
+    min-height: 100vh;
+}
+
+/* Theme variants */
+.app-root.app-dark {
+    background: var(--bg-dark);
+    color: var(--fg-dark);
+}
+
+.app-root.app-light {
+    background: var(--bg-light);
+    color: var(--fg-light);
+}
+
+/* Sidebar */
+.app-sidebar {
+    min-height: 100vh;
+    border-right: 1px solid var(--line-dark);
+}
+
+.app-root.app-light .app-sidebar {
+    border-right: 1px solid var(--line-light);
+}
+
+/* Card */
+.card-soft {
+    background: var(--card-dark);
+    border: 1px solid var(--line-dark);
+    border-radius: 16px;
+}
+
+.app-root.app-light .card-soft {
+    background: var(--card-light);
+    border: 1px solid var(--line-light);
+}
+
+/* Inputs */
+.search-input,
+select.form-select,
+.form-control {
+    background: #0e131a;
+    border: 1px solid #1b2230;
+    color: #e6e9ee;
+}
+
+.app-root.app-light .search-input,
+.app-root.app-light select.form-select,
+.app-root.app-light .form-control {
+    background: #ffffff;
+    border: 1px solid var(--line-light);
+    color: #111827;
+}
+
+.search-input::placeholder {
+    color: #8a94a6;
+}
+
+.app-root.app-light .search-input::placeholder {
+    color: #9aa4b2;
+}
+
+/* Buttons */
+.btn-soft {
+    background: #0f1520;
+    border: 1px solid #1c2432;
+    color: #cfd6e4;
+}
+
+.btn-soft:hover {
+    background: #141c29;
+    color: #ffffff;
+}
+
+.app-root.app-light .btn-soft {
+    background: #f3f4f6;
+    border: 1px solid var(--line-light);
+    color: #111827;
+}
+
+/* Badges */
+.badge-soft {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.app-root.app-light .badge-soft {
+    background: #0040ff;
+    border: 1px solid var(--line-light);
+}
+
+/* Pills */
+.pill {
+    border-radius: 999px;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.8rem;
+}
+
+/* Muted text */
+.muted {
+    color: var(--muted-dark);
+}
+
+.app-root.app-light .muted {
+    color: var(--muted-light);
+}
+
+/* Divider */
+.divider {
+    border-top: 1px dashed #2a3444;
+    margin: 1rem 0;
+}
+
+.app-root.app-light .divider {
+    border-top: 1px dashed var(--line-light);
+}
+
+/* Scroll list */
+.list-scroll {
+    max-height: 65vh;
+    overflow: auto;
+}
+
+/* Sticky sidebar */
+.sticky-top-20 {
+    position: sticky;
+    top: 20px;
+}
+
+/* KPI */
+.kpi .value {
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.kpi .delta.up {
+    color: #16a34a;
+}
+
+.kpi .delta.down {
+    color: #dc2626;
+}
+
+/* Empty state */
+.empty {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--muted-dark);
+}
+
+.app-root.app-light .empty {
+    color: var(--muted-light);
+}
+
+/* Search highlight */
+mark.search {
+    background: #fde68a;
+    color: #111827;
+    padding: 0.05rem 0.2rem;
+    border-radius: 0.25rem;
+}
+
+/* Row actions */
+.row-actions .btn {
+    padding: 0.25rem 0.5rem;
+}
+
+/* Skeleton (եթե պետք գա) */
+.skeleton {
+    animation: sheen 1.2s linear infinite;
+    background: linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.06),
+            rgba(255, 255, 255, 0.12),
+            rgba(255, 255, 255, 0.06)
+    );
+    border-radius: 0.5rem;
+    height: 64px;
+}
+
+@keyframes sheen {
+    0% {
+        background-position: -200px 0;
+    }
+    100% {
+        background-position: calc(200px + 100%) 0;
+    }
+}
+
+/* Responsive */
+@media (max-width: 991px) {
+    .app-sidebar {
+        min-height: auto;
+    }
+}

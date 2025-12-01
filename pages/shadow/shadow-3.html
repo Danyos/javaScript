@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="hy">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Box‑Shadow Generator — Bootstrap</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root{
+            --bg:#f8fafc;           /* app bg */
+            --card:#ffffff;         /* panels */
+            --ink:#111827;          /* text */
+            --muted:#6b7280;        /* secondary text */
+            --accent:#3b82f6;       /* primary */
+            --ring:rgba(59,130,246,.25);
+            --line:#e5e7eb;         /* borders */
+            --chip:#eef2ff;         /* soft tag */
+        }
+        body{background:var(--bg); color:var(--ink)}
+        .app-header{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+        .card{background:var(--card);border:1px solid var(--line);box-shadow:0 10px 30px rgba(15,23,42,.06)}
+
+        .form-control,.form-select{background:#ffffff;color:var(--ink);border-color:var(--line)}
+        .form-control:focus,.form-select:focus{box-shadow:0 0 0 .25rem var(--ring);border-color:var(--accent)}
+
+        .shadow-item{background:#ffffff;border:1px dashed var(--line);border-radius:.8rem;box-shadow:0 4px 16px rgba(15,23,42,.05)}
+        .shadow-item .handle{cursor:grab;color:var(--muted)}
+        .shadow-item.inactive{opacity:.55;}
+
+        .preview-wrap{min-height:420px;display:grid;place-items:center;background:
+                linear-gradient(0deg, rgba(0,0,0,.02), rgba(0,0,0,.02)),
+                linear-gradient(90deg, transparent 49%, rgba(0,0,0,.03) 50%, transparent 51%) ,
+                linear-gradient(0deg, transparent 49%, rgba(0,0,0,.03) 50%, transparent 51%);
+            background-size:100% 100%, 24px 24px, 24px 24px}
+        .preview-stage{padding:36px;display:grid;place-items:center;width:100%}
+        .preview-box{transition:box-shadow .15s ease,width .15s ease,height .15s ease,background .15s ease,border .15s ease,border-radius .15s ease}
+
+        .code-area{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;background:#f1f5f9;color:#0f172a;border:1px solid var(--line);border-radius:.75rem}
+        .tiny{font-size:.86rem;color:var(--muted)}
+        .badge-inset{background:#fde68a;color:#7c2d12}
+    </style>
+</head>
+<body>
+<header class="app-header py-3">
+    <div class="container d-flex align-items-center justify-content-between">
+        <h1 class="h4 m-0">🎯 Box‑Shadow Generator</h1>
+        <div class="d-flex align-items-center gap-2">
+            <button id="btnClearAll" class="btn btn-outline-secondary btn-sm"><i class="bi bi-trash3"></i> Մաքրել շերտերը</button>
+            <a class="btn btn-primary btn-sm" href="#code"><i class="bi bi-code-slash"></i> CSS Կոդ</a>
+        </div>
+    </div>
+</header>
+
+<main class="container my-4">
+    <div class="row g-4">
+        <!-- Controls -->
+        <section class="col-12 col-lg-6">
+            <div class="card p-3 p-md-4">
+                <h2 class="h6">Բոքսի հատկություններ</h2>
+                <div class="row g-3 mb-3">
+                    <div class="col-6"><label class="form-label">Լայնք (px)</label><input id="boxW" type="number" class="form-control" min="40" value="240"></div>
+                    <div class="col-6"><label class="form-label">Բարձրություն (px)</label><input id="boxH" type="number" class="form-control" min="40" value="160"></div>
+                    <div class="col-12">
+                        <label class="form-label">Ֆոն</label>
+                        <div class="input-group">
+                            <input id="boxBg" type="color" class="form-control form-control-color" value="#ffffff" title="Background color">
+                            <input id="boxBgAlpha" type="range" class="form-range" min="0" max="100" value="100" aria-label="Background alpha">
+                        </div>
+                        <div class="tiny">Ալֆա՝ 0–100</div>
+                    </div>
+                    <div class="col-6"><label class="form-label">Կլորացնել անկյունները (px)</label><input id="boxRadius" type="number" class="form-control" min="0" value="20"></div>
+                    <div class="col-6">
+                        <label class="form-label">Սահմանագիծ (border)</label>
+                        <div class="input-group">
+                            <input id="borderW" type="number" class="form-control" min="0" value="0" aria-label="Border width">
+                            <select id="borderStyle" class="form-select" aria-label="Border style">
+                                <option value="none">none</option>
+                                <option value="solid" selected>solid</option>
+                                <option value="dashed">dashed</option>
+                                <option value="dotted">dotted</option>
+                            </select>
+                            <input id="borderColor" type="color" class="form-control form-control-color" value="#e5e7eb" aria-label="Border color">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <h2 class="h5 m-0">Շեդոու շերտեր</h2>
+                    <button id="btnAddLayer" class="btn btn-success btn-sm"><i class="bi bi-plus-lg"></i> Ավելացնել շերտ</button>
+                </div>
+                <div id="layers" class="vstack gap-2"></div>
+            </div>
+        </section>
+
+        <!-- Preview & code -->
+        <section class="col-12 col-lg-6">
+            <div class="card">
+                <div class="preview-wrap">
+                    <div class="preview-stage">
+                        <div id="previewBox" class="preview-box" style="width:240px;height:160px;background:#ffffff;border-radius:20px;display:grid;place-items:center;">
+                            <span class="tiny">Preview</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-3 p-md-4">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <h2 class="h6 m-0" id="code">CSS Կոդ</h2>
+                        <button id="btnCopy" class="btn btn-outline-secondary btn-sm"><i class="bi bi-clipboard"></i> Copy</button>
+                    </div>
+                    <textarea id="output" class="form-control code-area" rows="8" spellcheck="false"></textarea>
+                    <div class="form-text tiny mt-2">Ստորև գեներացվում է լիարժեք CSS՝ ներառյալ ֆոնի ալֆան, սահմանագիծը և ստվերները։</div>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+
+<template id="layerRowTpl">
+    <div class="shadow-item p-3 rounded-3" data-layer>
+        <div class="d-flex align-items-center justify-content-between mb-2">
+            <div class="d-flex align-items-center gap-2">
+                <span class="handle"><i class="bi bi-grip-vertical"></i></span>
+                <span class="badge bg-light text-dark">#<span data-idx></span></span>
+                <span class="badge badge-inset d-none" data-inset-badge>inset</span>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <div class="form-check form-switch m-0">
+                    <input class="form-check-input" type="checkbox" data-active checked>
+                    <label class="form-check-label tiny">Active</label>
+                </div>
+                <button class="btn btn-sm btn-outline-danger" data-remove title="Ջնջել"><i class="bi bi-x-lg"></i></button>
+            </div>
+        </div>
+        <div class="row g-2 align-items-end">
+            <div class="col-6 col-md-3"><label class="form-label">X</label><input type="number" class="form-control" data-x value="0"></div>
+            <div class="col-6 col-md-3"><label class="form-label">Y</label><input type="number" class="form-control" data-y value="16"></div>
+            <div class="col-6 col-md-3"><label class="form-label">Blur</label><input type="number" class="form-control" data-blur value="24" min="0"></div>
+            <div class="col-6 col-md-3"><label class="form-label">Spread</label><input type="number" class="form-control" data-spread value="0"></div>
+            <div class="col-8 col-md-5"><label class="form-label">Գույն</label><div class="input-group"><input type="color" class="form-control form-control-color" data-color value="#000000"><input type="range" class="form-range" min="0" max="100" value="35" data-alpha></div><div class="tiny">Ալֆա՝ 0–100</div></div>
+            <div class="col-4 col-md-2"><div class="form-check mt-4"><input class="form-check-input" type="checkbox" data-inset id="inset-{{i}}"><label class="form-check-label">Inset</label></div></div>
+        </div>
+    </div>
+</template>
+
+<script>
+    const state={layers:[],box:{w:240,h:160,bg:"#ffffff",bgA:100,radius:20,borderW:0,borderStyle:"solid",borderColor:"#e5e7eb"}},elLayers=document.getElementById("layers"),tpl=document.getElementById("layerRowTpl"),preview=document.getElementById("previewBox"),out=document.getElementById("output"),boxW=document.getElementById("boxW"),boxH=document.getElementById("boxH"),boxBg=document.getElementById("boxBg"),boxBgAlpha=document.getElementById("boxBgAlpha"),boxRadius=document.getElementById("boxRadius"),borderW=document.getElementById("borderW"),borderStyle=document.getElementById("borderStyle"),borderColor=document.getElementById("borderColor");function hexToRgb(e){const t=e.replace("#",""),a=parseInt(t,16);return{r:3===t.length?17*(a>>8&15):a>>16&255,g:3===t.length?17*(a>>4&15):a>>8&255,b:3===t.length?17*(15&a):255&a}}function rgba(e,t){const{r:a,g:r,b:o}=hexToRgb(e);return`rgba(${a} ${r} ${o} / ${t}%)`}function renderLayers(){if(elLayers.innerHTML="",state.layers.forEach(((e,t)=>{const a=tpl.content.firstElementChild.cloneNode(!0);a.querySelector("[data-idx]").textContent=t+1;const r=a.querySelector("[data-x]"),o=a.querySelector("[data-y]"),n=a.querySelector("[data-blur]"),d=a.querySelector("[data-spread]"),l=a.querySelector("[data-color]"),s=a.querySelector("[data-alpha]"),b=a.querySelector("[data-inset]"),i=a.querySelector("[data-inset-badge]"),c=a.querySelector("[data-active]");r.value=e.x,o.value=e.y,n.value=e.blur,d.value=e.spread,l.value=e.color,s.value=e.alpha,b.checked=e.inset,c.checked=e.active,i.classList.toggle("d-none",!e.inset),a.classList.toggle("inactive",!e.active),[r,o,n,d,l,s].forEach((t=>t.addEventListener("input",(()=>{e.x=+r.value,e.y=+o.value,e.blur=+n.value,e.spread=+d.value,e.color=l.value,e.alpha=+s.value,apply()})))),b.addEventListener("change",(t=>{e.inset=t.target.checked,i.classList.toggle("d-none",!e.inset),apply()})),c.addEventListener("change",(t=>{e.active=t.target.checked,a.classList.toggle("inactive",!e.active),apply()})),a.querySelector("[data-remove]").addEventListener("click",(()=>{state.layers.splice(t,1),renderLayers(),apply()})),elLayers.appendChild(a)})),0===state.layers.length){const e=document.createElement("div");e.className="text-center py-4 text-secondary",e.innerHTML='<div class="tiny">Շերտեր չկան։ Սեղմեք <b>Ավելացնել շերտ</b>։</div>',elLayers.appendChild(e)}}function buildShadow(){return state.layers.filter((e=>e.active)).map((e=>{const t=rgba(e.color,e.alpha),a=`${e.x}px ${e.y}px ${Math.max(0,e.blur)}px ${e.spread}px ${t}`;return e.inset?`inset ${a}`:a})).join(", ")}function apply(){preview.style.width=state.box.w+"px",preview.style.height=state.box.h+"px",preview.style.background=rgba(state.box.bg,state.box.bgA),preview.style.borderRadius=state.box.radius+"px",preview.style.border=`${state.box.borderW}px ${state.box.borderStyle} ${state.box.borderW>0?state.box.borderColor:"transparent"}`;const e=buildShadow();preview.style.boxShadow=e||"none",out.value=`/* Box */\nwidth: ${state.box.w}px;\nheight: ${state.box.h}px;\nbackground: ${rgba(state.box.bg,state.box.bgA)};\nborder-radius: ${state.box.radius}px;\nborder: ${state.box.borderW}px ${state.box.borderStyle} ${state.box.borderW>0?state.box.borderColor:"transparent"};\nbox-shadow: ${e||"none"};`}function addLayer(e){const t=Object.assign({x:0,y:16,blur:24,spread:0,color:"#000000",alpha:30,inset:!1,active:!0},e||{});state.layers.push(t),renderLayers(),apply()}boxW.addEventListener("input",(e=>{state.box.w=+e.target.value,apply()})),boxH.addEventListener("input",(e=>{state.box.h=+e.target.value,apply()})),boxBg.addEventListener("input",(e=>{state.box.bg=e.target.value,apply()})),boxBgAlpha.addEventListener("input",(e=>{state.box.bgA=+e.target.value,apply()})),boxRadius.addEventListener("input",(e=>{state.box.radius=+e.target.value,apply()})),borderW.addEventListener("input",(e=>{state.box.borderW=+e.target.value,apply()})),borderStyle.addEventListener("change",(e=>{state.box.borderStyle=e.target.value,apply()})),borderColor.addEventListener("input",(e=>{state.box.borderColor=e.target.value,apply()})),document.getElementById("btnAddLayer").addEventListener("click",(()=>addLayer())),document.getElementById("btnClearAll").addEventListener("click",(()=>{state.layers=[],renderLayers(),apply()})),document.getElementById("btnCopy").addEventListener("click",(e=>{navigator.clipboard.writeText(out.value).then((()=>{const t=e.currentTarget,a=t.innerHTML;t.innerHTML='<i class="bi bi-check2"></i> Copied',setTimeout((()=>t.innerHTML=a),1200)}))})),addLayer({x:0,y:12,blur:28,alpha:14}),addLayer({x:0,y:4,blur:10,alpha:8}),apply();
+</script>
+</body>
+</html>

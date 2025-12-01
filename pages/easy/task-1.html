@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Memory Game</title>
+  <style>
+    body {
+      background: #ececec;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      height: 100vh;
+      margin: 0;
+      font-family: Arial;
+    }
+
+    h2 { margin-bottom: 15px; }
+
+    #board {
+      width: 420px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+    }
+
+    .card {
+      width: 90px;
+      height: 90px;
+      background: #1d3557;
+      color: white;
+      border-radius: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 28px;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.3s;
+      transform-style: preserve-3d;
+    }
+
+    .flipped {
+      background: #e63946 !important;
+      transform: rotateY(180deg);
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #2a9d8f;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Memory Cards Game</h2>
+<p>Moves: <span id="moves">0</span></p>
+
+<div id="board"></div>
+
+<button onclick="restartGame()">Restart</button>
+
+<script>
+  let cards = ["A","A","B","B","C","C","D","D"];
+  let firstCard=null,secondCard=null,lockBoard=!1,moves=0;function shuffle(e){return e.sort((()=>Math.random()-.5))}function createBoard(){const e=document.getElementById("board");e.innerHTML="",shuffle(cards),cards.forEach(((a,d)=>{const t=document.createElement("div");t.className="card",t.dataset.value=a,t.dataset.index=d,t.onclick=()=>flipCard(t),e.appendChild(t)}))}function flipCard(e){lockBoard||e.classList.contains("flipped")||(e.classList.add("flipped"),e.innerText=e.dataset.value,firstCard?(secondCard=e,moves++,document.getElementById("moves").innerText=moves,checkMatch()):firstCard=e)}function checkMatch(){firstCard.dataset.value===secondCard.dataset.value?(firstCard=null,secondCard=null):(lockBoard=!0,setTimeout((()=>{firstCard.classList.remove("flipped"),secondCard.classList.remove("flipped"),firstCard.innerText="",secondCard.innerText="",firstCard=null,secondCard=null,lockBoard=!1}),800))}function restartGame(){firstCard=null,secondCard=null,moves=0,document.getElementById("moves").innerText=0,lockBoard=!1,createBoard()}createBoard();
+</script>
+
+</body>
+</html>

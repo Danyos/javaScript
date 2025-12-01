@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+  <title>People — Minimal Light UI (design only)</title>
+  <style>
+    :root{
+      --bg:#f7f8fb;
+      --card:#ffffff;
+      --line:#e7e9ef;
+      --muted:#6b7280;
+      --txt:#0f172a;
+      --pri:#2563eb;
+      --pri-soft:#e6efff;
+      --ok:#16a34a;
+      --warn:#d97706;
+      --bad:#ef4444;
+      --shadow: 0 10px 30px rgba(10, 30, 60, .06);
+      --radius:14px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family: ui-sans-serif, system-ui, -apple-system,"Segoe UI",Roboto,Arial;
+      color:var(--txt); background:
+            radial-gradient(900px 600px at 0% -10%, #e9f1ff 0, transparent 60%),
+            radial-gradient(900px 600px at 100% 0%, #e8fff1 0, transparent 60%),
+            var(--bg);
+    }
+
+    .layout{ display:grid; grid-template-columns: 280px 1fr; gap:18px; padding:18px; max-width:1200px; margin:0 auto }
+    @media (max-width: 900px){ .layout{ grid-template-columns: 1fr } }
+
+    /* Sidebar */
+    .sidebar{
+      position:sticky; top:18px; align-self:start;
+      background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+      padding:16px; box-shadow:var(--shadow);
+    }
+    .sidebar h2{
+      margin:0 0 10px; font-size:1.05rem; letter-spacing:.2px;
+    }
+    .grid{ display:grid; gap:12px; grid-template-columns: 1fr 1fr }
+    .grid .full{ grid-column: 1 / -1 }
+    @media (max-width:900px){ .grid{ grid-template-columns: 1fr 1fr } }
+    @media (max-width:600px){ .grid{ grid-template-columns: 1fr } }
+
+    .field{
+      background:#fbfcff; border:1px solid var(--line); border-radius:12px; padding:10px 12px;
+    }
+    label{ display:block; font-size:.8rem; color:var(--muted); margin-bottom:6px }
+    input[type="number"], input[type="text"], select{
+      width:100%; border:1px solid var(--line); border-radius:10px; padding:8px 10px;
+      background:#fff; color:var(--txt); outline:none; transition:.15s;
+    }
+    input:focus, select:focus{ border-color:var(--pri); box-shadow:0 0 0 4px var(--pri-soft) }
+    .checkline{ display:flex; align-items:center; gap:8px; padding:8px 10px; border:1px solid var(--line); border-radius:10px; background:#fff }
+    input[type="checkbox"]{ width:18px; height:18px; accent-color:var(--pri) }
+
+    .actions{ display:flex; gap:8px; margin-top:12px }
+    .btn{
+      border:1px solid var(--line); background:#fff; padding:10px 12px; border-radius:10px; cursor:pointer;
+      transition:.15s; font-weight:600;
+    }
+    .btn:hover{ transform:translateY(-1px); box-shadow:0 8px 18px rgba(39,79,145,.08) }
+    .btn-primary{ background:var(--pri); color:#fff; border-color:transparent }
+    .hint{ font-size:.8rem; color:var(--muted); margin-top:8px }
+
+    /* Content */
+    .content{
+      display:flex; flex-direction:column; gap:12px;
+    }
+    .toolbar{
+      background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+      padding:12px; box-shadow:var(--shadow); display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+    }
+    .search{
+      display:flex; align-items:center; gap:10px; flex:1;
+      background:#fff; border:1px solid var(--line); border-radius:10px; padding:8px 10px;
+    }
+    .search input{ border:none; outline:none; width:100%; background:transparent }
+    .select{ min-width:200px; }
+
+    .chips{ display:flex; gap:8px; flex-wrap:wrap }
+    .chip{
+      display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px;
+      background:#f1f5ff; color:#26407e; border:1px solid #d7e3ff; font-size:.85rem;
+    }
+    .chip .x{
+      width:18px; height:18px; border-radius:50%; display:grid; place-items:center;
+      background:#e3ebff; color:#3756c6; font-weight:700;
+    }
+
+    /* Row cards (table-like list) */
+    .list{
+      display:flex; flex-direction:column; gap:10px;
+    }
+    .row{
+      display:grid; grid-template-columns: 220px 140px 1fr 160px 120px 100px; align-items:center;
+      gap:14px; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px 14px;
+      box-shadow: var(--shadow); transition:.15s;
+    }
+    .row:hover{ transform: translateY(-1px) }
+    .name{
+      font-weight:700; letter-spacing:.2px;
+    }
+    .subs{ font-size:.86rem; color:var(--muted) }
+    .pill{
+      display:inline-block; padding:4px 8px; border-radius:999px; font-size:.78rem;
+      background:#f6f7fb; border:1px solid var(--line); color:#334155;
+    }
+    .pill.ok{ background:#ecfdf5; border-color:#a7f3d0; color:#065f46 }
+    .pill.warn{ background:#fff7ed; border-color:#fed7aa; color:#9a3412 }
+    .pill.bad{ background:#fef2f2; border-color:#fecaca; color:#7f1d1d }
+    .money{ font-weight:700 }
+    .tags{ display:flex; gap:6px; flex-wrap:wrap }
+
+    /* Header row (visual) */
+    .head{
+      display:grid; grid-template-columns: 220px 140px 1fr 160px 120px 100px; gap:14px;
+      padding:0 6px 2px; color:var(--muted); font-size:.82rem;
+    }
+    @media (max-width: 1000px){
+      .row, .head{ grid-template-columns: 1fr 120px 120px 1fr }
+      .hide-lg{ display:none }
+    }
+    @media (max-width: 640px){
+      .row{ grid-template-columns: 1fr; gap:8px }
+      .head{ display:none }
+      .tags{ justify-content:flex-start }
+    }
+
+    .pagination{ display:flex; justify-content:center; gap:8px; margin:6px 0 0 }
+    .page{
+      min-width:36px; height:36px; display:grid; place-items:center; border-radius:10px;
+      background:#fff; border:1px solid var(--line); cursor:pointer; transition:.15s; font-weight:600;
+    }
+    .page.active{ background:var(--pri); color:#fff; border-color:transparent }
+    .page:hover{ transform: translateY(-1px) }
+  </style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- Sidebar filters -->
+  <aside class="sidebar">
+    <h2>Filters</h2>
+    <div class="grid">
+      <div class="field full">
+        <div class="checkline">
+          <input type="checkbox" id="hasCar" />
+          <label for="hasCar" style="margin:0">Has car</label>
+        </div>
+      </div>
+      <div class="field">
+        <div class="checkline">
+          <input type="checkbox" id="isEmployed" />
+          <label for="isEmployed" style="margin:0">Is employed</label>
+        </div>
+      </div>
+      <div class="field">
+        <div class="checkline">
+          <input type="checkbox" id="isExit" />
+          <label for="isExit" style="margin:0">Exit</label>
+        </div>
+      </div>
+      <div class="field">
+        <label for="children">Has children (≥)</label>
+        <input type="number" id="children" min="0" max="17" placeholder="0">
+      </div>
+      <div class="field">
+        <label for="minAge">Age min</label>
+        <input type="number" id="minAge" min="0" max="65" value="0">
+      </div>
+      <div class="field">
+        <label for="maxAge">Age max</label>
+        <input type="number" id="maxAge" min="0" max="65" value="65">
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn">Reset (UI)</button>
+      <button class="btn btn-primary">Apply (UI)</button>
+    </div>
+    <div class="hint">Սա միայն դիզայն է․ նույն ID-երը մնաց միացնելու համար։</div>
+  </aside>
+
+  <!-- Content -->
+  <main class="content">
+    <div class="toolbar">
+      <div class="search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" stroke="#475569" stroke-width="1.5"/></svg>
+        <input type="text" id="search" placeholder="Search name, city, car (UI)">
+      </div>
+      <select id="sortBy" class="select">
+        <option value="">Sort (UI)</option>
+        <option value="ageAsc">Age ↑</option>
+        <option value="ageDesc">Age ↓</option>
+        <option value="balanceDesc">Balance ↓</option>
+      </select>
+      <div class="chips">
+        <span class="chip">Age: 0–65 <span class="x">×</span></span>
+        <span class="chip">Car: any <span class="x">×</span></span>
+      </div>
+    </div>
+
+    <!-- Head row (visual) -->
+    <div class="head">
+      <div>Name</div>
+      <div class="hide-lg">Age</div>
+      <div>Location / Car</div>
+      <div class="hide-lg">Balance</div>
+      <div class="hide-lg">Status</div>
+      <div class="hide-lg">Active</div>
+    </div>
+
+    <section class="list">
+      <!-- Row 1 -->
+      <article class="row">
+        <div>
+          <div class="name">Arman</div>
+          <div class="subs">ID 1 • 178 cm</div>
+        </div>
+        <div class="hide-lg"><span class="pill">Age 43</span></div>
+        <div>
+          <div class="tags">
+            <span class="pill">Yerevan</span>
+            <span class="pill">Hyundai Elantra</span>
+            <span class="pill ok">Employed</span>
+          </div>
+        </div>
+        <div class="hide-lg money">1,250,000֏</div>
+        <div class="hide-lg"><span class="pill">single</span></div>
+        <div class="hide-lg"><span class="pill ok">Active</span></div>
+      </article>
+
+      <!-- Row 2 -->
+      <article class="row">
+        <div>
+          <div class="name">Ani</div>
+          <div class="subs">ID 4 • 160 cm</div>
+        </div>
+        <div class="hide-lg"><span class="pill">Age 19</span></div>
+        <div>
+          <div class="tags">
+            <span class="pill">Sevan</span>
+            <span class="pill bad">No car</span>
+            <span class="pill">single</span>
+            <span class="pill">children: 0</span>
+          </div>
+        </div>
+        <div class="hide-lg money">42,000֏</div>
+        <div class="hide-lg"><span class="pill">single</span></div>
+        <div class="hide-lg"><span class="pill bad">Jobless</span></div>
+      </article>
+
+      <!-- Row 3 -->
+      <article class="row">
+        <div>
+          <div class="name">Hayk</div>
+          <div class="subs">ID 3 • 182 cm</div>
+        </div>
+        <div class="hide-lg"><span class="pill">Age 31</span></div>
+        <div>
+          <div class="tags">
+            <span class="pill">Vanadzor</span>
+            <span class="pill">Toyota Camry</span>
+            <span class="pill warn">Exit</span>
+            <span class="pill ok">Employed</span>
+          </div>
+        </div>
+        <div class="hide-lg money">350,000֏</div>
+        <div class="hide-lg"><span class="pill">married</span></div>
+        <div class="hide-lg"><span class="pill warn">Inactive</span></div>
+      </article>
+    </section>
+
+    <div class="pagination">
+      <div class="page">«</div>
+      <div class="page active">1</div>
+      <div class="page">2</div>
+      <div class="page">3</div>
+      <div class="page">»</div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

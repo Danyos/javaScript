@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8">
+    <title>Danisoft Academy — Web & AI Coding</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-body:#020617;
+            --bg-light:#f5f7fb;
+            --primary:#22c55e;
+            --primary-dark:#16a34a;
+            --primary-soft:rgba(34,197,94,.12);
+            --accent:#38bdf8;
+            --text-main:#e5e7eb;
+            --text-muted:#9ca3af;
+            --radius-lg:20px;
+            --shadow-soft:0 22px 60px rgba(15,23,42,.65);
+        }
+
+        *{box-sizing:border-box;margin:0;padding:0}
+        html,body{
+            font-family:"Inter",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+            background:#020617;
+            color:var(--text-main);
+            scroll-behavior:smooth;
+        }
+        img{max-width:100%;display:block}
+        a{text-decoration:none;color:inherit}
+        ul{list-style:none}
+        button{font-family:inherit}
+
+        .section{padding:72px 0}
+        .section--light{background:var(--bg-light);color:#0f172a}
+        .section--compact{padding:52px 0}
+        .container{max-width:1140px;margin:0 auto;padding:0 16px}
+
+        .flex{display:flex}
+        .between{justify-content:space-between}
+        .items-center{align-items:center}
+        .text-center{text-align:center}
+
+        .btn{
+            display:inline-flex;align-items:center;justify-content:center;
+            padding:10px 24px;border-radius:999px;border:none;
+            font-size:14px;font-weight:500;cursor:pointer;
+            transition:.18s all ease;position:relative;overflow:hidden;
+            white-space:nowrap;
+        }
+        .btn::after{
+            content:"";position:absolute;inset:0;
+            background:linear-gradient(120deg,rgba(255,255,255,.16),transparent 55%);
+            opacity:0;transform:translateX(-20%);
+            transition:.25s all ease;pointer-events:none;
+        }
+        .btn:hover::after{opacity:1;transform:translateX(0)}
+        .btn-primary{
+            background:linear-gradient(135deg,#22c55e,#4ade80);
+            color:#022c22;box-shadow:0 18px 50px rgba(34,197,94,.4);
+        }
+        .btn-primary:hover{transform:translateY(-1px) scale(1.01)}
+        .btn-outline{
+            border:1px solid rgba(148,163,184,.6);
+            background:rgba(15,23,42,.9);color:var(--text-main);
+        }
+        .btn-outline:hover{border-color:var(--primary)}
+
+        .badge{
+            display:inline-flex;align-items:center;gap:6px;
+            padding:4px 12px;border-radius:999px;
+            background:var(--primary-soft);
+            border:1px solid rgba(34,197,94,.4);
+            font-size:11px;color:#bbf7d0;font-weight:500;
+        }
+        .badge-dot{
+            width:7px;height:7px;border-radius:999px;
+            background:#4ade80;box-shadow:0 0 0 3px rgba(34,197,94,.25);
+        }
+
+        .section-title{font-size:28px;font-weight:700;margin-bottom:8px}
+        .section-subtitle{
+            font-size:14px;color:var(--text-muted);
+            max-width:640px;margin:0 auto 24px;
+        }
+        .section-subtitle--dark{color:#6b7280}
+
+        .card{
+            border-radius:var(--radius-lg);
+            border:1px solid rgba(148,163,184,.25);
+            background:radial-gradient(circle at top left,rgba(56,189,248,.1),rgba(15,23,42,.95));
+            box-shadow:var(--shadow-soft);
+            backdrop-filter:blur(16px);
+        }
+        .card-hover{
+            transition:.18s transform ease,.18s box-shadow ease,.18s border-color ease;
+        }
+        .card-hover:hover{
+            transform:translateY(-4px);
+            box-shadow:0 26px 70px rgba(15,23,42,.95);
+            border-color:rgba(34,197,94,.6);
+        }
+
+        /* HEADER */
+        /* HEADER */
+        /* HEADER */
+        .header{
+            position:sticky;
+            top:0;
+            z-index:30;
+            background:rgba(2,6,23,.9);
+            backdrop-filter:blur(18px);
+            border-bottom:1px solid rgba(148,163,184,.25);
+            transition:.2s all ease;
+        }
+        .header--scrolled{
+            box-shadow:0 14px 45px rgba(15,23,42,.95);
+            border-color:rgba(148,163,184,.45);
+            background:rgba(2,6,23,.97);
+        }
+
+        .header-inner{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:24px;
+            padding:10px 0;
+        }
+
+        /* LOGO */
+        .logo-area{
+            display:flex;
+            align-items:center;
+        }
+        .logo-area img{
+            display:block;
+            height:40px;     /* պետք լինի՝ փոխի 36/42 */
+            width:auto;
+            filter: invert(1);
+            transform: scale(1.8);
+        }
+
+        /* DESKTOP NAV */
+        .nav{
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            gap:24px;
+            flex:1;
+            font-size:13px;
+            color:var(--text-muted);
+            min-width:0;
+        }
+        .nav a{
+            position:relative;
+            padding-bottom:2px;
+            white-space:nowrap;
+        }
+        .nav a::after{
+            content:"";
+            position:absolute;
+            left:0;
+            bottom:0;
+            width:0;
+            height:2px;
+            border-radius:999px;
+            background:linear-gradient(90deg,#22c55e,#38bdf8);
+            transition:.2s width ease;
+        }
+        .nav a:hover{
+            color:#e5e7eb;
+        }
+        .nav a:hover::after{
+            width:22px;
+        }
+
+        /* ACTIONS */
+        .header-actions{
+            display:flex;
+            align-items:center;
+            gap:12px;
+        }
+        .header-cta{
+            white-space:nowrap;
+        }
+
+        /* BURGER */
+        .burger{
+            display:none;
+            flex-direction:column;
+            gap:4px;
+            cursor:pointer;
+            border:none;
+            background:transparent;
+        }
+        .burger span{
+            width:20px;
+            height:2px;
+            border-radius:999px;
+            background:#e5e7eb;
+            transition:.2s all ease;
+        }
+        .burger.is-open span:nth-child(1){
+            transform:translateY(6px) rotate(45deg);
+        }
+        .burger.is-open span:nth-child(2){
+            opacity:0;
+        }
+        .burger.is-open span:nth-child(3){
+            transform:translateY(-6px) rotate(-45deg);
+        }
+
+
+        /* MOBILE MENU */
+        .mobile-menu{
+            position:fixed;inset:0;z-index:25;
+            background:rgba(15,23,42,.95);
+            backdrop-filter:blur(20px);
+            opacity:0;pointer-events:none;
+            transform:translateY(-10px);
+            transition:.2s opacity ease,.2s transform ease;
+            display:flex;flex-direction:column;
+            padding:80px 24px 32px;
+        }
+        .mobile-menu.is-open{
+            opacity:1;pointer-events:auto;transform:translateY(0);
+        }
+        .mobile-menu nav{
+            display:flex;flex-direction:column;gap:18px;
+            font-size:16px;
+        }
+        .mobile-menu nav a{color:#e5e7eb}
+        .mobile-menu-extra{
+            margin-top:14px;font-size:13px;color:var(--text-muted);
+        }
+        .mobile-menu-actions{
+            margin-top:auto;display:flex;flex-wrap:wrap;
+            gap:10px;
+        }
+        body.mobile-open{overflow:hidden}
+
+        /* HERO */
+        .hero{
+            padding:72px 0 84px;
+            position:relative;overflow:hidden;
+        }
+        .hero::before{
+            content:"";position:absolute;inset:-120px;
+            background:
+                    radial-gradient(circle at 10% 10%,rgba(34,197,94,.18) 0,transparent 52%),
+                    radial-gradient(circle at 95% 0,rgba(56,189,248,.2) 0,transparent 55%);
+            opacity:.9;pointer-events:none;
+        }
+        .hero-inner{
+            position:relative;z-index:1;
+            display:grid;grid-template-columns:minmax(0,1.2fr)minmax(0,1fr);
+            gap:40px;align-items:center;
+        }
+        .hero-title{font-size:32px;font-weight:700;line-height:1.25;margin-bottom:12px}
+        .hero-title span{
+            background:linear-gradient(120deg,#4ade80,#38bdf8);
+            -webkit-background-clip:text;color:transparent;
+        }
+        .hero-desc{
+            font-size:14px;color:var(--text-muted);
+            max-width:470px;margin-bottom:22px;
+        }
+        .hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:20px}
+        .hero-note{
+            font-size:12px;color:var(--text-muted);
+            display:flex;align-items:center;gap:8px;
+        }
+        .hero-note-dot{
+            width:8px;height:8px;border-radius:999px;
+            background:var(--primary);box-shadow:0 0 10px rgba(34,197,94,.8);
+        }
+        .hero-social{
+            margin-top:10px;font-size:13px;color:var(--text-muted);
+            display:flex;align-items:center;gap:10px;
+        }
+        .hero-social-icons{display:flex;gap:8px}
+        .social-circle{
+            width:28px;height:28px;border-radius:999px;
+            border:1px solid rgba(148,163,184,.6);
+            display:flex;align-items:center;justify-content:center;
+            font-size:13px;background:rgba(15,23,42,.95);
+        }
+        .hero-img-wrap{display:flex;justify-content:flex-end}
+        .hero-illustration{max-width:430px;padding:20px}
+        .hero-main-img{
+            border-radius:18px;overflow:hidden;
+            border:1px solid rgba(148,163,184,.45);
+        }
+        .hero-main-img img{
+            width:100%;height:230px;object-fit:cover;
+        }
+        .hero-img-meta{
+            margin-top:12px;font-size:11px;color:var(--text-muted);
+            display:flex;justify-content:space-between;align-items:center;
+        }
+        .hero-pills{display:flex;gap:8px}
+        .hero-pill{
+            padding:3px 10px;border-radius:999px;
+            background:rgba(15,23,42,.9);
+            border:1px solid rgba(148,163,184,.6);
+        }
+
+        /* COURSES */
+        .courses-section{
+            background:#020617;
+            border-top:1px solid rgba(148,163,184,.28);
+            border-bottom:1px solid rgba(148,163,184,.28);
+        }
+        .courses-grid{
+            display:grid;
+            grid-template-columns:minmax(0,1.1fr)minmax(0,.9fr);
+            gap:40px;align-items:center;
+        }
+        .courses-header h2{font-size:24px;margin-bottom:6px}
+        .courses-header p{font-size:13px;color:var(--text-muted);max-width:420px}
+        .courses-header-stats{
+            display:flex;flex-wrap:wrap;gap:14px;
+            margin-top:10px;font-size:11px;color:var(--text-muted);
+        }
+        .courses-header-stats strong{color:#e5e7eb}
+        .courses-cards{
+            margin-top:18px;
+            display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;
+        }
+        .course-card{
+            padding:16px 18px 14px;border-radius:18px;
+            background:radial-gradient(circle at top left,rgba(34,197,94,.18),rgba(15,23,42,.96));
+            border:1px solid rgba(148,163,184,.4);
+            box-shadow:0 18px 40px rgba(15,23,42,.9);
+        }
+        .course-icon{
+            width:32px;height:32px;border-radius:999px;
+            display:flex;align-items:center;justify-content:center;
+            background:rgba(15,23,42,.85);margin-bottom:8px;font-size:18px;
+        }
+        .course-title{font-size:14px;font-weight:600;margin-bottom:2px}
+        .course-meta{font-size:11px;color:var(--text-muted)}
+
+        .courses-badges{
+            margin-top:18px;display:flex;flex-wrap:wrap;gap:8px;
+            font-size:11px;color:var(--text-muted);
+        }
+        .courses-badges span{
+            padding:4px 10px;border-radius:999px;
+            border:1px dashed rgba(148,163,184,.5);
+            background:rgba(15,23,42,.9);
+            display:inline-flex;align-items:center;gap:6px;
+        }
+        .courses-dot{width:5px;height:5px;border-radius:999px;background:var(--primary)}
+
+        .courses-illustration{max-width:360px;margin-left:auto}
+        .courses-illustration-inner{padding:20px}
+        .courses-main-img{
+            border-radius:18px;overflow:hidden;
+            border:1px solid rgba(148,163,184,.5);margin-bottom:10px;
+        }
+        .courses-main-img img{width:100%;height:220px;object-fit:cover}
+        .courses-footer{
+            font-size:11px;color:var(--text-muted);
+            display:flex;align-items:center;justify-content:space-between;
+        }
+        .slider-dots{display:flex;gap:5px}
+        .slider-dot{
+            width:7px;height:7px;border-radius:999px;
+            background:rgba(148,163,184,.6);
+        }
+        .slider-dot--active{width:20px;background:var(--primary)}
+
+        /* BENEFITS / ACCORDION */
+        .benefits-grid{
+            display:grid;grid-template-columns:minmax(0,.95fr)minmax(0,1.05fr);
+            gap:40px;align-items:center;
+        }
+        .benefits-card{padding:24px}
+        .benefits-card img{
+            width:100%;height:230px;object-fit:cover;border-radius:18px;
+        }
+        .accordion{margin-top:16px;display:flex;flex-direction:column;gap:10px}
+        details.accordion-item{
+            background:rgba(15,23,42,.96);
+            border-radius:999px;border:1px solid rgba(148,163,184,.7);
+            padding:10px 16px;font-size:13px;
+            cursor:pointer;box-shadow:0 16px 32px rgba(15,23,42,.85);
+        }
+        details[open].accordion-item{
+            border-color:var(--primary);
+            background:radial-gradient(circle at left,rgba(34,197,94,.32),rgba(15,23,42,.96));
+        }
+        details.accordion-item summary{
+            list-style:none;display:flex;align-items:center;justify-content:space-between;
+        }
+        details.accordion-item summary::-webkit-details-marker{display:none}
+        .accordion-title{display:flex;align-items:center;gap:10px}
+        .accordion-icon{
+            width:22px;height:22px;border-radius:999px;
+            background:rgba(15,23,42,.85);
+            border:1px solid rgba(148,163,184,.8);
+            display:flex;align-items:center;justify-content:center;
+            font-size:12px;
+        }
+        .accordion-arrow{font-size:16px;color:#9ca3af;transition:.18s transform ease}
+        details[open].accordion-item .accordion-arrow{transform:rotate(90deg)}
+        .accordion-body{
+            padding-top:8px;padding-left:32px;
+            font-size:12px;color:var(--text-muted);
+        }
+
+        /* CTA */
+        .cta-section{
+            background:radial-gradient(circle at top left,rgba(34,197,94,.18),#020617);
+            color:#f9fafb;
+        }
+        .cta-inner{
+            display:grid;grid-template-columns:minmax(0,1.1fr)minmax(0,.9fr);
+            gap:32px;align-items:center;
+        }
+        .cta-badges{
+            display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;
+            font-size:12px;
+        }
+        .cta-badge{
+            padding:4px 10px;border-radius:999px;
+            border:1px solid rgba(52,211,153,.7);
+            background:rgba(21,128,61,.45);color:#bbf7d0;
+        }
+        .cta-list{margin-top:14px;font-size:13px;color:#d1fae5}
+        .cta-list li+li{margin-top:6px}
+        .cta-list li{display:flex;gap:8px;align-items:flex-start}
+        .cta-check{
+            width:16px;height:16px;border-radius:999px;
+            background:var(--primary);color:#022c22;font-size:11px;
+            display:flex;align-items:center;justify-content:center;margin-top:1px;
+        }
+        .cta-card{
+            border-radius:22px;border:1px solid rgba(52,211,153,.55);
+            background:rgba(15,23,42,.96);
+            box-shadow:0 24px 60px rgba(6,78,59,.9);
+            padding:20px 20px 16px;
+        }
+        .cta-title{font-size:15px;font-weight:600;margin-bottom:6px}
+        .cta-sub{font-size:12px;color:#a7f3d0;margin-bottom:12px}
+        .cta-row{display:flex;gap:10px;margin-bottom:10px}
+        .cta-field{flex:1;display:flex;flex-direction:column;gap:4px;font-size:12px}
+        .cta-field label{color:#e5e7eb}
+        .cta-field input,.cta-field select{
+            border-radius:999px;border:1px solid rgba(148,163,184,.7);
+            background:#020617;color:#e5e7eb;
+            font-size:13px;padding:8px 11px;outline:none;
+        }
+        .cta-field input:focus,.cta-field select:focus{
+            border-color:var(--primary);
+            box-shadow:0 0 0 1px rgba(34,197,94,.45);
+        }
+        .cta-error{min-height:12px;font-size:11px;color:#fecaca}
+        .cta-footer{
+            margin-top:8px;font-size:11px;color:#9ca3af;
+            display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;
+        }
+        .cta-footer strong{color:#bbf7d0}
+
+        /* GALLERY */
+        .gallery-grid{
+            margin-top:30px;
+            display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;
+        }
+        .gallery-item{
+            border-radius:18px;overflow:hidden;
+            position:relative;box-shadow:0 16px 40px rgba(15,23,42,.8);
+        }
+        .gallery-item img{
+            width:100%;height:180px;object-fit:cover;
+        }
+        .gallery-tag{
+            position:absolute;left:10px;bottom:10px;
+            padding:4px 9px;border-radius:999px;
+            background:rgba(15,23,42,.9);
+            font-size:10px;color:#e5e7eb;
+            border:1px solid rgba(148,163,184,.7);
+        }
+
+        /* ABOUT */
+        .about-grid{
+            display:grid;grid-template-columns:minmax(0,1.1fr)minmax(0,.9fr);
+            gap:40px;align-items:center;
+        }
+        .about-text{font-size:13px;color:#6b7280;line-height:1.65}
+        .about-text p+p{margin-top:10px}
+        .about-card{
+            padding:24px;border-radius:22px;
+            background:radial-gradient(circle at top left,rgba(34,197,94,.18),#0f172a);
+            box-shadow:0 18px 45px rgba(15,23,42,.85);
+        }
+        .about-card img{
+            width:100%;height:230px;object-fit:cover;border-radius:18px;
+        }
+
+        /* FOOTER */
+        .footer{
+            background:#020617;
+            border-top:1px solid rgba(148,163,184,.4);
+            padding:40px 0 24px;font-size:12px;
+        }
+        .footer-top{
+            display:grid;
+            grid-template-columns:minmax(0,1.1fr)repeat(3,minmax(0,.7fr));
+            gap:26px;margin-bottom:16px;
+        }
+        .footer-logo-text{
+            font-size:12px;color:var(--text-muted);
+            margin-top:10px;max-width:260px;
+        }
+        .footer-heading{
+            font-size:12px;font-weight:600;margin-bottom:8px;color:#e5e7eb;
+        }
+        .footer-list li{color:var(--text-muted)}
+        .footer-list li+li{margin-top:4px}
+        .footer-bottom{
+            padding-top:12px;margin-top:12px;
+            border-top:1px solid rgba(148,163,184,.4);
+            display:flex;justify-content:space-between;align-items:center;
+            gap:12px;color:#6b7280;font-size:11px;
+        }
+        .footer-social{display:flex;gap:6px}
+        .footer-social .social-circle{
+            width:24px;height:24px;font-size:11px;
+        }
+
+        /* REVEAL ANIM */
+        .reveal{opacity:0;transform:translateY(18px);transition:.5s opacity ease,.5s transform ease}
+        .reveal.in-view{opacity:1;transform:translateY(0)}
+
+        /* RESPONSIVE */
+        /* Tablet + Mobile header behavior */
+        @media (max-width: 1100px){
+            /* header-ը փոքրանում է */
+            .header-inner{
+                padding:8px 0;
+            }
+
+            /* desktop nav + CTA թաքցնել */
+            .nav,
+            .header-cta{
+                display:none;
+            }
+
+            /* burger-ը ցույց տալ */
+            .burger{
+                display:flex;
+            }
+
+            /* hero-ին մի փոքր տեղ թողնենք վերևից */
+            .hero{
+                padding-top:56px;
+            }
+        }
+
+        /* Մնացած responsive-դ թող մնա նույնը,
+           կարևորը՝ ուրիշ media-ում .nav / .header-cta display:none չանես նորից */
+
+        @media (max-width:992px){
+            .hero-inner,
+            .courses-grid,
+            .benefits-grid,
+            .cta-inner,
+            .about-grid{grid-template-columns:minmax(0,1fr)}
+            .hero-inner{gap:32px}
+            .hero-img-wrap{justify-content:flex-start}
+            .hero-illustration,.courses-illustration{margin:0 auto}
+            .benefits-grid>:first-child{order:2}
+            .benefits-grid>:last-child{order:1}
+            .footer-top{
+                grid-template-columns:repeat(2,minmax(0,1fr));
+            }
+        }
+
+        @media (max-width:768px){
+            .nav,.phone-link{display:none}
+            .burger{display:flex}
+            .hero{padding-top:56px}
+            .hero-title{font-size:26px}
+            .courses-cards{grid-template-columns:minmax(0,1fr)}
+            .gallery-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+            .footer-top{grid-template-columns:minmax(0,1fr)}
+            .footer-bottom{flex-direction:column;align-items:flex-start}
+            .cta-row{flex-direction:column}
+        }
+
+        @media (max-width:480px){
+            .section,.section--compact{padding:44px 0}
+            .hero-actions{flex-direction:column;align-items:flex-start}
+            .gallery-grid{grid-template-columns:minmax(0,1fr)}
+            .hero-main-img img,.benefits-card img,.courses-main-img img,.about-card img{
+                height:200px;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+    <nav>
+        <a href="#courses">Դասընթացներ</a>
+        <a href="#benefits">Ինչու Danisoft</a>
+        <a href="#gallery">Ուսանողներ</a>
+        <a href="#about">Մեր պատմությունը</a>
+        <a href="#cta">Գրանցվել հիմա</a>
+    </nav>
+    <div class="mobile-menu-extra">
+        <p>Հեռ․ <strong>+374 98 65 75 45</strong></p>
+        <p>info@danisoft.am</p>
+    </div>
+    <div class="mobile-menu-actions">
+        <button class="btn btn-primary" onclick="scrollToCta()">Գրանցվել</button>
+        <button class="btn btn-outline">Գրառվել զանգի համար</button>
+    </div>
+</div>
+
+<!-- HEADER -->
+<!-- HEADER -->
+<header class="header" id="header">
+    <div class="container">
+        <div class="header-inner">
+            <!-- LOGO -->
+            <a href="#" class="logo-area">
+                <img src="https://danisoft.am/client/logo/DanisoftArmenia.png" alt="Danisoft logo">
+            </a>
+
+            <!-- DESKTOP NAV -->
+            <nav class="nav">
+                <a href="#courses">Դասընթացներ</a>
+                <a href="#benefits">Մեր Մոտեցումը</a>
+                <a href="#gallery">Ուսանողներ</a>
+                <a href="#about">Մեր Մասին</a>
+                <a href="#cta">Կապ</a>
+            </nav>
+
+            <!-- ACTIONS (CTA + BURGER) -->
+            <div class="header-actions">
+                <button class="btn btn-primary header-cta" onclick="scrollToCta()">
+                    Գրանցվել Դասընթացին
+                </button>
+
+                <button class="burger" id="burger" type="button" aria-label="Open menu">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="container hero-inner reveal">
+        <div>
+            <div class="badge" style="margin-bottom:10px;">
+                <span class="badge-dot"></span> Ծրագրավորող դառնա՛ Danisoft style-ով
+            </div>
+            <h1 class="hero-title">
+                Սովորի՛ր <span>Web & AI ծրագրավորում</span><br>իրական պրոյեկտներով։
+            </h1>
+            <p class="hero-desc">
+                Danisoft Academy–ում դասերը լաբորատորիա են․
+                գործնական խնդիրներ, AI գործիքներ ու project–ներ,
+                որոնք կարող ես դնել GitHub–ում և ուղիղ CV–ում։
+            </p>
+            <div class="hero-actions">
+                <button class="btn btn-primary" onclick="scrollToCta()">Սկսել հիմա</button>
+                <button class="btn btn-outline" onclick="document.getElementById('courses').scrollIntoView({behavior:'smooth'});">
+                    Դիտել բոլոր դասընթացները
+                </button>
+            </div>
+            <div class="hero-note">
+                <span class="hero-note-dot"></span>
+                <span>7–9 ամսում՝ սկսնակից մինչև ձեր առաջին commercial նախագիծը։</span>
+            </div>
+            <div class="hero-social">
+                <span>Կապ Danisoft–ի հետ</span>
+                <div class="hero-social-icons">
+                    <div class="social-circle">f</div>
+                    <div class="social-circle">ig</div>
+                    <div class="social-circle">yt</div>
+                    <div class="social-circle">in</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="hero-img-wrap">
+            <div class="hero-illustration card card-hover">
+                <div class="hero-main-img">
+                    <!-- Քո իրական hero նկարը -->
+                    <img src="/img/danisoft-hero-classroom.jpg" alt="Danisoft classroom">
+                </div>
+                <div class="hero-img-meta">
+                    <div class="hero-pills">
+                        <span class="hero-pill">Live lessons</span>
+                        <span class="hero-pill">Web • React • AI</span>
+                    </div>
+                    <span>📍 Երևան • Offline & Online</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- COURSES -->
+<section id="courses" class="section courses-section">
+    <div class="container courses-grid reveal">
+        <div>
+            <div class="courses-header">
+                <h2>Danisoft–ի ծրագրավորման ուղղությունները</h2>
+                <p>
+                    Web, React, Next.js, Python և AI Automation։
+                    Ուղղությունը ընտրում ես դու, ճանապարհի քարտեզը տալիս է Danisoft-ը։
+                </p>
+                <div class="courses-header-stats">
+                    <div>👨‍🎓 <strong>200+ շրջանավարտ</strong></div>
+                    <div>💼 <strong>60%+</strong> արդեն աշխատում են ոլորտում</div>
+                </div>
+            </div>
+
+            <div class="courses-cards">
+                <div class="course-card card-hover">
+                    <div class="course-icon">⚡</div>
+                    <div class="course-title">AI Automation & No-Code</div>
+                    <div class="course-meta">
+                        Make / Zapier • ChatGPT • Automation, որ աշխատի քո փոխարեն։
+                    </div>
+                </div>
+                <div class="course-card card-hover">
+                    <div class="course-icon">💻</div>
+                    <div class="course-title">Web Coding Basics</div>
+                    <div class="course-meta">
+                        HTML • CSS • Responsive • JavaScript հիմքեր — zero-ից։
+                    </div>
+                </div>
+                <div class="course-card card-hover">
+                    <div class="course-icon">🧩</div>
+                    <div class="course-title">Front-End Pro (React / Next.js)</div>
+                    <div class="course-meta">
+                        Component thinking, SPA, API–ներ, real projects Danisoft style։
+                    </div>
+                </div>
+                <div class="course-card card-hover">
+                    <div class="course-icon">🐍</div>
+                    <div class="course-title">Python • Data • Automation</div>
+                    <div class="course-meta">
+                        Scripts, Data, bot-եր, ավտոմատացում, AI tools։
+                    </div>
+                </div>
+            </div>
+
+            <div class="courses-badges">
+                <span><span class="courses-dot"></span> Փոքր խմբեր՝ մինչև 6 ուսանող</span>
+                <span><span class="courses-dot"></span> GitHub portfolio + project defense</span>
+                <span><span class="courses-dot"></span> AI որպես օգնական, ոչ թե փոխարինող</span>
+            </div>
+        </div>
+
+        <div class="courses-illustration card courses-illustration-inner card-hover">
+            <div class="courses-main-img">
+                <!-- Այստեղ կարող ես դնել ընդհանուր դահլիճի / laptop-ների նկարը -->
+                <img src="/img/danisoft-lab.jpg" alt="Danisoft lab">
+            </div>
+            <div class="courses-footer">
+                <span>📆 Նոր խմբեր ամեն ամիս</span>
+                <div class="slider-dots">
+                    <span class="slider-dot slider-dot--active"></span>
+                    <span class="slider-dot"></span>
+                    <span class="slider-dot"></span>
+                    <span class="slider-dot"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- BENEFITS -->
+<section id="benefits" class="section">
+    <div class="container">
+        <div class="benefits-grid reveal">
+            <div class="card benefits-card card-hover">
+                <img src="/img/danisoft-team.jpg" alt="Danisoft team & students">
+            </div>
+            <div>
+                <h2 class="section-title">Ինչու են ընտրում հենց Danisoft Academy–ն</h2>
+                <p class="section-subtitle">
+                    Այստեղ ծրագրավորումը սառը սինտաքս չէ․
+                    կա live energy, իրական փորձ և աջակցող միջավայր։
+                </p>
+
+                <div class="accordion">
+                    <details class="accordion-item" open>
+                        <summary>
+                            <div class="accordion-title">
+                                <div class="accordion-icon">01</div>
+                                <span>Project–ներից դեպի իրական աշխատանք</span>
+                            </div>
+                            <span class="accordion-arrow">›</span>
+                        </summary>
+                        <div class="accordion-body">
+                            Դասընթացի ընթացքում հավաքում ես 2–4 project, որոնք արդեն կարելի է ցույց տալ HR–ին,
+                            ոչ թե «պարապել ու մոռանալ» տարբերակ։
+                        </div>
+                    </details>
+
+                    <details class="accordion-item">
+                        <summary>
+                            <div class="accordion-title">
+                                <div class="accordion-icon">02</div>
+                                <span>AI–ով ուժեղացված ուսուցում</span>
+                            </div>
+                            <span class="accordion-arrow">›</span>
+                        </summary>
+                        <div class="accordion-body">
+                            Սովորում ես ինչպես ճիշտ օգտագործել ChatGPT, Copilot և այլ գործիքներ,
+                            որ քո productivity–ն բարձրանա, ոչ թե պակասի։
+                        </div>
+                    </details>
+
+                    <details class="accordion-item">
+                        <summary>
+                            <div class="accordion-title">
+                                <div class="accordion-icon">03</div>
+                                <span>Տաք, կենդանի միջավայր</span>
+                            </div>
+                            <span class="accordion-arrow">›</span>
+                        </summary>
+                        <div class="accordion-body">
+                            Success tree պատին, սուրճ, whiteboard–ներ ու մարդիկ, որոնք նույն ճանապարհին են,
+                            ինչը օգնում է չընկնել մենակ։
+                        </div>
+                    </details>
+
+                    <details class="accordion-item">
+                        <summary>
+                            <div class="accordion-title">
+                                <div class="accordion-icon">04</div>
+                                <span>Մենթորություն և ուղեկցում</span>
+                            </div>
+                            <span class="accordion-arrow">›</span>
+                        </summary>
+                        <div class="accordion-body">
+                            Դասից դուրս էլ կարող ես հարցեր տալ, ստանալ code-review և հասկանալ՝
+                            ինչ անել հաջորդ քայլով։
+                        </div>
+                    </details>
+                </div>
+
+                <button class="btn btn-primary" style="margin-top:20px;" onclick="scrollToCta()">
+                    Ճանաչել Danisoft մոտեցումը
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section id="cta" class="section section--compact cta-section">
+    <div class="container">
+        <div class="cta-inner reveal">
+            <div>
+                <div class="cta-badges">
+                    <span class="cta-badge">Նոր Web / React խումբ</span>
+                    <span class="cta-badge">Սկիզբ՝ Դեկտեմբերի 5</span>
+                </div>
+                <h2 class="section-title">Պատրա՞ստ ես առաջին քայլին դեպի IT աշխատանք</h2>
+                <p class="section-subtitle" style="color:#e5e7eb;margin-left:0;margin-right:0;">
+                    Թողիր հեռախոսահամար, մենք կզանգենք, կգնահատենք քո մակարդակը
+                    և կառաջարկենք ուղի, որը իրոք կառաջացնի առաջընթաց։
+                </p>
+                <ul class="cta-list">
+                    <li><span class="cta-check">✓</span><span>Անվճար խորհրդատվություն՝ ինչ ուղղություն է քեզ ավելի հարմար</span></li>
+                    <li><span class="cta-check">✓</span><span>Մանրամասներ գրաֆիկի, արժեքների ու հնարավոր զեղչերի մասին</span></li>
+                    <li><span class="cta-check">✓</span><span>PDF ուղեցույց՝ ինչպես սովորել ավելի արդյունավետ</span></li>
+                </ul>
+            </div>
+
+            <div>
+                <div class="cta-card">
+                    <div class="cta-title">Թողիր հայտ՝ մենք կզանգենք</div>
+                    <div class="cta-sub">Լրացրու 3 դաշտը, մնացածը թող Danisoft–ին։</div>
+
+                    <div class="cta-row">
+                        <div class="cta-field">
+                            <label for="cta-name">Անուն</label>
+                            <input id="cta-name" type="text" placeholder="Օրինակ՝ Դանիել">
+                            <div id="cta-name-error" class="cta-error"></div>
+                        </div>
+                        <div class="cta-field">
+                            <label for="cta-phone">Հեռախոսահամար</label>
+                            <input id="cta-phone" type="tel" placeholder="+374 ...">
+                            <div id="cta-phone-error" class="cta-error"></div>
+                        </div>
+                    </div>
+
+                    <div class="cta-field">
+                        <label for="cta-course">Ինչ ուղղություն է քեզ հետաքրքրում</label>
+                        <select id="cta-course">
+                            <option value="">Ընտրիր ուղղությունը</option>
+                            <option>Web Coding (HTML/CSS/JS)</option>
+                            <option>React / Next.js Front-End</option>
+                            <option>Python • Data • Automation</option>
+                            <option>AI Tools & Automation</option>
+                        </select>
+                        <div id="cta-course-error" class="cta-error"></div>
+                    </div>
+
+                    <button class="btn btn-primary" style="width:100%;margin-top:8px;" id="cta-submit">
+                        Ուղարկել հայտը
+                    </button>
+
+                    <div class="cta-footer">
+                        <span>Կկապվենք <strong>նույն օրվա ընթացքում</strong>։</span>
+                        <span>Կամ զանգիր՝ <strong>+374 98 65 75 45</strong></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- GALLERY -->
+<section id="gallery" class="section section--light">
+    <div class="container reveal">
+        <h2 class="section-title text-center" style="color:#0f172a;">Danisoft պահերը</h2>
+        <p class="section-subtitle section-subtitle--dark">
+            Demo-day–ներ, առաջին deploy–ներ, graduation ու սուրճի ընդմիջումներ։
+            Հենց սրանք են ստեղծում Danisoft հիշողությունները։
+        </p>
+
+        <div class="gallery-grid">
+            <div class="gallery-item">
+                <img src="/img/danisoft-group-1.jpg" alt="group">
+                <span class="gallery-tag">Live lesson</span>
+            </div>
+            <div class="gallery-item">
+                <img src="/img/danisoft-group-2.jpg" alt="work">
+                <span class="gallery-tag">Project work</span>
+            </div>
+            <div class="gallery-item">
+                <img src="/img/danisoft-group-3.jpg" alt="workshop">
+                <span class="gallery-tag">Workshop</span>
+            </div>
+            <div class="gallery-item">
+                <img src="/img/danisoft-group-4.jpg" alt="demo">
+                <span class="gallery-tag">Demo day</span>
+            </div>
+            <div class="gallery-item">
+                <img src="/img/danisoft-group-5.jpg" alt="team">
+                <span class="gallery-tag">Danisoft family</span>
+            </div>
+            <div class="gallery-item">
+                <img src="/img/danisoft-group-6.jpg" alt="new group">
+                <span class="gallery-tag">New group</span>
+            </div>
+            <div class="gallery-item">
+                <img src="/img/danisoft-group-7.jpg" alt="coding">
+                <span class="gallery-tag">Coding session</span>
+            </div>
+            <div class="gallery-item">
+                <img src="/img/danisoft-group-8.jpg" alt="graduation">
+                <span class="gallery-tag">Graduation</span>
+            </div>
+            <div class="gallery-item">
+                <img src="/img/danisoft-group-9.jpg" alt="office">
+                <span class="gallery-tag">Danisoft space</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about" class="section section--light">
+    <div class="container about-grid reveal">
+        <div>
+            <h2 class="section-title" style="color:#0f172a;">Մեր պատմությունը</h2>
+            <div class="about-text">
+                <p>
+                    Danisoft Academy–ն սկսվել է մի պարզ գաղափարից — ստեղծել վայր, որտեղ ուսանողները
+                    չեն «անցնում թեման», այլ կառուցում են իրական project–ներ և սովորում մտածել
+                    որպես ծրագրավորող։
+                </p>
+                <p>
+                    Այստեղ շեշտը միայն syntax–ի վրա չէ․ սովորում ենք ինչպես կառուցել կոդը,
+                    ինչպես աշխատել թիմով, ինչպես ճիշտ օգտագործել AI-ն ու GitHub-ը, և
+                    ինչպես պատրաստվել հարցազրույցների։
+                </p>
+                <p>
+                    Եթե ուզում ես ոչ թե պարզապես լիկբեզ, այլ ուղի, որը տանում է դեպի աշխատանք
+                    և սեփական project–ներ, ապա սպասում ենք քեզ Danisoft Academy–ում։
+                </p>
+            </div>
+        </div>
+
+        <div class="about-card card-hover">
+            <img src="/img/danisoft-office.jpg" alt="Danisoft office">
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-top">
+            <div>
+                <div class="logo-area">
+                    <div class="logo-mark"></div>
+                    <div>
+                        <div class="logo-text" style="font-size:15px;">Danisoft Academy</div>
+                        <div class="logo-sub">WEB • AI • ENGLISH</div>
+                    </div>
+                </div>
+                <p class="footer-logo-text">
+                    Ուսումնական հարթակ, որտեղ ծրագրավորումն ու անգլերենը միավորված են
+                    մի գաղափարի մեջ՝ քեզ հասցնել աշխատանքի շուկա։
+                    Այստեղ սովորում ես այնպես, ինչպես հետո աշխատելու ես։
+                </p>
+            </div>
+
+            <div>
+                <div class="footer-heading">Դասընթացներ</div>
+                <ul class="footer-list">
+                    <li>Web Coding (HTML/CSS/JS)</li>
+                    <li>React / Next.js Front-End</li>
+                    <li>Python • Data • Automation</li>
+                    <li>AI Tools & No-Code</li>
+                </ul>
+            </div>
+
+            <div>
+                <div class="footer-heading">Կապ Danisoft–ի հետ</div>
+                <ul class="footer-list">
+                    <li>Հեռ․ +374 98 65 75 45</li>
+                    <li>info@danisoft.am</li>
+                    <li>ք. Երևան, Danisoft office</li>
+                </ul>
+            </div>
+
+            <div>
+                <div class="footer-heading">Օգտակար բաժիններ</div>
+                <ul class="footer-list">
+                    <li>Հաճախ տրվող հարցեր</li>
+                    <li>Կարիերա ու պատմություններ</li>
+                    <li>Գաղտնիության քաղաքականություն</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <span>© 2025 Danisoft Academy — բոլոր իրավունքները պաշտպանված են։</span>
+            <div class="footer-social">
+                <div class="social-circle">f</div>
+                <div class="social-circle">ig</div>
+                <div class="social-circle">yt</div>
+                <div class="social-circle">in</div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script>
+
+
+
+    // scroll to CTA helper
+    function scrollToCta(){
+        const el = document.getElementById('cta');
+        if(!el) return;
+        const headerOffset = 72;
+        const rect = el.getBoundingClientRect();
+        const offset = rect.top + window.scrollY - headerOffset;
+        window.scrollTo({top:offset,behavior:'smooth'});
+    }
+
+    // burger / mobile
+    const burger = document.getElementById('burger');
+    const mobileMenu = document.getElementById('mobileMenu');
+    burger.addEventListener('click', () => {
+        burger.classList.toggle('is-open');
+        mobileMenu.classList.toggle('is-open');
+        document.body.classList.toggle('mobile-open');
+    });
+    // close mobile menu when clicking links
+    mobileMenu.querySelectorAll('a[href^="#"]').forEach(link=>{
+        link.addEventListener('click', ()=>{
+            burger.classList.remove('is-open');
+            mobileMenu.classList.remove('is-open');
+            document.body.classList.remove('mobile-open');
+        });
+    });
+
+    // header shadow
+    const headerEl = document.getElementById('header');
+    function onScrollHeader(){
+        if(window.scrollY>10) headerEl.classList.add('header--scrolled');
+        else headerEl.classList.remove('header--scrolled');
+    }
+    window.addEventListener('scroll',onScrollHeader);
+    onScrollHeader();
+
+    // smooth scroll for desktop nav
+    document.querySelectorAll('a[href^="#"]').forEach(link=>{
+        link.addEventListener('click',e=>{
+            const id = link.getAttribute('href').slice(1);
+            const target = document.getElementById(id);
+            if(target){
+                e.preventDefault();
+                const headerOffset = 72;
+                const rect = target.getBoundingClientRect();
+                const offset = rect.top + window.scrollY - headerOffset;
+                window.scrollTo({top:offset,behavior:'smooth'});
+            }
+        });
+    });
+
+    // reveal on scroll
+    const revealEls = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver(entries=>{
+        entries.forEach(entry=>{
+            if(entry.isIntersecting){
+                entry.target.classList.add('in-view');
+                observer.unobserve(entry.target);
+            }
+        });
+    },{threshold:.15});
+    revealEls.forEach(el=>observer.observe(el));
+
+    // CTA validation
+    const ctaSubmit = document.getElementById('cta-submit');
+    ctaSubmit.addEventListener('click',e=>{
+        e.preventDefault();
+        const name = document.getElementById('cta-name');
+        const phone = document.getElementById('cta-phone');
+        const course = document.getElementById('cta-course');
+        const nameErr = document.getElementById('cta-name-error');
+        const phoneErr = document.getElementById('cta-phone-error');
+        const courseErr = document.getElementById('cta-course-error');
+
+        let hasError = false;
+        if(!name.value.trim()){nameErr.textContent='Գրեք ձեր անունը։';hasError=true;}else nameErr.textContent='';
+        if(!phone.value.trim()){phoneErr.textContent='Գրեք գործում հեռախոսահամար։';hasError=true;}else phoneErr.textContent='';
+        if(!course.value.trim()){courseErr.textContent='Ընտրեք ուղղությունը։';hasError=true;}else courseErr.textContent='';
+
+        if(!hasError){
+            alert('Շնորհակալություն հայտի համար 🙌 Danisoft թիմը շուտով կկապվի ձեր հետ։');
+            name.value='';phone.value='';course.value='';
+        }
+    });
+</script>
+</body>
+</html>

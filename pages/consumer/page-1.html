@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="hy" data-theme="dark">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WebGroup • Enhanced Filters Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root{
+            --bg-dark:#0f1216;--fg-dark:#e6e9ee;--card-dark:#131922;--line-dark:#1f2630;--muted-dark:#9aa3b2;
+            --bg-light:#f7f9fc;--fg-light:#111827;--card-light:#ffffff;--line-light:#e5e7eb;--muted-light:#6b7280;
+            --ring:#3b82f61a; --ring-strong:#3b82f666;
+        }
+        html[data-theme="dark"] body{ background:var(--bg-dark); color:var(--fg-dark) }
+        html[data-theme="light"] body{ background:var(--bg-light); color:var(--fg-light) }
+
+        .app-sidebar{min-height:100vh;border-right:1px solid var(--line-dark)}
+        html[data-theme="light"] .app-sidebar{border-right:1px solid var(--line-light)}
+        .card-soft{ background:var(--card-dark); border:1px solid var(--line-dark); border-radius:16px }
+        html[data-theme="light"] .card-soft{ background:var(--card-light); border:1px solid var(--line-light) }
+        .search-input, select.form-select, .form-control{ background:#0e131a; border:1px solid #1b2230; color:#e6e9ee; }
+        html[data-theme="light"] .search-input, html[data-theme="light"] select.form-select, html[data-theme="light"] .form-control{ background:#fff; border:1px solid var(--line-light); color:#111827 }
+        .search-input::placeholder{ color:#8a94a6 }
+        html[data-theme="light"] .search-input::placeholder{ color:#9aa4b2 }
+
+        .btn-soft{ background:#0f1520; border:1px solid #1c2432; color:#cfd6e4 }
+        .btn-soft:hover{ background:#141c29; color:#fff }
+        html[data-theme="light"] .btn-soft{ background:#f3f4f6; border:1px solid var(--line-light); color:#111827 }
+
+        .badge-soft{ background: rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08) }
+        html[data-theme="light"] .badge-soft{ background: #0040ff; border:1px solid var(--line-light) }
+
+        .pill{ border-radius:999px; padding:.2rem .6rem; font-size:.8rem }
+        .muted{ color:var(--muted-dark) }
+        html[data-theme="light"] .muted{ color:var(--muted-light) }
+
+        .divider{ border-top:1px dashed #2a3444; margin:1rem 0 }
+        html[data-theme="light"] .divider{ border-top:1px dashed var(--line-light) }
+
+        .list-scroll{ max-height:65vh; overflow:auto }
+        .todo-item.done .todo-text{ text-decoration:line-through; opacity:.6 }
+
+        .sticky-top-20{ position:sticky; top:20px }
+
+        .kpi .value{ font-weight:700; font-size:1.1rem }
+        .kpi .delta.up{ color:#16a34a }
+        .kpi .delta.down{ color:#dc2626 }
+
+        .empty{ text-align:center; padding:3rem 1rem; color:var(--muted-dark) }
+        html[data-theme="light"] .empty{ color:var(--muted-light) }
+
+        /* highlight search match */
+        mark.search{ background:#fde68a; color:#111827; padding:.05rem .2rem; border-radius:.25rem }
+
+        /* row actions */
+        .row-actions .btn{ padding:.25rem .5rem }
+
+        /* skeleton */
+        .skeleton{ animation:sheen 1.2s linear infinite; background:linear-gradient(90deg,rgba(255,255,255,.06),rgba(255,255,255,.12),rgba(255,255,255,.06)); border-radius:.5rem; height:64px }
+        @keyframes sheen{0%{background-position:-200px 0}100%{background-position:calc(200px + 100%) 0}}
+
+        @media (max-width: 991px){ .app-sidebar{min-height:auto} }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row g-0">
+        <!-- Sidebar -->
+        <aside class="col-12 col-lg-3 p-3 p-lg-4 app-sidebar">
+            <div class="sticky-top-20">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h4 class="m-0">🧑&zwj;💻 WebGroup ֆիլտրեր</h4>
+                    <button id="themeToggle" class="btn btn-outline-secondary btn-sm" title="Dark / Light"><i class="bi bi-brightness-high"></i></button>
+                </div>
+
+                <!-- Quick actions -->
+                <div class="d-grid gap-2 mb-3">
+                    <button class="btn btn-soft" id="btnReset"><i class="bi bi-arrow-counterclockwise me-1"></i>Սկզբնական ցուցակ</button>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-soft w-100" id="btnEmployed">Աշխատողներ</button>
+                        <button class="btn btn-soft w-100" id="btnMarried">Ամուսնացած</button>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-soft w-100" id="btnCarOwners">Մեքենա ունեն</button>
+                        <button class="btn btn-soft w-100" id="btnExited">Լքածներ</button>
+                    </div>
+                </div>
+
+                <!-- Search -->
+                <div class="mb-3">
+                    <label for="searchByName" class="form-label">Փնտրել անունով</label>
+                    <input id="searchByName" type="text" class="form-control search-input" placeholder="օր. Ani, David">
+                </div>
+
+                <!-- Age filter -->
+                <div class="card card-soft mb-3">
+                    <div class="card-body">
+                        <h6 class="mb-3">Տարիքային ֆիլտր</h6>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <label class="form-label" for="ageMin">Min</label>
+                                <input id="ageMin" type="number" class="form-control" placeholder="16">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label" for="ageMax">Max</label>
+                                <input id="ageMax" type="number" class="form-control" placeholder="35">
+                            </div>
+                        </div>
+                        <div class="d-grid mt-3">
+                            <button class="btn btn-soft" id="btnAgeFilter">Ֆիլտրել ըստ տարիք</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Multi select city + marital -->
+                <div class="card card-soft mb-3">
+                    <div class="card-body">
+                        <h6 class="mb-3">Քաղաք / Կարգավիճակ</h6>
+                        <select id="citySelect" class="form-select mb-2">
+                            <option value="">— Բոլորը —</option>
+                            <option>Yerevan</option><option>Gyumri</option><option>Vanadzor</option><option>Kapan</option><option>Dilijan</option><option>Sevan</option><option>Abovyan</option><option>Hrazdan</option><option>Artashat</option><option>Stepanakert</option>
+                        </select>
+                        <select id="maritalSelect" class="form-select">
+                            <option value="">— Ամուսն. կարգավիճակ —</option>
+                            <option value="single">single</option>
+                            <option value="married">married</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Sort -->
+                <div class="card card-soft mb-3">
+                    <div class="card-body">
+                        <h6 class="mb-3">Սորտավորում</h6>
+                        <select id="sortSelect" class="form-select">
+                            <option value="">— Առանց սորտ —</option>
+                            <option value="az">Անուն (A–Z)</option>
+                            <option value="za">Անուն (Z–A)</option>
+                            <option value="ageAsc">Տարիք ↑</option>
+                            <option value="ageDesc">Տարիք ↓</option>
+                            <option value="balanceDesc">Հաշիվ ↓</option>
+                            <option value="balanceAsc">Հաշիվ ↑</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Persist + Export -->
+                <div class="d-grid gap-2">
+                    <button id="btnSaveState" class="btn btn-outline-primary"><i class="bi bi-save me-1"></i>Պահել ֆիլտրերը</button>
+                    <button id="btnExportCsv" class="btn btn-outline-success"><i class="bi bi-filetype-csv me-1"></i>Արտահանել CSV</button>
+                </div>
+                <div class="small muted mt-2">Made for Daniel • Bootstrap 5 • Pure JS</div>
+            </div>
+        </aside>
+
+        <!-- Main -->
+        <main class="col-12 col-lg-9 p-3 p-lg-4">
+            <!-- KPIs + toolbar -->
+            <div class="row g-3 align-items-stretch mb-3">
+                <div class="col-12 col-md-8">
+                    <div class="card card-soft h-100">
+                        <div class="card-body d-flex flex-wrap gap-3 align-items-center justify-content-between">
+                            <div class="kpi"><div class="text-muted">Ընդհանուր</div><div class="value" id="kpiTotal">10</div></div>
+                            <div class="kpi"><div class="text-muted">Աշխատողներ</div><div class="value" id="kpiEmployed">7 <span class="delta up" id="kpiEmployedPct">(70%)</span></div></div>
+                            <div class="kpi"><div class="text-muted">Միջ. տարիք</div><div class="value" id="kpiAvgAge">25</div></div>
+                            <div class="kpi"><div class="text-muted">Ընդհանուր հաշիվ</div><div class="value" id="kpiSum">1,993,000 ֏</div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <div class="card card-soft h-100">
+                        <div class="card-body d-flex align-items-center justify-content-between gap-2">
+                            <div>
+                                <div class="text-muted small">Ցուցադրված արդյունքներ</div>
+                                <div class="h5 m-0"><span id="countBadge">10 արդյունք</span></div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-outline-secondary" id="btnShareState" title="Կիսվել ֆիլտրերով"><i class="bi bi-link-45deg"></i></button>
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalAdd"><i class="bi bi-plus-lg me-1"></i>Ավելացնել</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- List -->
+            <div class="card card-soft mb-3">
+                <div class="card-body">
+                    <div id="list" class="list-scroll">
+                        <div class="card card-soft mb-3">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between flex-wrap gap-2">
+                                    <div>
+                                        <h6 class="mb-1">Arman</h6>
+                                        <div class="small muted">ID:1 • Քաղաք:Yerevan • Տարիք:22</div>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="badge badge-soft pill">Աշխատում է</span>
+                                        <span class="badge badge-soft pill">single</span>
+                                        <span class="badge badge-soft pill" title="Hyundai Elantra"><i class="bi bi-car-front"></i></span>
+                                        <div class="row-actions btn-group">
+                                            <button class="btn btn-outline-secondary btn-sm" data-id="1" data-action="edit"><i class="bi bi-pencil"></i></button>
+                                            <button class="btn btn-outline-danger btn-sm" data-id="1" data-action="delete"><i class="bi bi-trash"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="divider"></div>
+                                <div class="small">Երեխաներ:0 • Հաշիվ:125,000 ֏</div>
+                            </div>
+                        </div>
+                        <div class="card card-soft mb-3">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between flex-wrap gap-2">
+                                    <div>
+                                        <h6 class="mb-1">Mariam</h6>
+                                        <div class="small muted">ID:2 • Քաղաք:Gyumri • Տարիք:28</div>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="badge badge-soft pill">Աշխատում է</span>
+                                        <span class="badge badge-soft pill">married</span>
+
+                                        <div class="row-actions btn-group">
+                                            <button class="btn btn-outline-secondary btn-sm" data-id="2" data-action="edit"><i class="bi bi-pencil"></i></button>
+                                            <button class="btn btn-outline-danger btn-sm" data-id="2" data-action="delete"><i class="bi bi-trash"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="divider"></div>
+                                <div class="small">Երեխաներ:1 • Հաշիվ:89,000 ֏</div>
+                            </div>
+                        </div>
+                        <div class="card card-soft mb-3">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between flex-wrap gap-2">
+                                    <div>
+                                        <h6 class="mb-1">Hayk</h6>
+                                        <div class="small muted">ID:3 • Քաղաք:Vanadzor • Տարիք:31</div>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="badge badge-soft pill">Աշխատում է</span>
+                                        <span class="badge badge-soft pill">married</span>
+                                        <span class="badge badge-soft pill" title="Toyota Camry"><i class="bi bi-car-front"></i></span>
+                                        <div class="row-actions btn-group">
+                                            <button class="btn btn-outline-secondary btn-sm" data-id="3" data-action="edit"><i class="bi bi-pencil"></i></button>
+                                            <button class="btn btn-outline-danger btn-sm" data-id="3" data-action="delete"><i class="bi bi-trash"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="divider"></div>
+                                <div class="small">Երեխաներ:2 • Հաշիվ:350,000 ֏</div>
+                            </div>
+                        </div>
+                        <div class="card card-soft mb-3">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between flex-wrap gap-2">
+                                    <div>
+                                        <h6 class="mb-1">Ani</h6>
+                                        <div class="small muted">ID:4 • Քաղաք:Sevan • Տարիք:19</div>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2">
+
+                                        <span class="badge badge-soft pill">single</span>
+
+                                        <div class="row-actions btn-group">
+                                            <button class="btn btn-outline-secondary btn-sm" data-id="4" data-action="edit"><i class="bi bi-pencil"></i></button>
+                                            <button class="btn btn-outline-danger btn-sm" data-id="4" data-action="delete"><i class="bi bi-trash"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="divider"></div>
+                                <div class="small">Երեխաներ:0 • Հաշիվ:42,000 ֏</div>
+                            </div>
+                        </div>
+                        <div class="card card-soft mb-3">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between flex-wrap gap-2">
+                                    <div>
+                                        <h6 class="mb-1">David</h6>
+                                        <div class="small muted">ID:5 • Քաղաք:Stepanakert • Տարիք:26</div>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="badge badge-soft pill">Աշխատում է</span>
+                                        <span class="badge badge-soft pill">single</span>
+                                        <span class="badge badge-soft pill" title="Lada Priora"><i class="bi bi-car-front"></i></span>
+                                        <div class="row-actions btn-group">
+                                            <button class="btn btn-outline-secondary btn-sm" data-id="5" data-action="edit"><i class="bi bi-pencil"></i></button>
+                                            <button class="btn btn-outline-danger btn-sm" data-id="5" data-action="delete"><i class="bi bi-trash"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="divider"></div>
+                                <div class="small">Երեխաներ:0 • Հաշիվ:65,000 ֏</div>
+                            </div>
+                        </div></div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="small muted">Էջ <span id="pageNum">1</span> / <span id="pageCount">2</span></div>
+                <div class="btn-group">
+                    <button class="btn btn-outline-secondary" id="prevPage" disabled=""><i class="bi bi-chevron-left"></i></button>
+                    <button class="btn btn-outline-secondary" id="nextPage"><i class="bi bi-chevron-right"></i></button>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Add/Edit Modal -->
+<div class="modal fade" id="modalAdd" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Ավելացնել մասնակից</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formPerson" class="row g-3">
+                    <input type="hidden" id="personId">
+                    <div class="col-6"><label class="form-label">Անուն</label><input class="form-control" id="personName" required></div>
+                    <div class="col-6"><label class="form-label">Տարիք</label><input type="number" class="form-control" id="personAge" required></div>
+                    <div class="col-6"><label class="form-label">Քաղաք</label><input class="form-control" id="personCity" placeholder="օր. Yerevan"></div>
+                    <div class="col-6"><label class="form-label">Հաշիվ (֏)</label><input type="number" class="form-control" id="personBalance" value="0"></div>
+                    <div class="col-6"><label class="form-label">Աշխատում է</label>
+                        <select id="personEmployed" class="form-select"><option value="true">Այո</option><option value="false">Ոչ</option></select>
+                    </div>
+                    <div class="col-6"><label class="form-label">Կարգավիճակ</label>
+                        <select id="personMarital" class="form-select"><option>single</option><option>married</option></select>
+                    </div>
+                    <div class="col-12"><label class="form-label">Մեքենա (ընտրովի)</label><input class="form-control" id="personCar" placeholder="օր. Toyota"></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-light" data-bs-dismiss="modal">Փակել</button>
+                <button class="btn btn-primary" id="btnSavePerson">Պահպանել</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ===== Data =====
+    let lists = [
+        {id:1,name:"Arman",exit:false,age:22,height:178,birthplace:"Yerevan",car:"Hyundai Elantra",accountBalance:125000,maritalStatus:"single",children:0,isEmployed:true},
+        {id:2,name:"Mariam",exit:false,age:28,height:165,birthplace:"Gyumri",car:null,accountBalance:89000,maritalStatus:"married",children:1,isEmployed:true},
+        {id:3,name:"Hayk",exit:true,age:31,height:182,birthplace:"Vanadzor",car:"Toyota Camry",accountBalance:350000,maritalStatus:"married",children:2,isEmployed:true},
+        {id:4,name:"Ani",exit:false,age:19,height:160,birthplace:"Sevan",car:null,accountBalance:42000,maritalStatus:"single",children:0,isEmployed:false},
+        {id:5,name:"David",exit:false,age:26,height:175,birthplace:"Stepanakert",car:"Lada Priora",accountBalance:65000,maritalStatus:"single",children:0,isEmployed:true},
+        {id:6,name:"Nare",exit:false,age:24,height:167,birthplace:"Abovyan",car:"Mazda 3",accountBalance:210000,maritalStatus:"single",children:0,isEmployed:true},
+        {id:7,name:"Gevorg",exit:false,age:16,height:170,birthplace:"Hrazdan",car:null,accountBalance:37000,maritalStatus:"single",children:0,isEmployed:false},
+        {id:8,name:"Sona",exit:true,age:35,height:163,birthplace:"Kapan",car:"Nissan Juke",accountBalance:480000,maritalStatus:"married",children:3,isEmployed:true},
+        {id:9,name:"Tigran",exit:false,age:29,height:180,birthplace:"Artashat",car:"Mercedes C200",accountBalance:520000,maritalStatus:"married",children:1,isEmployed:true},
+        {id:10,name:"Lilit",exit:false,age:21,height:168,birthplace:"Dilijan",car:null,accountBalance:75000,maritalStatus:"single",children:0,isEmployed:false}
+    ];
+
+    // ===== State =====
+    const state={filters:{searchName:"",isEmployed:null,isMarried:null,hasCar:null,exited:null,ageMin:null,ageMax:null,city:"",marital:"",sort:""},page:1,perPage:5},THEME_KEY="wg_theme",savedTheme=localStorage.getItem(THEME_KEY)||"dark";document.documentElement.setAttribute("data-theme",savedTheme);const $=e=>document.querySelector(e),$$=e=>document.querySelectorAll(e),formatMoney=e=>new Intl.NumberFormat("hy-AM").format(e)+" ֏";function saveState(){localStorage.setItem("wg_filters",JSON.stringify(state.filters))}function loadState(){try{const e=JSON.parse(localStorage.getItem("wg_filters"));e&&Object.assign(state.filters,e)}catch(e){}}function applyFilters(){let e=lists.filter((e=>{const t=state.filters;return!(t.searchName&&!e.name.toLowerCase().includes(t.searchName.toLowerCase()))&&((null===t.isEmployed||e.isEmployed===t.isEmployed)&&((null===t.isMarried||(t.isMarried?"married"===e.maritalStatus:"married"!==e.maritalStatus))&&(!(null!==t.hasCar&&(t.hasCar?!e.car:e.car))&&((null===t.exited||e.exit===t.exited)&&(!(null!==t.ageMin&&e.age<t.ageMin)&&(!(null!==t.ageMax&&e.age>t.ageMax)&&((!t.city||e.birthplace===t.city)&&(!t.marital||e.maritalStatus===t.marital))))))))}));switch(state.filters.sort){case"az":e.sort(((e,t)=>e.name.localeCompare(t.name)));break;case"za":e.sort(((e,t)=>t.name.localeCompare(e.name)));break;case"ageAsc":e.sort(((e,t)=>e.age-t.age));break;case"ageDesc":e.sort(((e,t)=>t.age-e.age));break;case"balanceDesc":e.sort(((e,t)=>t.accountBalance-e.accountBalance));break;case"balanceAsc":e.sort(((e,t)=>e.accountBalance-t.accountBalance))}renderKPIs(e),renderList(paginate(e)),renderPager(e.length)}function highlight(e,t){if(!t)return e;const a=new RegExp(`(${t})`,"ig");return e.replace(a,'<mark class="search">$1</mark>')}function renderList(e){const t=$("#list");e.length?(t.innerHTML="",e.forEach((e=>{const a=`\n        <div class="card card-soft mb-3">\n          <div class="card-body">\n            <div class="d-flex justify-content-between flex-wrap gap-2">\n              <div>\n                <h6 class="mb-1">${highlight(e.name,state.filters.searchName)}</h6>\n                <div class="small muted">ID:${e.id} • Քաղաք:${e.birthplace} • Տարիք:${e.age}</div>\n              </div>\n              <div class="d-flex align-items-center gap-2">\n                ${e.isEmployed?'<span class="badge badge-soft pill">Աշխատում է</span>':""}\n                <span class="badge badge-soft pill">${e.maritalStatus}</span>\n                ${e.car?`<span class="badge badge-soft pill" title="${e.car}"><i class="bi bi-car-front"></i></span>`:""}\n                <div class="row-actions btn-group">\n                  <button class="btn btn-outline-secondary btn-sm" data-id="${e.id}" data-action="edit"><i class="bi bi-pencil"></i></button>\n                  <button class="btn btn-outline-danger btn-sm" data-id="${e.id}" data-action="delete"><i class="bi bi-trash"></i></button>\n                </div>\n              </div>\n            </div>\n            <div class="divider"></div>\n            <div class="small">Երեխաներ:${e.children} • Հաշիվ:${formatMoney(e.accountBalance)}</div>\n          </div>\n        </div>`;t.insertAdjacentHTML("beforeend",a)}))):t.innerHTML='<div class="empty">Չկան համապատասխան արդյունքներ</div>'}function renderKPIs(e){const t=e.length,a=e.filter((e=>e.isEmployed)).length,s=t?Math.round(a/t*100):0,l=t?Math.round(e.reduce(((e,t)=>e+t.age),0)/t):0,n=e.reduce(((e,t)=>e+t.accountBalance),0);$("#kpiTotal").textContent=t,$("#kpiEmployed").firstChild&&($("#kpiEmployed").childNodes[0].textContent=a+" "),$("#kpiEmployedPct").textContent=`(${s}%)`,$("#kpiAvgAge").textContent=l,$("#kpiSum").textContent=new Intl.NumberFormat("hy-AM").format(n)+" ֏",$("#countBadge").textContent=t+" արդյունք"}function paginate(e){const t=(state.page-1)*state.perPage;return e.slice(t,t+state.perPage)}function renderPager(e){const t=Math.max(1,Math.ceil(e/state.perPage));$("#pageCount").textContent=t,$("#pageNum").textContent=state.page,$("#prevPage").disabled=state.page<=1,$("#nextPage").disabled=state.page>=t}function exportCsv(){const e=["id","name","birthplace","age","maritalStatus","isEmployed","car","accountBalance"],t=getFiltered().map((t=>e.map((e=>JSON.stringify(t[e]??""))).join(","))),a=[e.join(","),...t].join("\n"),s=new Blob([a],{type:"text/csv;charset=utf-8;"}),l=document.createElement("a");l.href=URL.createObjectURL(s),l.download="webgroup.csv",l.click()}function getFiltered(){const e=state.page;state.page=1;let t=lists.filter((e=>{const t=state.filters;return!(t.searchName&&!e.name.toLowerCase().includes(t.searchName.toLowerCase()))&&((null===t.isEmployed||e.isEmployed===t.isEmployed)&&((null===t.isMarried||(t.isMarried?"married"===e.maritalStatus:"married"!==e.maritalStatus))&&(!(null!==t.hasCar&&(t.hasCar?!e.car:e.car))&&((null===t.exited||e.exit===t.exited)&&(!(null!==t.ageMin&&e.age<t.ageMin)&&(!(null!==t.ageMax&&e.age>t.ageMax)&&((!t.city||e.birthplace===t.city)&&(!t.marital||e.maritalStatus===t.marital))))))))}));return state.page=e,t}function shareState(){const e=new URLSearchParams;for(const[t,a]of Object.entries(state.filters))null!==a&&""!==a&&e.set(t,a);e.set("page",state.page);const t=location.origin+location.pathname+"?"+e.toString();navigator.clipboard.writeText(t).then((()=>{alert("Հղումը պատճենվեց. կիսվեք թիմի հետ")}))}function readParams(){new URLSearchParams(location.search).forEach(((e,t)=>{"page"===t?state.page=+e:state.filters[t]="true"===e||"false"!==e&&(isFinite(e)&&""!==e?+e:e)}))}function bindEvents(){$("#btnEmployed").onclick=()=>{state.filters.isEmployed=!0,state.page=1,applyFilters(),syncInputs()},$("#btnMarried").onclick=()=>{state.filters.isMarried=!0,state.page=1,applyFilters(),syncInputs()},$("#btnCarOwners").onclick=()=>{state.filters.hasCar=!0,state.page=1,applyFilters()},$("#btnExited").onclick=()=>{state.filters.exited=!0,state.page=1,applyFilters()},$("#btnReset").onclick=()=>{state.filters={searchName:"",isEmployed:null,isMarried:null,hasCar:null,exited:null,ageMin:null,ageMax:null,city:"",marital:"",sort:""},state.page=1,applyFilters(),syncInputs(!0),localStorage.removeItem("wg_filters"),history.replaceState({},"",location.pathname)},$("#searchByName").addEventListener("input",(e=>{state.filters.searchName=e.target.value,state.page=1,applyFilters()})),$("#btnAgeFilter").onclick=()=>{state.filters.ageMin=$("#ageMin").value?+$("#ageMin").value:null,state.filters.ageMax=$("#ageMax").value?+$("#ageMax").value:null,state.page=1,applyFilters()},$("#citySelect").onchange=e=>{state.filters.city=e.target.value,state.page=1,applyFilters()},$("#maritalSelect").onchange=e=>{state.filters.marital=e.target.value,state.page=1,applyFilters()},$("#sortSelect").onchange=e=>{state.filters.sort=e.target.value,state.page=1,applyFilters()},$("#prevPage").onclick=()=>{state.page=Math.max(1,state.page-1),applyFilters()},$("#nextPage").onclick=()=>{state.page=state.page+1,applyFilters()},$("#btnSaveState").onclick=()=>{saveState(),alert("Ֆիլտրերը պահպանված են")},$("#btnExportCsv").onclick=exportCsv,$("#btnShareState").onclick=shareState,$("#themeToggle").onclick=()=>{const e="dark"===document.documentElement.getAttribute("data-theme")?"light":"dark";document.documentElement.setAttribute("data-theme",e),localStorage.setItem(THEME_KEY,e)},$("#list").addEventListener("click",(e=>{const t=e.target.closest("button[data-action]");if(!t)return;const a=+t.dataset.id,s=t.dataset.action;if("delete"===s)lists=lists.filter((e=>e.id!==a)),applyFilters();else if("edit"===s){const e=lists.find((e=>e.id===a));$("#modalTitle").textContent="Խմբագրել մասնակից",$("#personId").value=e.id,$("#personName").value=e.name,$("#personAge").value=e.age,$("#personCity").value=e.birthplace,$("#personBalance").value=e.accountBalance,$("#personEmployed").value=String(!!e.isEmployed),$("#personMarital").value=e.maritalStatus,$("#personCar").value=e.car||"";new bootstrap.Modal("#modalAdd").show()}})),$("#btnSavePerson").onclick=()=>{const e=$("#personId").value,t={id:e?+e:Math.max(...lists.map((e=>e.id)))+1,name:$("#personName").value.trim(),age:+$("#personAge").value,birthplace:$("#personCity").value.trim()||"Yerevan",accountBalance:+$("#personBalance").value||0,isEmployed:"true"===$("#personEmployed").value,maritalStatus:$("#personMarital").value,car:$("#personCar").value.trim()||null,children:0,exit:!1,height:170};if(t.name&&t.age){if(e){const a=lists.findIndex((t=>t.id===+e));lists[a]={...lists[a],...t}}else lists.push(t);bootstrap.Modal.getInstance($("#modalAdd")).hide(),$("#formPerson").reset(),$("#personId").value="",$("#modalTitle").textContent="Ավելացնել մասնակից",applyFilters()}else alert("Անուն/տարիք պարտադիր է")},document.getElementById("modalAdd").addEventListener("hidden.bs.modal",(()=>{$("#formPerson").reset(),$("#personId").value="",$("#modalTitle").textContent="Ավելացնել մասնակից"}))}function syncInputs(e=!1){if(e)return $("#searchByName").value="",$("#ageMin").value="",$("#ageMax").value="",$("#citySelect").value="",$("#maritalSelect").value="",void($("#sortSelect").value="");$("#searchByName").value=state.filters.searchName||"",$("#ageMin").value=state.filters.ageMin??"",$("#ageMax").value=state.filters.ageMax??"",$("#citySelect").value=state.filters.city||"",$("#maritalSelect").value=state.filters.marital||"",$("#sortSelect").value=state.filters.sort||""}const bootstrapScript=document.createElement("script");bootstrapScript.src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js",document.body.appendChild(bootstrapScript),loadState(),readParams(),bindEvents(),syncInputs(),applyFilters();
+</script>
+</body>
+</html>

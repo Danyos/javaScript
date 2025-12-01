@@ -1,0 +1,1522 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8">
+    <title>DVCoding English — Անգլերենի դասընթացներ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #35B76D;
+            --dark: #212121;
+            --light-bg: #f5f5f5;
+            --text: #222;
+            --muted: #777;
+            --radius-lg: 18px;
+            --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.18);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #111;
+            color: #f9f9f9;
+            line-height: 1.6;
+            scroll-behavior: smooth;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        img {
+            max-width: 100%;
+            display: block;
+        }
+
+        .page {
+            min-height: 100vh;
+            background: radial-gradient(circle at top left, rgba(53, 183, 109, 0.12), transparent 60%),
+            radial-gradient(circle at bottom right, rgba(53, 183, 109, 0.07), transparent 55%),
+            var(--dark);
+            color: #f9f9f9;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        /* HEADER */
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            backdrop-filter: blur(16px);
+            background: linear-gradient(to bottom, rgba(17, 17, 17, 0.96), rgba(17, 17, 17, 0.8), transparent);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            gap: 16px;
+        }
+
+        .logo {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .logo-img {
+            height: 40px;
+            width: auto;
+            display: block;
+            object-fit: contain;
+        }
+
+        .logo-text-sub {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #b5b5b5;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 18px;
+            font-size: 14px;
+            color: #d5d5d5;
+        }
+
+        .nav-links a {
+            position: relative;
+            padding-bottom: 2px;
+        }
+
+        .nav-links a::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: -4px;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.2s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-cta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            white-space: nowrap;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 999px;
+            padding: 9px 18px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 10px 25px rgba(53, 183, 109, 0.55);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 16px 35px rgba(53, 183, 109, 0.7);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: #f5f5f5;
+            border: 1px solid rgba(245, 245, 245, 0.3);
+        }
+
+        .btn-ghost:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .phone-tag {
+            font-size: 12px;
+            color: #b5b5b5;
+        }
+
+        /* NAV TOGGLE (MOBILE) */
+
+        .nav-toggle {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            gap: 4px;
+            width: 34px;
+            height: 34px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.4);
+            cursor: pointer;
+            padding: 6px;
+        }
+
+        .nav-toggle span {
+            height: 2px;
+            width: 100%;
+            background: #f5f5f5;
+            border-radius: 999px;
+            transition: transform 0.15s ease, opacity 0.15s ease;
+        }
+
+        .nav-toggle.nav-open span:nth-child(1) {
+            transform: translateY(4px) rotate(45deg);
+        }
+
+        .nav-toggle.nav-open span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .nav-toggle.nav-open span:nth-child(3) {
+            transform: translateY(-4px) rotate(-45deg);
+        }
+
+        /* HERO */
+
+        .hero {
+            padding: 40px 0 56px;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 3fr) minmax(0, 2.6fr);
+            gap: 32px;
+            align-items: center;
+        }
+
+        .eyebrow {
+            font-size: 13px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--primary);
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .eyebrow-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: var(--primary);
+        }
+
+        .hero-title {
+            font-size: clamp(30px, 4vw, 40px);
+            font-weight: 700;
+            line-height: 1.15;
+            margin-bottom: 12px;
+        }
+
+        .hero-title span.highlight {
+            color: var(--primary);
+        }
+
+        .hero-subtitle {
+            font-size: 15px;
+            color: #d0d0d0;
+            max-width: 480px;
+            margin-bottom: 22px;
+        }
+
+        .hero-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 22px;
+        }
+
+        .badge {
+            font-size: 12px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(210, 210, 210, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #e5e5e5;
+        }
+
+        .badge-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 999px;
+            background: var(--primary);
+        }
+
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .hero-note {
+            font-size: 12px;
+            color: #b8b8b8;
+        }
+
+        .hero-note strong {
+            color: #fff;
+        }
+
+        .hero-side {
+            position: relative;
+        }
+
+        .hero-card {
+            background: rgba(18, 18, 18, 0.96);
+            border-radius: 24px;
+            padding: 18px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .hero-class-photo {
+            position: relative;
+            overflow: hidden;
+            border-radius: 18px;
+            background: #000;
+            aspect-ratio: 4 / 3;
+            margin-bottom: 14px;
+        }
+
+        .hero-class-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.88;
+        }
+
+        .photo-tag {
+            position: absolute;
+            left: 12px;
+            top: 12px;
+            background: rgba(0, 0, 0, 0.68);
+            border-radius: 999px;
+            padding: 5px 11px;
+            font-size: 11px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #f5f5f5;
+        }
+
+        .photo-tag-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: var(--primary);
+        }
+
+        .hero-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            color: #cfcfcf;
+            flex-wrap: wrap;
+        }
+
+        .level-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .level-pill {
+            padding: 5px 9px;
+            border-radius: 999px;
+            font-size: 11px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .hero-tagline {
+            font-size: 11px;
+            color: #a5a5a5;
+        }
+
+        /* SECTION BASE */
+
+        section {
+            padding: 42px 0;
+        }
+
+        .section-header {
+            margin-bottom: 22px;
+        }
+
+        .section-eyebrow {
+            font-size: 12px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .section-subtitle {
+            font-size: 14px;
+            color: #c3c3c3;
+        }
+
+        /* WHY SECTION */
+
+        .why {
+            background: #151515;
+            border-top: 1px solid rgba(255, 255, 255, 0.07);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .why-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.4fr) minmax(0, 2fr);
+            gap: 28px;
+        }
+
+        .why-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 14px;
+        }
+
+        .why-item {
+            background: #1d1d1d;
+            border-radius: 16px;
+            padding: 14px 14px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .why-item-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .why-item-text {
+            font-size: 13px;
+            color: #c2c2c2;
+        }
+
+        .stats-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-top: 12px;
+        }
+
+        .stat-card {
+            flex: 1;
+            min-width: 130px;
+            background: #111;
+            border-radius: 14px;
+            padding: 10px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            font-size: 12px;
+            color: #c4c4c4;
+        }
+
+        .stat-number {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        /* PRICING SECTION */
+
+        .pricing {
+            background: #101010;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 2.1fr) minmax(0, 1.4fr);
+            gap: 24px;
+            align-items: flex-start;
+        }
+
+        .pricing-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 14px;
+        }
+
+        .pricing-card {
+            background: #171717;
+            border-radius: 16px;
+            padding: 14px 14px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .pricing-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            gap: 8px;
+        }
+
+        .pricing-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #bfbfbf;
+        }
+
+        .pricing-badge {
+            font-size: 11px;
+            padding: 5px 9px;
+            border-radius: 999px;
+            background: rgba(53, 183, 109, 0.15);
+            color: #e8ffe4;
+            border: 1px solid rgba(53, 183, 109, 0.5);
+            white-space: nowrap;
+        }
+
+        .pricing-main-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .pricing-meta {
+            font-size: 12px;
+            color: #b8b8b8;
+            margin-bottom: 8px;
+        }
+
+        .pricing-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            margin-bottom: 6px;
+        }
+
+        .pricing-table th,
+        .pricing-table td {
+            padding: 5px 4px;
+            text-align: left;
+        }
+
+        .pricing-table th {
+            font-weight: 500;
+            color: #c5c5c5;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .pricing-table td {
+            color: #e6e6e6;
+        }
+
+        .pricing-note {
+            font-size: 11px;
+            color: #a5a5a5;
+        }
+
+        .formats-card {
+            background: #171717;
+            border-radius: 16px;
+            padding: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .formats-list {
+            list-style: none;
+            font-size: 13px;
+            color: #d3d3d3;
+        }
+
+        .formats-list li {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .dot {
+            margin-top: 6px;
+            width: 6px;
+            height: 6px;
+            border-radius: 999px;
+            background: var(--primary);
+            flex-shrink: 0;
+        }
+
+        /* SPEAKING CLUB */
+
+        .speaking {
+            background: #151515;
+        }
+
+        .speaking-card {
+            background: linear-gradient(135deg, #1d1d1d, #101c14);
+            border-radius: 20px;
+            padding: 18px 16px;
+            border: 1px solid rgba(53, 183, 109, 0.6);
+            box-shadow: 0 14px 40px rgba(0, 0, 0, 0.45);
+            display: grid;
+            grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.5fr);
+            gap: 18px;
+            align-items: center;
+        }
+
+        .tag-strong {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(0, 0, 0, 0.55);
+            color: #e9ffe9;
+            font-size: 11px;
+            margin-bottom: 8px;
+        }
+
+        .speaking-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .speaking-text {
+            font-size: 13px;
+            color: #dedede;
+            margin-bottom: 8px;
+        }
+
+        .speaking-meta-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 12px;
+            color: #c3c3c3;
+            margin-bottom: 8px;
+        }
+
+        .pill {
+            padding: 5px 9px;
+            border-radius: 999px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .speaking-price {
+            font-size: 14px;
+            color: #e3ffe4;
+        }
+
+        .speaking-right-note {
+            font-size: 12px;
+            color: #b8f3c4;
+            margin-bottom: 8px;
+        }
+
+        /* PHOTOS SECTION */
+
+        .photos {
+            background: #101010;
+        }
+
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 14px;
+        }
+
+        .photo-card {
+            background: #181818;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .photo-card-img {
+            aspect-ratio: 4 / 3;
+            background: #000;
+            overflow: hidden;
+        }
+
+        .photo-card-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.9;
+        }
+
+        .photo-card-body {
+            padding: 10px 12px;
+            font-size: 12px;
+            color: #d9d9d9;
+        }
+
+        /* REGISTER SECTION */
+
+        .register {
+            background: #151515;
+        }
+
+        .register-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.6fr);
+            gap: 24px;
+            align-items: flex-start;
+        }
+
+        .register-info {
+            font-size: 13px;
+            color: #cfcfcf;
+        }
+
+        .register-info p {
+            margin-bottom: 10px;
+        }
+
+        .register-highlight {
+            padding: 10px 12px;
+            border-radius: 14px;
+            background: rgba(0, 0, 0, 0.55);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 12px;
+            color: #e2e2e2;
+        }
+
+        .register-highlight strong {
+            color: var(--primary);
+        }
+
+        form {
+            background: #111;
+            border-radius: 18px;
+            padding: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 16px 42px rgba(0, 0, 0, 0.45);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            margin-bottom: 4px;
+            color: #e8e8e8;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            background: #050505;
+            color: #f7f7f7;
+            padding: 9px 11px;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+        }
+
+        textarea {
+            border-radius: 14px;
+            resize: vertical;
+            min-height: 70px;
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #777;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 1px rgba(53, 183, 109, 0.6);
+            background: #050805;
+        }
+
+        .form-footnote {
+            font-size: 11px;
+            color: #a8a8a8;
+            margin-top: 6px;
+        }
+
+        /* FOOTER */
+
+        footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            background: #101010;
+            padding: 14px 0 18px;
+            font-size: 12px;
+            color: #bcbcbc;
+        }
+
+        .footer-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .footer-contact {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .footer-contact span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .footer-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 999px;
+            background: var(--primary);
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 900px) {
+            .hero-grid,
+            .why-grid,
+            .pricing-grid,
+            .speaking-card,
+            .register-grid {
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+            .hero {
+                padding-top: 26px;
+            }
+        }
+
+        @media (max-width: 720px) {
+            header {
+                background: rgba(17,17,17,0.96);
+            }
+
+            .nav {
+                gap: 8px;
+            }
+
+            .nav-toggle {
+                display: flex;
+            }
+
+            .nav-links {
+                position: absolute;
+                top: 100%;
+                right: 16px;
+                margin-top: 8px;
+                background: rgba(0,0,0,0.96);
+                border-radius: 14px;
+                border: 1px solid rgba(255,255,255,0.12);
+                padding: 10px 12px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+                min-width: 180px;
+                display: none;
+            }
+
+            .nav-links.nav-links--open {
+                display: flex;
+            }
+
+            .nav-cta .phone-tag {
+                display: none;
+            }
+
+            .hero {
+                padding-bottom: 44px;
+            }
+
+            section {
+                padding: 30px 0;
+            }
+
+            form {
+                padding: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav {
+                padding: 8px 0;
+            }
+
+            .logo {
+                gap: 6px;
+            }
+
+            .logo-img {
+                height: 32px;
+            }
+
+            .hero-title {
+                font-size: 26px;
+            }
+
+            .hero-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .form-row {
+                grid-template-columns: minmax(0, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+
+    <!-- HEADER -->
+    <header>
+        <div class="container nav">
+            <div class="logo">
+                <img class="logo-img" src="https://dvcoding.com/client/logo/logo.png" alt="DVCoding logo">
+                <div class="logo-text-sub">English Courses</div>
+            </div>
+
+            <nav class="nav-links" id="navLinks">
+                <a href="#why">Առավելություններ</a>
+                <a href="#pricing">Դասընթացներ</a>
+                <a href="#speaking">Speaking Club</a>
+                <a href="#photos">Դասերի մթնոլորտ</a>
+                <a href="#register">Գրանցում</a>
+            </nav>
+
+            <div class="nav-cta">
+                <div class="phone-tag">📞 +374 98 657 545</div>
+                <a href="#register" class="btn btn-primary">Գրանցվել</a>
+                <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO -->
+    <main>
+        <section class="hero">
+            <div class="container hero-grid">
+                <div>
+                    <div class="eyebrow">
+                        <span class="eyebrow-dot"></span>
+                        English that actually works
+                    </div>
+                    <h1 class="hero-title">
+                        Անգլերենի <span class="highlight">կենտրոնացված դասընթացներ</span><br>
+                        DVCoding-ում՝ Komitas / Aram Khachaturyan 4
+                    </h1>
+                    <p class="hero-subtitle">
+                        Անգլերենի դասընթացներ շաբաթը 2 օր, 1.5–2 ժամ։
+                        Դասավանդում է 10+ տարվա փորձ ունեցող մասնագետ։ Offline և online ձևաչափեր՝ բոլոր մակարդակների
+                        համար։
+                    </p>
+
+                    <div class="hero-badges">
+                        <div class="badge">
+                            <span class="badge-dot"></span>
+                            A1–C2 մակարդակներ
+                        </div>
+                        <div class="badge">
+                            <span class="badge-dot"></span>
+                            Փոքր խմբեր՝ մինչև 5-6 մասնակից
+                        </div>
+                        <div class="badge">
+                            <span class="badge-dot"></span>
+                            Offline և Online
+                        </div>
+                        <div class="badge">
+                            <span class="badge-dot"></span>
+                            10+ տարվա փորձ
+                        </div>
+                    </div>
+
+                    <div class="hero-actions">
+                        <a href="#register" class="btn btn-primary">
+                            Գրանցվել դասընթացին →
+                        </a>
+                        <a href="tel:+37498657545" class="btn btn-ghost">
+                            Զանգել հիմա
+                        </a>
+                    </div>
+
+                    <p class="hero-note">
+                        <strong>Շաբաթական գրաֆիկը</strong> հարմարեցվում է ձեր զբաղվածությանը՝
+                        աշխատանքից կամ ուսումից հետո ժամերին։
+                    </p>
+                </div>
+
+                <aside class="hero-side">
+                    <div class="hero-card">
+                        <div class="hero-class-photo">
+                            <!-- Քո դասից նկարի հասցեն կդնես այստեղ -->
+                            <img src="https://images.pexels.com/photos/7092612/pexels-photo-7092612.jpeg?auto=compress&cs=tinysrgb&w=1200"
+                                 alt="English class at DVCoding">
+                            <div class="photo-tag">
+                                <span class="photo-tag-dot"></span>
+                                Իրական դասից մթնոլորտ
+                            </div>
+                        </div>
+                        <div class="hero-card-footer">
+                            <div class="level-pills">
+                                <div class="level-pill">A1–A2 • Foundations</div>
+                                <div class="level-pill">B1–B2 • Fluency</div>
+                                <div class="level-pill">C1–C2 • Advanced</div>
+                            </div>
+                            <div class="hero-tagline">
+                                Offline 📍 Komitas / A. Khachaturyan 4 &nbsp;·&nbsp; Online 🌍
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <!-- WHY -->
+        <section id="why" class="why">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-eyebrow">Ինչու հենց այստեղ</div>
+                    <h2 class="section-title">Ինչու՞ ընտրել DVCoding-ի անգլերենի դասընթացները</h2>
+                    <p class="section-subtitle">
+                        Մեզ մոտ պրակտիկան է կարևոր․ խոսք, լսում, իրական life situations, ոչ թե միայն grammar գրքերով։
+                    </p>
+                </div>
+
+                <div class="why-grid">
+                    <div>
+                        <div class="why-list">
+                            <div class="why-item">
+                                <div class="why-item-title">10+ տարվա դասավանդման փորձ</div>
+                                <div class="why-item-text">
+                                    Դասավանդողը աշխատել է տարբեր տարիքային և մակարդակային խմբերի հետ,
+                                    ունի հստակ կառուցված ծրագիր՝ արագ առաջընթացի համար։
+                                </div>
+                            </div>
+                            <div class="why-item">
+                                <div class="why-item-title">Փոքր խմբեր, մեծ արդյունք</div>
+                                <div class="why-item-text">
+                                    Խմբային դասերն ունեն սահմանափակ մասնակիցների քանակ՝
+                                    յուրաքանչյուր ուսանողի խոսքը և ուշադրությունը ապահովելու համար։
+                                </div>
+                            </div>
+                            <div class="why-item">
+                                <div class="why-item-title">Offline & Online ձևաչափ</div>
+                                <div class="why-item-text">
+                                    Կարող եք հաճախել ինչպես լսարան, այնպես էլ միանալ առցանց՝
+                                    եթե ճանապարհն ու ժամանակը խնայելը ձեզ համար կարևոր է։
+                                </div>
+                            </div>
+                            <div class="why-item">
+                                <div class="why-item-title">Խոսք, ոչ միայն քերականություն</div>
+                                <div class="why-item-text">
+                                    Խոսակցական բլոկներ, դերային խաղեր, real dialogs, B1 speaking club —
+                                    ամեն ինչ, որպեսզի սկսեք վստահ խոսել անգլերեն։
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="stats-row">
+                            <div class="stat-card">
+                                <div class="stat-number">2×</div>
+                                <div>շաբաթական դասեր հիմնական դասընթացների համար․
+                                    կայուն, բայց չծանրաբեռնող գրաֆիկ։
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number">1.5–2 ժամ</div>
+                                <div>դասի տևողություն՝ խորությամբ բացատրություն + խոսք + վարժություններ։</div>
+                            </div>
+                        </div>
+                        <div class="stats-row">
+                            <div class="stat-card">
+                                <div class="stat-number">A1–C2</div>
+                                <div>բոլոր մակարդակների դասընթացներ՝ սկսնակից մինչև առաջադեմ։</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number">5×</div>
+                                <div>շաբաթական B1 Speaking Club — արագ խոսակցական առաջընթացի համար։</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- PRICING -->
+        <section id="pricing" class="pricing">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-eyebrow">Դասընթացների տարբերակներ</div>
+                    <h2 class="section-title">Գնային փաթեթներ՝ խմբային և անհատական</h2>
+                    <p class="section-subtitle">
+                        Ընտրեք այն տարբերակը, որը ամենաշատը համապատասխանում է ձեր գրաֆիկին և նպատակին։
+                    </p>
+                </div>
+
+                <div class="pricing-grid">
+                    <div class="pricing-cards">
+
+                        <!-- GROUP -->
+                        <article class="pricing-card">
+                            <div class="pricing-card-header">
+                                <div>
+                                    <div class="pricing-label">Group course • Offline & Online</div>
+                                    <div class="pricing-main-title">Խմբային դասընթացներ</div>
+                                </div>
+                                <div class="pricing-badge">2 օր / շաբաթ</div>
+                            </div>
+
+                            <div class="pricing-meta">
+                                Դասերն անցկացվում են շաբաթը 2 անգամ, յուրաքանչյուր դաս՝ 1.5 ժամ։
+                                Խմբում մինչև 5–6 ուսանող։
+                            </div>
+
+                            <table class="pricing-table">
+                                <thead>
+                                <tr>
+                                    <th>Մակարդակ</th>
+                                    <th>Արժեք</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>A1–A2</td>
+                                    <td>30.000 դրամ / ամիս</td>
+                                </tr>
+                                <tr>
+                                    <td>B1–B2</td>
+                                    <td>35.000 դրամ / ամիս</td>
+                                </tr>
+                                <tr>
+                                    <td>C1–C2</td>
+                                    <td>40.000 դրամ / ամիս</td>
+                                </tr>
+                                </tbody>
+                            </table>
+
+                            <div class="pricing-note">
+                                Խմբային դասընթացները հարմար են, եթե սիրում եք աշխատել թիմով և
+                                լսել տարբեր մարդկանց խոսքը։
+                            </div>
+                        </article>
+
+                        <!-- INDIVIDUAL 2x -->
+                        <article class="pricing-card">
+                            <div class="pricing-card-header">
+                                <div>
+                                    <div class="pricing-label">Individual • 2x per week</div>
+                                    <div class="pricing-main-title">Անհատական դասեր (2× / շաբաթ)</div>
+                                </div>
+                                <div class="pricing-badge">1 ժամ / դաս</div>
+                            </div>
+
+                            <div class="pricing-meta">
+                                Շաբաթը 2 անգամ, յուրաքանչյուր դաս՝ 1 ժամ։ Գրաֆիկը
+                                համադրվում է ձեր զբաղվածության հետ։
+                            </div>
+
+                            <table class="pricing-table">
+                                <thead>
+                                <tr>
+                                    <th>Մակարդակ</th>
+                                    <th>Արժեք</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>A1–A2</td>
+                                    <td>40.000 դրամ / ամիս</td>
+                                </tr>
+                                <tr>
+                                    <td>B1–B2</td>
+                                    <td>45.000 դրամ / ամիս</td>
+                                </tr>
+                                <tr>
+                                    <td>C1–C2</td>
+                                    <td>50.000 դրամ / ամիս</td>
+                                </tr>
+                                </tbody>
+                            </table>
+
+                            <div class="pricing-note">
+                                Եթե ուզում եք առավելագույն ուշադրություն և արագ առաջընթաց՝ սա ձեր տարբերակն է։
+                            </div>
+                        </article>
+
+                        <!-- INDIVIDUAL 3x -->
+                        <article class="pricing-card">
+                            <div class="pricing-card-header">
+                                <div>
+                                    <div class="pricing-label">Individual • 3x per week</div>
+                                    <div class="pricing-main-title">Անհատական դասեր (3× / շաբաթ)</div>
+                                </div>
+                                <div class="pricing-badge">Intensive</div>
+                            </div>
+
+                            <div class="pricing-meta">
+                                Շաբաթը 3 անգամ, յուրաքանչյուր դաս՝ 1 ժամ։ Իդեալական է,
+                                եթե ուզում եք արագ բարձրանալ մեկ մակարդակով։
+                            </div>
+
+                            <table class="pricing-table">
+                                <thead>
+                                <tr>
+                                    <th>Մակարդակ</th>
+                                    <th>Արժեք</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>A1–A2</td>
+                                    <td>50.000 դրամ / ամիս</td>
+                                </tr>
+                                <tr>
+                                    <td>B1–B2</td>
+                                    <td>55.000 դրամ / ամիս</td>
+                                </tr>
+                                <tr>
+                                    <td>C1–C2</td>
+                                    <td>60.000 դրամ / ամիս</td>
+                                </tr>
+                                </tbody>
+                            </table>
+
+                            <div class="pricing-note">
+                                Այս ինտենսիվ տարբերակը հարմար է կարճ ժամանակում լուրջ արդյունք ստանալու համար։
+                            </div>
+                        </article>
+
+                    </div>
+
+                    <aside>
+                        <div class="formats-card">
+                            <h3 class="pricing-main-title">Դասերի կառուցվածքը</h3>
+                            <p class="pricing-meta">
+                                Ամեն դաս կազմված է 3 հիմնական բլոկից, որպեսզի իրականում սկսեք օգտագործել անգլերենը։
+                            </p>
+                            <ul class="formats-list">
+                                <li>
+                                    <span class="dot"></span>
+                                    <span><strong>Grammar + explanation</strong> — պարզ, հասկանալի բացատրություն օրինակներով։</span>
+                                </li>
+                                <li>
+                                    <span class="dot"></span>
+                                    <span><strong>Speaking practice</strong> — խոսակցական թեմաներ, հարցուպատասխան, փոքր role-plays։</span>
+                                </li>
+                                <li>
+                                    <span class="dot"></span>
+                                    <span><strong>Listening & vocabulary</strong> — տեսանյութեր, աուդիոներ, իրական life situations։</span>
+                                </li>
+                                <li>
+                                    <span class="dot"></span>
+                                    <span><strong>Homework & feedback</strong> — հստակ տնային, ուղղում և անհատական խորհուրդներ։</span>
+                                </li>
+                            </ul>
+                            <p class="pricing-note" style="margin-top: 8px;">
+                                Offline դասերի հասցեն՝ <strong>ք. Երևան, Կոմիտաս / Արամ Խաչատրյան 4</strong>.
+                                Online դասերին կարող եք միանալ Հայաստանից և արտերկրից։
+                            </p>
+                        </div>
+                    </aside>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SPEAKING CLUB -->
+        <section id="speaking" class="speaking">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-eyebrow">Extra speaking practice</div>
+                    <h2 class="section-title">B1 Speaking Club (offline)</h2>
+                    <p class="section-subtitle">
+                        Եթե արդեն ունեք B1 մակարդակ և ուզում եք սկսել ազատ խոսել՝ առանց վախի ու երկար մտածելու։
+                    </p>
+                </div>
+
+                <div class="speaking-card">
+                    <div>
+                        <div class="tag-strong">
+                            <span class="badge-dot"></span>
+                            Only speaking, no boring theory
+                        </div>
+                        <div class="speaking-title">B1 Speaking Club — 5x շաբաթական</div>
+                        <p class="speaking-text">
+                            Speaking Club-ը նախատեսված է B1 մակարդակի ուսանողների համար, որոնք ուզում են դուրս գալ
+                            «ուզում եմ խոսել, բայց ամաչում եմ» վիճակից։
+                            Այստեղ աշխատում ենք միայն խոսքի վրա։
+                        </p>
+                        <div class="speaking-meta-row">
+                            <div class="pill">շաբաթական 5 անգամ</div>
+                            <div class="pill">յուրաքանչյուր դաս՝ 2 ժամ</div>
+                            <div class="pill">խումբ՝ մինչև 8 մասնակից</div>
+                            <div class="pill">սկիզբ՝ 19:30 (երեկոյան)</div>
+                        </div>
+                        <div class="speaking-price">
+                            💸 Արժեքը՝ <strong>65.000 դրամ / ամիս</strong> (միայն offline, սրահում)
+                        </div>
+                    </div>
+                    <div>
+                        <p class="speaking-right-note">
+                            Ամեն դաս ընտրված թեմա, խաղեր, debate-ներ, real life իրավիճակներ։ Արգելված է երկար մտածել։
+                            Խոսում ենք, սխալվում, ուղղվում ու առաջ ենք գնում։ 🙂
+                        </p>
+                        <a href="#register" class="btn btn-primary">
+                            Գրանցվել Speaking Club-ին
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PHOTOS -->
+        <section id="photos" class="photos">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-eyebrow">Class vibe</div>
+                    <h2 class="section-title">Դասերի իրական մթնոլորտը</h2>
+                    <p class="section-subtitle">
+                        Այստեղ կարող ես տեղադրել լուսանկարներ քո դասերից՝ որպեսզի ուսանողները տեսնեն, թե ինչ միջավայրում
+                        են սովորելու։
+                    </p>
+                </div>
+
+                <div class="photo-grid">
+                    <article class="photo-card">
+                        <div class="photo-card-img">
+                            <!-- Փոխիր real նկարով -->
+                            <img src="https://images.pexels.com/photos/4144222/pexels-photo-4144222.jpeg?auto=compress&cs=tinysrgb&w=1200"
+                                 alt="English group lesson at DVCoding">
+                        </div>
+                        <div class="photo-card-body">
+                            Խմբային դաս՝ խոսակցական բլոկ, դերային խաղեր և live feedback։
+                        </div>
+                    </article>
+
+                    <article class="photo-card">
+                        <div class="photo-card-img">
+                            <img src="https://images.pexels.com/photos/1181395/pexels-photo-1181395.jpeg?auto=compress&cs=tinysrgb&w=1200"
+                                 alt="Teacher explaining grammar on board">
+                        </div>
+                        <div class="photo-card-body">
+                            Քերականության բացատրություն պարզ լեզվով + օրինակներ այն թեմաների, որ իրականում օգտագործվում
+                            են կյանքում։
+                        </div>
+                    </article>
+
+                    <article class="photo-card">
+                        <div class="photo-card-img">
+                            <img src="https://images.pexels.com/photos/5212345/pexels-photo-5212345.jpeg?auto=compress&cs=tinysrgb&w=1200"
+                                 alt="Online English lesson">
+                        </div>
+                        <div class="photo-card-body">
+                            Online դասեր՝ նույն մոտեցմամբ․ տեսազանգ, նյութեր, վարժություններ և խոսք։
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- REGISTER -->
+        <section id="register" class="register">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-eyebrow">Գրանցում</div>
+                    <h2 class="section-title">Թողեք ձեր տվյալները — мы свяжемся с вами</h2>
+                    <p class="section-subtitle">
+                        Լրացրեք կարճ ձևը, և մենք կզանգահարենք, կպարզենք ձեր մակարդակը և կառաջարկենք լավագույն տարբերակը։
+                    </p>
+                </div>
+
+                <div class="register-grid">
+                    <div class="register-info">
+                        <p>
+                            Անկախ նրանից՝ սկսնակի՞ց եք, թե արդեն խոսում եք ու ուզում եք բարձրացնել մակարդակը,
+                            կօգնենք ընտրել ճիշտ դասընթացը՝ A1-ից մինչև C2։
+                        </p>
+                        <div class="register-highlight">
+                            📍 <strong>Հասցե՝ ք. Երևան, Կոմիտաս / Արամ Խաչատրյան 4</strong><br>
+                            📞 <strong>Հեռ.: +374 98 657 545</strong><br>
+                            ✉️ Կարող եք գրել նաև Viber / WhatsApp / Telegram։
+                        </div>
+                    </div>
+
+                    <div>
+                        <form>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="name">Անուն, ազգանուն</label>
+                                    <input type="text" id="name" name="name" placeholder="Օրինակ՝ Անահիտ Սարգսյան"
+                                           required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="phone">Հեռախոսահամար</label>
+                                    <input type="tel" id="phone" name="phone" placeholder="+374 ..." required>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="format">Ցանկալի ձևաչափ</label>
+                                    <select id="format" name="format">
+                                        <option value="group">Խմբային դասընթաց</option>
+                                        <option value="ind-2">Անհատական (շաբաթը 2 անգամ)</option>
+                                        <option value="ind-3">Անհատական (շաբաթը 3 անգամ)</option>
+                                        <option value="speaking">B1 Speaking Club</option>
+                                        <option value="not-sure">Չեմ կողմնորոշվել, պետք է խորհրդատվություն</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="level">Մակարդակ (եթե գիտեք)</label>
+                                    <select id="level" name="level">
+                                        <option value="unknown">Չեմ կողմնորոշվել</option>
+                                        <option value="a1">A1</option>
+                                        <option value="a2">A2</option>
+                                        <option value="b1">B1</option>
+                                        <option value="b2">B2</option>
+                                        <option value="c1">C1</option>
+                                        <option value="c2">C2</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="mode">Տիպ</label>
+                                    <select id="mode" name="mode">
+                                        <option value="offline">Offline (լսարան, Komitas / A. Khachaturyan 4)</option>
+                                        <option value="online">Online</option>
+                                        <option value="both">Կարող եմ և offline, և online</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="time">Նախընտրելի ժամ</label>
+                                    <select id="time" name="time">
+                                        <option value="evening">Երեկոյան (18:00–21:30)</option>
+                                        <option value="day">Ցերեկային ժամեր</option>
+                                        <option value="flex">Ցանկացած, հարմարեցվող</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="message">Լրացուցիչ տեղեկություն (կամ հարց)</label>
+                                <textarea id="message" name="message"
+                                          placeholder="Գրեք՝ ինչ եք ուզում հասնել անգլերենով, կամ ձեր հարցերը։"></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary"
+                                    style="width: 100%; justify-content: center; margin-top: 4px;">
+                                Ուղարկել հայտը
+                            </button>
+
+                            <div class="form-footnote">
+                                * Դեպի «Ուղարկել հայտը» սեղմելով՝ համաձայնում եք, որ մենք կարող ենք կապ հաստատել ձեզ հետ
+                                հեռախոսով կամ մեսենջերով։
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container footer-row">
+            <div>© <span id="year"></span> DVCoding English — Անգլերենի դասընթացներ Երևանում և online։</div>
+            <div class="footer-contact">
+                <span><span class="footer-dot"></span> Komitas / Aram Khachaturyan 4, Երևան</span>
+                <span><span class="footer-dot"></span> Tel: <a href="tel:+37498657545">+374 98 657 545</a></span>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<script>
+    // Տարեթիվը ավտոմատ
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    // Mobile nav toggle
+    const navToggle = document.getElementById("navToggle");
+    const navLinks = document.getElementById("navLinks");
+
+    navToggle.addEventListener("click", () => {
+        navToggle.classList.toggle("nav-open");
+        navLinks.classList.toggle("nav-links--open");
+    });
+
+    // Close menu on link click (mobile UX)
+    navLinks.querySelectorAll("a").forEach(link => {
+        link.addEventListener("click", () => {
+            navToggle.classList.remove("nav-open");
+            navLinks.classList.remove("nav-links--open");
+        });
+    });
+</script>
+</body>
+</html>

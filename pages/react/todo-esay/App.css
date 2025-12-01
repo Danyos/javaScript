@@ -1,0 +1,175 @@
+/* ===== Theme ===== */
+:root{
+    --bg-1:#0f1226;
+    --bg-2:#101a3f;
+    --card-bg: rgba(255,255,255,.08);
+    --card-brd: rgba(255,255,255,.18);
+    --shadow: 0 10px 30px rgba(0,0,0,.35);
+    --text: #e9ecf1;
+    --muted: #b9c2d3;
+    --primary:#6ea8fe;
+    --warning:#ffd24d;
+    --success:#63d297;
+    --danger:#ff6b6b;
+}
+
+/* ===== Background ===== */
+html, body, #root {
+    height: 100%;
+}
+body{
+    min-height:100vh;
+    background:
+            radial-gradient(1200px 600px at 10% -10%, #2b68ff22, transparent 60%),
+            radial-gradient(1000px 700px at 110% 10%, #24d6a922, transparent 60%),
+            linear-gradient(160deg, var(--bg-1), var(--bg-2));
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    margin: 0;
+}
+
+/* ===== Container & Card ===== */
+.app-wrap{
+    max-width: 900px;
+    margin: clamp(24px, 4vh, 56px) auto;
+    padding: 0 16px;
+}
+.glass-card{
+    background: var(--card-bg);
+    border: 1px solid var(--card-brd);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+/* ===== Header ===== */
+.app-header{
+    padding: 28px 28px 12px;
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+}
+.app-title{
+    margin:0;
+    font-weight: 800;
+    letter-spacing:.3px;
+}
+.sub{
+    color: var(--muted);
+    font-size: .95rem;
+}
+
+/* ===== Form Row ===== */
+.form-zone{
+    padding: 0 28px 20px;
+}
+.form-control, .form-select{
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.18);
+    color: var(--text);
+}
+.form-control::placeholder{ color:#c6cbd8aa; }
+.form-control:focus, .form-select:focus{
+    border-color: #8bb3ff;
+    box-shadow: 0 0 0 .2rem rgba(142,168,255,.18);
+    color: var(--text);
+}
+
+/* ===== List ===== */
+.list-holder{
+    padding: 8px 8px 22px;
+}
+.list-group{
+    --bs-list-group-bg: transparent;
+    --bs-list-group-border-color: rgba(255,255,255,.10);
+    border-radius: 16px;
+    overflow: hidden;
+}
+.list-group-item{
+    display:flex; align-items:center; justify-content:space-between;
+    background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+    color: var(--text);
+    padding: 14px 16px;
+    transition: transform .18s ease, background .18s ease, border-color .18s ease;
+    border-color: rgba(255,255,255,.10);
+    border-style: solid;
+    border-width: 1px;
+}
+.list-group-item:hover{
+    background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
+    transform: translateY(-2px);
+    border-color: rgba(255,255,255,.20);
+}
+
+/* Task text & status badge */
+.task-left{
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+}
+.task-text{
+    font-weight: 600;
+    letter-spacing:.2px;
+}
+.task-status{
+    border-radius: 999px;
+    padding: .25rem .6rem;
+    font-weight:700;
+    letter-spacing:.2px;
+}
+.status-pending{ background: #64748b33; border:1px solid #94a3b888; color:#e2e8f0;}
+.status-progress{ background: #997a0033; border:1px solid #ffd24d99; color:#ffe08a;}
+.status-done{ background: #0e7b5533; border:1px solid #63d297aa; color:#b9f3d3;}
+
+/* Buttons – view-only */
+.btn-ghost{
+    border:1px solid rgba(255,255,255,.20);
+    color: var(--text);
+    background: transparent;
+    padding: .35rem .7rem;
+    border-radius: 10px;
+    transition: background .2s ease, transform .15s ease, border-color .2s ease;
+}
+.btn-ghost:hover{ background: rgba(255,255,255,.08); transform: translateY(-1px); }
+.btn-edit{ border-color:#ffd24daa; }
+.btn-edit:hover{ background: #ffd24d26; }
+.btn-del{ border-color:#ff8d8daa; }
+.btn-del:hover{ background:#ff6b6b26; }
+
+.btn-add{
+    border:none;
+    background: linear-gradient(135deg, #6ea8fe, #3ddab6);
+    color:#0b1020;
+    font-weight:800;
+    letter-spacing:.3px;
+    box-shadow: 0 8px 20px rgba(16, 63, 236, .25);
+    transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+    border-radius: 12px;
+    padding: .45rem .8rem;
+}
+.btn-add:hover{ transform: translateY(-1px); filter: brightness(1.05); }
+.btn-add:active{ transform: translateY(0); box-shadow: 0 4px 12px rgba(16,63,236,.18); }
+
+/* Footer note */
+.hint{
+    color: var(--muted);
+    font-size: .9rem;
+    padding: 0 28px 26px;
+}
+
+/* Small helpers */
+.divider{
+    height:1px; background: rgba(255,255,255,.10);
+    margin: 0 28px 8px;
+}
+
+/* Responsive tweaks */
+@media (max-width: 575.98px){
+    .app-header{ flex-direction:column; align-items:flex-start; }
+    .sub{ font-size:.9rem; }
+}
+
+/* Utility (since we don't import full Bootstrap JS) */
+.d-grid { display: grid; }
+.gap-2 { gap: .5rem; }
+.mb-1 { margin-bottom: .25rem; }
+.h3 { font-size: 1.75rem; font-weight: 700; }

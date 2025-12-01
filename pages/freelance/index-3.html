@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Course Groups & Students Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        :root {
+            --bg: #020617;
+            --bg-soft: #020617;
+            --panel: #020617;
+            --accent: #38bdf8;
+            --accent-soft: rgba(56,189,248,0.16);
+            --danger: #fb7185;
+            --success: #22c55e;
+            --muted: #9ca3af;
+            --border: #1f2937;
+            --text: #e5e7eb;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: radial-gradient(circle at top, #1e293b 0, #020617 55%);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .app {
+            width: 100%;
+            max-width: 1180px;
+            background: rgba(15,23,42,0.96);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            box-shadow: 0 24px 60px rgba(15,23,42,0.9);
+            padding: 18px 18px 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .app-title-block {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .app-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .app-subtitle {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .badge {
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(148,163,184,0.6);
+            color: var(--muted);
+            background: rgba(15,23,42,0.95);
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.5fr);
+            gap: 14px;
+        }
+
+        @media (max-width: 900px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* LEFT: GROUPS */
+        .groups-panel {
+            background: var(--panel);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            padding: 12px 10px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-title {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .panel-caption {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .chip {
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 999px;
+            background: rgba(148,163,184,0.18);
+            color: var(--muted);
+            white-space: nowrap;
+        }
+
+        .group-form {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr auto;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        @media (max-width: 640px) {
+            .group-form {
+                grid-template-columns: 1.3fr 1fr;
+            }
+            .group-form button {
+                grid-column: 1 / -1;
+                justify-content: center;
+            }
+        }
+
+        .field {
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: var(--bg-soft);
+            color: var(--text);
+            font-size: 12px;
+            padding: 7px 10px;
+            outline: none;
+        }
+
+        .field::placeholder {
+            color: #6b7280;
+        }
+
+        .field:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 1px rgba(56,189,248,0.6);
+        }
+
+        .btn {
+            border-radius: 999px;
+            border: 1px solid transparent;
+            font-size: 11px;
+            cursor: pointer;
+            padding: 7px 11px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+            transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.12s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0ea5e9, #22c55e);
+            color: #020617;
+            font-weight: 500;
+            box-shadow: 0 12px 32px rgba(34,197,94,0.45);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--muted);
+            border-color: var(--border);
+        }
+
+        .btn:active {
+            transform: translateY(1px) scale(0.98);
+            box-shadow: none;
+        }
+
+        .error-hint {
+            font-size: 11px;
+            color: var(--danger);
+            min-height: 16px;
+            margin-top: 2px;
+        }
+
+        .groups-list {
+            margin-top: 4px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: rgba(15,23,42,0.95);
+            max-height: 360px;
+            overflow-y: auto;
+            padding: 4px 4px 4px 3px;
+        }
+
+        .group-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 8px 9px;
+            border-radius: 9px;
+            cursor: pointer;
+            transition: background 0.14s ease, transform 0.1s ease;
+        }
+
+        .group-card + .group-card {
+            margin-top: 3px;
+        }
+
+        .group-card:hover {
+            background: rgba(15,23,42,0.9);
+            transform: translateY(-1px);
+        }
+
+        .group-card.active {
+            background: var(--accent-soft);
+            box-shadow: inset 0 0 0 1px rgba(56,189,248,0.9);
+        }
+
+        .group-main {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            max-width: 70%;
+        }
+
+        .group-name {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .group-meta {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .group-right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tag-level {
+            font-size: 10px;
+            padding: 3px 7px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: rgba(15,23,42,0.9);
+            color: var(--muted);
+        }
+
+        .tag-open {
+            border-color: rgba(34,197,94,0.7);
+            color: var(--success);
+            background: rgba(34,197,94,0.14);
+        }
+
+        .icon-btn {
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 2px 4px;
+            color: #6b7280;
+        }
+
+        .icon-btn:hover {
+            color: var(--danger);
+        }
+
+        .empty-state {
+            padding: 16px 12px;
+            font-size: 12px;
+            color: var(--muted);
+            text-align: center;
+        }
+
+        /* RIGHT: STUDENTS PANEL */
+        .students-panel {
+            background: var(--panel);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            padding: 12px 10px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .students-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .header-left {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .header-title {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .header-subtitle {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .current-group-label {
+            font-size: 12px;
+            margin-top: 2px;
+        }
+
+        .current-group-label span {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: flex-end;
+        }
+
+        .filter-pill {
+            font-size: 11px;
+            padding: 4px 9px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: rgba(15,23,42,0.95);
+            color: var(--muted);
+            cursor: pointer;
+        }
+
+        .filter-pill.active {
+            background: var(--accent);
+            color: #020617;
+            border-color: var(--accent);
+        }
+
+        .students-top-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr) minmax(0, 0.8fr);
+            gap: 6px;
+            margin-top: 4px;
+            align-items: center;
+        }
+
+        @media (max-width: 720px) {
+            .students-top-row {
+                grid-template-columns: 1fr 1fr;
+            }
+            .students-top-row > div:nth-child(3) {
+                grid-column: 1 / -1;
+            }
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 6px;
+            font-size: 12px;
+        }
+
+        @media (max-width: 600px) {
+            .stats-row {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        .stat-card {
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: rgba(15,23,42,0.95);
+            padding: 8px 9px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .stat-label {
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .stat-value {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .stat-value--ok {
+            color: var(--success);
+        }
+
+        .stat-value--warn {
+            color: var(--danger);
+        }
+
+        .students-table {
+            margin-top: 6px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: rgba(15,23,42,0.96);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-height: 140px;
+        }
+
+        .table-head {
+            display: grid;
+            grid-template-columns: 32% 18% 18% 18% 14%;
+            padding: 7px 9px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: rgba(15,23,42,0.98);
+            color: var(--muted);
+        }
+
+        .table-body {
+            max-height: 320px;
+            overflow-y: auto;
+        }
+
+        .student-row {
+            display: grid;
+            grid-template-columns: 32% 18% 18% 18% 14%;
+            padding: 8px 9px;
+            font-size: 12px;
+            border-top: 1px solid rgba(15,23,42,0.9);
+            align-items: center;
+        }
+
+        .student-row:nth-child(odd) {
+            background: rgba(15,23,42,0.9);
+        }
+
+        .student-main {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .student-name {
+            font-weight: 500;
+        }
+
+        .student-email {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .score-pill {
+            display: inline-block;
+            padding: 3px 7px;
+            border-radius: 999px;
+            font-size: 11px;
+        }
+
+        .score-good {
+            background: rgba(34,197,94,0.12);
+            color: var(--success);
+            border: 1px solid rgba(34,197,94,0.75);
+        }
+
+        .score-mid {
+            background: rgba(234,179,8,0.1);
+            color: #eab308;
+            border: 1px solid rgba(234,179,8,0.75);
+        }
+
+        .score-low {
+            background: rgba(248,113,113,0.12);
+            color: var(--danger);
+            border: 1px solid rgba(248,113,113,0.8);
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            display: inline-block;
+            margin-right: 4px;
+        }
+
+        .status-active {
+            background: var(--success);
+        }
+
+        .status-paused {
+            background: #eab308;
+        }
+
+        .status-dropped {
+            background: var(--danger);
+        }
+
+        .status-text {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .student-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 6px;
+        }
+
+        .link-btn {
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 11px;
+            text-decoration: underline;
+            color: var(--muted);
+            padding: 2px 0;
+        }
+
+        .link-btn:hover {
+            color: var(--accent);
+        }
+
+        .search-input {
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: var(--bg-soft);
+            color: var(--text);
+            font-size: 12px;
+            padding: 7px 10px;
+            outline: none;
+            width: 100%;
+        }
+
+        .search-input::placeholder {
+            color: #6b7280;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 1px rgba(56,189,248,0.6);
+        }
+
+        /* ☑️ NEW: add-student form layout  */
+        .add-student-form {
+            display: grid;
+            grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 0.8fr) minmax(0, 0.7fr) auto;
+            gap: 6px;
+            margin-top: 8px;
+            align-items: center;
+        }
+
+        .select {
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: var(--bg-soft);
+            color: var(--text);
+            font-size: 12px;
+            padding: 7px 10px;
+            outline: none;
+        }
+
+        .select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 1px rgba(56,189,248,0.6);
+        }
+
+        .add-student-error {
+            font-size: 11px;
+            color: var(--danger);
+            min-height: 16px;
+            margin-top: 2px;
+        }
+
+        @media (max-width: 900px) {
+            .add-student-form {
+                grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+            }
+            .add-student-form > *:nth-child(n+3) {
+                grid-column: 1 / -1;
+            }
+        }
+
+        @media (max-width: 750px) {
+            .table-head,
+            .student-row {
+                grid-template-columns: 40% 24% 18% 18%;
+            }
+            .table-head div:last-child,
+            .student-row div:last-child {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <header class="app-header">
+        <div class="app-title-block">
+            <div class="app-title">Course Groups & Students Dashboard</div>
+            <div class="app-subtitle">
+                Ձախում խմբերն են, աջում ընտրված խմբի ուսանողների ցուցակը + վիճակագրություն։
+            </div>
+        </div>
+        <div class="badge">Groups • Students • Stats</div>
+    </header>
+
+    <main class="layout">
+        <!-- LEFT: GROUPS -->
+        <aside class="groups-panel">
+            <div class="panel-header">
+                <div>
+                    <div class="panel-title">Groups</div>
+                    <div class="panel-caption">Ընտրիր խումբ, տեսնես դրա ուսանողներին</div>
+                </div>
+                <span id="group-count" class="chip">0 groups</span>
+            </div>
+
+            <form id="group-form" class="group-form">
+                <input
+                        type="text"
+                        id="group-name-input"
+                        class="field"
+                        placeholder="Group name (e.g. JS Evening)"
+                >
+                <input
+                        type="text"
+                        id="group-level-input"
+                        class="field"
+                        placeholder="Level (e.g. Beginner)"
+                >
+                <button type="submit" class="btn btn-primary">+ Add group</button>
+            </form>
+            <div id="group-error" class="error-hint"></div>
+
+            <div id="groups-list" class="groups-list"></div>
+        </aside>
+
+        <!-- RIGHT: STUDENTS -->
+        <section class="students-panel">
+            <div class="students-header">
+                <div class="header-left">
+                    <div class="header-title">Students</div>
+                    <div class="header-subtitle">
+                        Աջ կողմում թվարկված են ընտրված խմբի ուսանողները։
+                    </div>
+                    <div id="current-group-label" class="current-group-label">
+                        Ընտրված խումբ չկա
+                    </div>
+                </div>
+                <div class="filter-row" id="status-filters">
+                    <button class="filter-pill active" data-filter="all">All</button>
+                    <button class="filter-pill" data-filter="active">Active</button>
+                    <button class="filter-pill" data-filter="paused">Paused</button>
+                    <button class="filter-pill" data-filter="dropped">Dropped</button>
+                </div>
+            </div>
+
+            <div class="students-top-row">
+                <div>
+                    <input
+                            id="student-search"
+                            type="text"
+                            class="search-input"
+                            placeholder="Search by student name..."
+                    >
+                </div>
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <div class="stat-label">Students in group</div>
+                        <div id="stat-count" class="stat-value">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Average score</div>
+                        <div id="stat-average" class="stat-value">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Completed (&gt;= 80)</div>
+                        <div id="stat-completed" class="stat-value stat-value--ok">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ☑️ NEW: Add student form -->
+            <form id="student-form" class="add-student-form">
+                <input
+                        type="text"
+                        id="student-name-input"
+                        class="field"
+                        placeholder="Full name (e.g. Arman Petrosyan)"
+                >
+                <input
+                        type="email"
+                        id="student-email-input"
+                        class="field"
+                        placeholder="Email (optional)"
+                >
+                <input
+                        type="tel"
+                        id="student-phone-input"
+                        class="field"
+                        placeholder="Phone (e.g. 091-000-000)"
+                >
+                <input
+                        type="number"
+                        id="student-score-input"
+                        class="field"
+                        placeholder="Score (0-100)"
+                        min="0"
+                        max="100"
+                >
+                <select id="student-status-select" class="select">
+                    <option value="active">active</option>
+                    <option value="paused">paused</option>
+                    <option value="dropped">dropped</option>
+                </select>
+                <button type="submit" class="btn btn-outline">+ Add student</button>
+            </form>
+            <div id="student-error" class="add-student-error"></div>
+
+            <div class="students-table">
+                <div class="table-head">
+                    <div>Student</div>
+                    <div>Score</div>
+                    <div>Status</div>
+                    <div>Phone</div>
+                    <div>Actions</div>
+                </div>
+                <div id="students-body" class="table-body">
+                    <!-- rows from JS -->
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+    let groups=[{id:1,name:"JS Evening",level:"Beginner",schedule:"Mon / Wed 19:00"},{id:2,name:"React Weekend",level:"Intermediate",schedule:"Sat / Sun 11:00"},{id:3,name:"English B1 Group",level:"B1",schedule:"Tue / Thu 18:30"}],students=[{id:101,groupId:1,name:"Arman Petrosyan",email:"arman@example.com",phone:"091-000-001",status:"active",score:78},{id:102,groupId:1,name:"Mane Sargsyan",email:"mane@example.com",phone:"093-000-002",status:"paused",score:63},{id:103,groupId:1,name:"Suren Hakobyan",email:"suren@example.com",phone:"099-000-003",status:"active",score:88},{id:104,groupId:2,name:"Ani Mirzakhanyan",email:"ani@example.com",phone:"095-000-004",status:"active",score:91},{id:105,groupId:2,name:"Davit Safrazyan",email:"davit@example.com",phone:"044-000-005",status:"dropped",score:52},{id:106,groupId:3,name:"Lilit Martirosyan",email:"lilit@example.com",phone:"094-000-006",status:"active",score:70},{id:107,groupId:3,name:"Gor Grigoryan",email:"gor@example.com",phone:"098-000-007",status:"active",score:84}],activeGroupId=groups[0]?.id??null,activeStatusFilter="all",searchQuery="";const groupsListEl=document.getElementById("groups-list"),groupCountEl=document.getElementById("group-count"),groupFormEl=document.getElementById("group-form"),groupNameInputEl=document.getElementById("group-name-input"),groupLevelInputEl=document.getElementById("group-level-input"),groupErrorEl=document.getElementById("group-error"),currentGroupLabelEl=document.getElementById("current-group-label"),statusFiltersEl=document.getElementById("status-filters"),studentSearchEl=document.getElementById("student-search"),studentsBodyEl=document.getElementById("students-body"),statCountEl=document.getElementById("stat-count"),statAverageEl=document.getElementById("stat-average"),statCompletedEl=document.getElementById("stat-completed"),studentFormEl=document.getElementById("student-form"),studentNameInputEl=document.getElementById("student-name-input"),studentEmailInputEl=document.getElementById("student-email-input"),studentPhoneInputEl=document.getElementById("student-phone-input"),studentScoreInputEl=document.getElementById("student-score-input"),studentStatusSelectEl=document.getElementById("student-status-select"),studentErrorEl=document.getElementById("student-error");function renderGroups(){if(groupsListEl.innerHTML="",!groups.length)return groupsListEl.innerHTML='<div class="empty-state">No groups yet. Add a new group above.</div>',groupCountEl.textContent="0 groups",activeGroupId=null,updateCurrentGroupLabel(),void renderStudents();groups.forEach((e=>{const t=document.createElement("div");t.className="group-card"+(e.id===activeGroupId?" active":""),t.dataset.id=e.id;const n=document.createElement("div");n.className="group-main";const u=document.createElement("div");u.className="group-name",u.textContent=e.name;const r=document.createElement("div");r.className="group-meta";const s=students.filter((t=>t.groupId===e.id)).length;r.textContent=`${e.level} • ${e.schedule} • ${s} students`,n.appendChild(u),n.appendChild(r);const o=document.createElement("div");o.className="group-right";const a=document.createElement("span");a.className="tag-level "+(s>0?"tag-open":""),a.textContent=s>0?"Active group":"Empty";const d=document.createElement("button");d.type="button",d.className="icon-btn",d.title="Delete group",d.textContent="🗑",o.appendChild(a),o.appendChild(d),t.appendChild(n),t.appendChild(o),t.addEventListener("click",(t=>{t.target!==d&&(activeGroupId=e.id,renderGroups(),renderStudents(),updateCurrentGroupLabel())})),d.addEventListener("click",(t=>{t.stopPropagation(),deleteGroup(e.id)})),groupsListEl.appendChild(t)})),groupCountEl.textContent=`${groups.length} group${1===groups.length?"":"s"}`}function deleteGroup(e){groups=groups.filter((t=>t.id!==e)),students=students.filter((t=>t.groupId!==e)),activeGroupId===e&&(activeGroupId=groups[0]?.id??null),renderGroups(),renderStudents(),updateCurrentGroupLabel()}function updateCurrentGroupLabel(){const e=groups.find((e=>e.id===activeGroupId));e?currentGroupLabelEl.innerHTML=`Ընտրված խումբ․ <span>${e.name}</span>`:currentGroupLabelEl.textContent="Ընտրված խումբ չկա"}function scoreClass(e){return e>=80?"score-pill score-good":e>=60?"score-pill score-mid":"score-pill score-low"}function statusDotClass(e){return"active"===e?"status-dot status-active":"paused"===e?"status-dot status-paused":"status-dot status-dropped"}function statusText(e){return"active"===e?"Active":"paused"===e?"Paused":"Dropped"}function renderStudents(){studentsBodyEl.innerHTML="";if(!groups.find((e=>e.id===activeGroupId)))return studentsBodyEl.innerHTML='<div class="empty-state">Ընտրիր խումբ ձախից, տեսնես ուսանողների ցուցակը։</div>',statCountEl.textContent="0",statAverageEl.textContent="0",void(statCompletedEl.textContent="0");let e=students.filter((e=>e.groupId===activeGroupId));if("all"!==activeStatusFilter&&(e=e.filter((e=>e.status===activeStatusFilter))),searchQuery.trim()){const t=searchQuery.trim().toLowerCase();e=e.filter((e=>e.name.toLowerCase().includes(t)))}if(!e.length)return studentsBodyEl.innerHTML='<div class="empty-state">Այս խմբում դեռ ուսանող գրանցված չէ կամ filter/search-ը ոչինչ չի վերադարձնում։</div>',statCountEl.textContent="0",statAverageEl.textContent="0",void(statCompletedEl.textContent="0");const t=e.length,n=e.reduce(((e,t)=>e+t.score),0)/t,u=e.filter((e=>e.score>=80)).length;statCountEl.textContent=String(t),statAverageEl.textContent=n.toFixed(1),statCompletedEl.textContent=String(u),e.forEach((e=>{const t=document.createElement("div");t.className="student-row";const n=document.createElement("div"),u=document.createElement("div");u.className="student-main";const r=document.createElement("div");r.className="student-name",r.textContent=e.name;const s=document.createElement("div");s.className="student-email",s.textContent=e.email,u.appendChild(r),u.appendChild(s),n.appendChild(u);const o=document.createElement("div"),a=document.createElement("span");a.className=scoreClass(e.score),a.textContent=e.score,o.appendChild(a);const d=document.createElement("div"),l=document.createElement("span");l.className=statusDotClass(e.status);const i=document.createElement("span");i.className="status-text",i.textContent=statusText(e.status),d.appendChild(l),d.appendChild(i);const c=document.createElement("div");c.textContent=e.phone;const p=document.createElement("div");p.className="student-actions";const m=document.createElement("button");m.type="button",m.className="link-btn",m.textContent="Boost +5";const E=document.createElement("button");E.type="button",E.className="icon-btn",E.textContent="🗑",E.title="Remove student from group",m.addEventListener("click",(()=>{e.score=Math.min(100,e.score+5),renderStudents()})),E.addEventListener("click",(()=>{students=students.filter((t=>t.id!==e.id)),renderStudents(),renderGroups()})),p.appendChild(m),p.appendChild(E),t.appendChild(n),t.appendChild(o),t.appendChild(d),t.appendChild(c),t.appendChild(p),studentsBodyEl.appendChild(t)}))}groupFormEl.addEventListener("submit",(e=>{e.preventDefault(),groupErrorEl.textContent="";const t=groupNameInputEl.value.trim(),n=groupLevelInputEl.value.trim()||"Level";if(!t)return void(groupErrorEl.textContent="Գրիր խմբի անունը։");const u=Date.now();groups.push({id:u,name:t,level:n,schedule:"New schedule"}),groupNameInputEl.value="",groupLevelInputEl.value="",activeGroupId=u,renderGroups(),renderStudents(),updateCurrentGroupLabel()})),statusFiltersEl.addEventListener("click",(e=>{const t=e.target.closest(".filter-pill");if(!t)return;const n=t.dataset.filter;n&&(activeStatusFilter=n,Array.from(statusFiltersEl.querySelectorAll(".filter-pill")).forEach((e=>{e.classList.toggle("active",e.dataset.filter===activeStatusFilter)})),renderStudents())})),studentSearchEl.addEventListener("input",(()=>{searchQuery=studentSearchEl.value,renderStudents()})),studentFormEl.addEventListener("submit",(e=>{if(e.preventDefault(),studentErrorEl.textContent="",!activeGroupId)return void(studentErrorEl.textContent="Սկզբում ընտրիր խումբ ձախից, հետո ավելացրու ուսանող։");const t=studentNameInputEl.value.trim(),n=studentEmailInputEl.value.trim()||"no-email@example.com",u=studentPhoneInputEl.value.trim()||"—",r=Number(studentScoreInputEl.value),s=studentStatusSelectEl.value;if(!t)return void(studentErrorEl.textContent="Մուտքագրիր ուսանողի անունը։");if(Number.isNaN(r)||r<0||r>100)return void(studentErrorEl.textContent="Միավորը պետք է լինի 0-ից 100 միջակայքում։");const o=Date.now();students.push({id:o,groupId:activeGroupId,name:t,email:n,phone:u,status:s,score:r}),studentNameInputEl.value="",studentEmailInputEl.value="",studentPhoneInputEl.value="",studentScoreInputEl.value="",studentStatusSelectEl.value="active",studentNameInputEl.focus(),renderStudents(),renderGroups()})),renderGroups(),renderStudents(),updateCurrentGroupLabel();
+</script>
+</body>
+</html>

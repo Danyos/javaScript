@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Math Yes / No Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f1f1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .card {
+            background: #ffffff;
+            padding: 25px 30px;
+            border-radius: 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            text-align: center;
+            width: 320px;
+        }
+
+        .question {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .label {
+            font-size: 14px;
+            margin-bottom: 15px;
+            color: #666;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            min-width: 90px;
+        }
+
+        .yes-btn {
+            background: #1f8b4c;
+            color: white;
+        }
+
+        .no-btn {
+            background: #e63946;
+            color: white;
+        }
+
+        .info {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .feedback {
+            font-size: 14px;
+            min-height: 22px;
+            margin-top: 5px;
+        }
+
+        .feedback.ok {
+            color: #1f8b4c;
+        }
+
+        .feedback.error {
+            color: #e63946;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="question" id="question">10 − 7 = 3</div>
+    <div class="label">Is this correct?</div>
+
+    <div class="buttons">
+        <button class="yes-btn" onclick="answer(true)">Yes</button>
+        <button class="no-btn" onclick="answer(false)">No</button>
+    </div>
+
+    <div class="info">
+        Score: <span id="score">0</span> / <span id="total">0</span>
+    </div>
+    <div id="feedback" class="feedback"></div>
+</div>
+
+<script>let state={a:0,b:0,op:"+",shown:0,correctResult:0,isExpressionCorrect:!0},score=0,total=0;function randomInt(t,e){return Math.floor(Math.random()*(e-t+1))+t}function generateQuestion(){const t=["+","-","*"],e=t[randomInt(0,t.length-1)],n=randomInt(1,10),o=randomInt(1,10);let s;"+"===e&&(s=n+o),"-"===e&&(s=n-o),"*"===e&&(s=n*o);const a=Math.random()<.5;let r=s;if(!a){let t;do{t=randomInt(-3,3)}while(0===t||s+t<-20||s+t>100);r=s+t}state={a:n,b:o,op:e,shown:r,correctResult:s,isExpressionCorrect:a};document.getElementById("question").textContent=`${n} ${e} ${o} = ${r}`;const c=document.getElementById("feedback");c.textContent="",c.className="feedback",document.getElementById("score").textContent=score,document.getElementById("total").textContent=total}function answer(t){total++;const e=document.getElementById("feedback"),n=`${state.a} ${state.op} ${state.b} = ${state.shown}`,o=`${state.a} ${state.op} ${state.b} = ${state.correctResult}`;t===state.isExpressionCorrect?(score++,e.textContent=`Ճիշտ է 👏 ${n}։`,e.className="feedback ok"):(e.className="feedback error",state.isExpressionCorrect?e.textContent=`Սխալվեցիր ❌ ${n} ճիշտ է, քանի որ ${o}։`:e.textContent=`Սխալվեցիր ❌ ${n} սխալ է, ճիշտը ${o}։`),document.getElementById("score").textContent=score,document.getElementById("total").textContent=total,generateQuestion()}generateQuestion();</script>
+
+</body>
+</html>

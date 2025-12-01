@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8">
+    <title>Homework Progress Tracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        :root {
+            --bg: #0f172a;
+            --bg-soft: #111827;
+            --card: #020617;
+            --primary: #38bdf8;
+            --danger: #f97373;
+            --text-main: #e5e7eb;
+            --text-muted: #9ca3af;
+            --border: #1f2937;
+            --success: #22c55e;
+            --warning: #facc15;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: radial-gradient(circle at top, #1e293b, #020617 55%);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .app {
+            width: 100%;
+            max-width: 960px;
+            background: rgba(15, 23, 42, 0.96);
+            border-radius: 18px;
+            border: 1px solid var(--border);
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.9);
+            padding: 24px 20px 28px;
+        }
+
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .app-header h1 {
+            font-size: 22px;
+            margin: 0;
+        }
+
+        .app-header p {
+            margin: 4px 0 0;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .badge {
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.45);
+            color: var(--text-muted);
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.3fr);
+            gap: 18px;
+        }
+
+        @media (max-width: 768px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: rgba(15, 23, 42, 0.9);
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            padding: 16px 14px 18px;
+        }
+
+        .card-title {
+            font-size: 15px;
+            margin: 0 0 10px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+
+        label {
+            color: var(--text-muted);
+        }
+
+        input[type="text"],
+        select {
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg-soft);
+            color: var(--text-main);
+            font-size: 14px;
+            outline: none;
+        }
+
+        input[type="text"]:focus,
+        select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.4);
+        }
+
+        .btn {
+            border: none;
+            border-radius: 999px;
+            padding: 8px 14px;
+            font-size: 14px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.12s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0ea5e9, #22c55e);
+            color: #0b1120;
+            font-weight: 600;
+            box-shadow: 0 10px 30px rgba(34, 197, 94, 0.35);
+            width: 100%;
+            justify-content: center;
+            margin-top: 6px;
+        }
+
+        .btn-primary:active {
+            transform: translateY(1px) scale(0.99);
+            box-shadow: 0 4px 16px rgba(34, 197, 94, 0.4);
+        }
+
+        .error-text {
+            font-size: 12px;
+            color: var(--danger);
+            min-height: 16px;
+            margin-top: 2px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .stat-card {
+            border-radius: 10px;
+            border: 1px solid rgba(31, 41, 55, 0.9);
+            padding: 8px 9px;
+            font-size: 12px;
+            background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), rgba(15, 23, 42, 0.95));
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            margin-bottom: 2px;
+        }
+
+        .stat-value {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .stat-value.ok {
+            color: var(--success);
+        }
+
+        .stat-value.warn {
+            color: var(--warning);
+        }
+
+        .stat-value.bad {
+            color: var(--danger);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+
+        thead {
+            background: rgba(15, 23, 42, 0.9);
+        }
+
+        th, td {
+            padding: 6px 8px;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        th {
+            font-weight: 500;
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        tbody tr:hover {
+            background: rgba(15, 23, 42, 0.9);
+        }
+
+        .status-pill {
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            display: inline-block;
+        }
+
+        .status-done {
+            background: rgba(34, 197, 94, 0.12);
+            color: var(--success);
+            border: 1px solid rgba(34, 197, 94, 0.45);
+        }
+
+        .status-late {
+            background: rgba(250, 204, 21, 0.10);
+            color: var(--warning);
+            border: 1px solid rgba(250, 204, 21, 0.60);
+        }
+
+        .status-not-done {
+            background: rgba(248, 113, 113, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(248, 113, 113, 0.45);
+        }
+
+        .empty-state {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: center;
+            padding: 16px 8px 4px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <header class="app-header">
+        <div>
+            <h1>Homework Progress Tracker</h1>
+            <p>Տնայինների կատարման պարզ վահանակ․ array of objects + DOM 👇</p>
+        </div>
+        <div class="badge">HTML • CSS • JavaScript</div>
+    </header>
+
+    <div class="layout">
+        <!-- LEFT: FORM + STATS -->
+        <section class="card">
+            <h2 class="card-title">Ավելացրու տնային</h2>
+
+            <form id="homework-form">
+                <div class="form-group">
+                    <label for="student-name">Ուսանողի անուն</label>
+                    <input type="text" id="student-name" placeholder="Օրինակ՝ Arman Petrosyan">
+                </div>
+
+                <div class="form-group">
+                    <label for="task-title">Տնայինի անվանում</label>
+                    <input type="text" id="task-title" placeholder="Օրինակ՝ Array methods practice">
+                </div>
+
+                <div class="form-group">
+                    <label for="status">Կարգավիճակ</label>
+                    <select id="status">
+                        <option value="">Ընտրիր կարգավիճակ</option>
+                        <option value="done">Կատարված</option>
+                        <option value="late">Ուշացած</option>
+                        <option value="not_done">Չարված</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">+ Ավելացնել տնային</button>
+                <div id="error" class="error-text"></div>
+            </form>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-label">Ընդամենը տնային</div>
+                    <div id="stat-total" class="stat-value">5</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Կատարված</div>
+                    <div id="stat-done" class="stat-value ok">2</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Ուշացած</div>
+                    <div id="stat-late" class="stat-value warn">2</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Չարված</div>
+                    <div id="stat-not-done" class="stat-value bad">1</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Կատարման տոկոս</div>
+                    <div id="stat-completion" class="stat-value ok">40.0%</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RIGHT: TABLE -->
+        <section class="card">
+            <h2 class="card-title">Տնայինների աղյուսակ</h2>
+
+            <table>
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Ուսանող</th>
+                    <th>Տնային</th>
+                    <th>Կարգավիճակ</th>
+                </tr>
+                </thead>
+                <tbody id="table-body"><tr>
+                    <td>1</td>
+                    <td>Հայկ</td>
+                    <td>Array-ները սովորել</td>
+                    <td><span class="status-pill status-done">Կատարված</span></td>
+                </tr><tr>
+                    <td>2</td>
+                    <td>Սառա</td>
+                    <td>OOP եսինչ հավեսա</td>
+                    <td><span class="status-pill status-late">Ուշացած</span></td>
+                </tr><tr>
+                    <td>3</td>
+                    <td>Աննա</td>
+                    <td>object ներով խնդիրները</td>
+                    <td><span class="status-pill status-done">Կատարված</span></td>
+                </tr><tr>
+                    <td>4</td>
+                    <td>ԱՆի</td>
+                    <td>dom պետք է անի բայց</td>
+                    <td><span class="status-pill status-late">Ուշացած</span></td>
+                </tr><tr>
+                    <td>5</td>
+                    <td>Գայան</td>
+                    <td>function խնդիրներ</td>
+                    <td><span class="status-pill status-not-done">Չարված</span></td>
+                </tr></tbody>
+            </table>
+
+            <div id="empty-state" class="empty-state" style="display: none;">Առայժմ ավելացված տնային չկա 🙂</div>
+        </section>
+    </div>
+</div>
+
+<script>
+    const homeworks=[],form=document.getElementById("homework-form"),studentInput=document.getElementById("student-name"),taskInput=document.getElementById("task-title"),statusSelect=document.getElementById("status"),errorBox=document.getElementById("error"),tableBody=document.getElementById("table-body"),emptyState=document.getElementById("empty-state"),statTotal=document.getElementById("stat-total"),statDone=document.getElementById("stat-done"),statLate=document.getElementById("stat-late"),statNotDone=document.getElementById("stat-not-done"),statCompletion=document.getElementById("stat-completion");function clearError(){errorBox.textContent=""}function validateForm(t,e,n){return t.trim()?e.trim()?n?"":"Ընտրիր կարգավիճակը։":"Մուտքագրիր տնայինի անվանումը։":"Մուտքագրիր ուսանողի անունը։"}function renderTable(){tableBody.innerHTML="",0!==homeworks.length?(emptyState.style.display="none",homeworks.forEach(((t,e)=>{const n=document.createElement("tr");let o="",a="";"done"===t.status?(o="Կատարված",a="status-done"):"late"===t.status?(o="Ուշացած",a="status-late"):(o="Չարված",a="status-not-done"),n.innerHTML=`\n        <td>${e+1}</td>\n        <td>${t.studentName}</td>\n        <td>${t.taskTitle}</td>\n        <td><span class="status-pill ${a}">${o}</span></td>\n      `,tableBody.appendChild(n)}))):emptyState.style.display="block"}function renderStats(){const t=homeworks.length,e=homeworks.filter((t=>"done"===t.status)).length,n=homeworks.filter((t=>"late"===t.status)).length,o=homeworks.filter((t=>"not_done"===t.status)).length,a=0===t?0:(e/t*100).toFixed(1);statTotal.textContent=t,statDone.textContent=e,statLate.textContent=n,statNotDone.textContent=o,statCompletion.textContent=a+"%"}function updateUI(){renderTable(),renderStats()}form.addEventListener("submit",(function(t){t.preventDefault(),clearError();const e=studentInput.value,n=taskInput.value,o=statusSelect.value,a=validateForm(e,n,o);a?errorBox.textContent=a:(homeworks.push({id:Date.now(),studentName:e.trim(),taskTitle:n.trim(),status:o}),form.reset(),studentInput.focus(),updateUI())})),updateUI();
+</script>
+
+</body>
+</html>

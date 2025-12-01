@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8">
+    <title>Homework Progress Tracker PRO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        :root {
+            --bg: #0f172a;
+            --bg-soft: #111827;
+            --card: #020617;
+            --primary: #38bdf8;
+            --danger: #f97373;
+            --text-main: #e5e7eb;
+            --text-muted: #9ca3af;
+            --border: #1f2937;
+            --success: #22c55e;
+            --warning: #facc15;
+        }
+
+        *{box-sizing:border-box;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
+        body{
+            margin:0;min-height:100vh;background:radial-gradient(circle at top,#1e293b,#020617 55%);
+            color:var(--text-main);display:flex;justify-content:center;padding:24px;
+        }
+
+        .app{
+            width:100%;max-width:1050px;background:rgba(15,23,42,.96);
+            border-radius:18px;border:1px solid var(--border);
+            box-shadow:0 18px 45px rgba(15,23,42,.9);
+            padding:24px 20px 28px;
+        }
+
+        .app-header{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:20px;}
+        .app-header h1{font-size:22px;margin:0;}
+        .app-header p{margin:4px 0 0;font-size:13px;color:var(--text-muted);}
+        .badge{font-size:11px;padding:4px 8px;border-radius:999px;border:1px solid rgba(148,163,184,.45);color:var(--text-muted);}
+
+        .layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.5fr);gap:18px;}
+        @media(max-width:768px){.layout{grid-template-columns:1fr;}}
+
+        .card{
+            background:rgba(15,23,42,.9);border-radius:14px;border:1px solid var(--border);
+            padding:16px 14px 18px;
+        }
+        .card-title{font-size:15px;margin:0 0 10px;}
+
+        .form-group{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;font-size:13px;}
+        label{color:var(--text-muted);}
+        input[type=text],select,input[type=search]{
+            padding:8px 10px;border-radius:8px;border:1px solid var(--border);
+            background:var(--bg-soft);color:var(--text-main);font-size:14px;outline:none;
+        }
+        input:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 1px rgba(56,189,248,.4);}
+
+        .btn{border:none;border-radius:999px;padding:8px 14px;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;}
+        .btn-primary{
+            background:linear-gradient(135deg,#0ea5e9,#22c55e);color:#0b1120;font-weight:600;
+            width:100%;justify-content:center;margin-top:6px;box-shadow:0 10px 30px rgba(34,197,94,.35);
+        }
+        .btn-primary:active{transform:translateY(1px) scale(.99);}
+
+        .filters{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+        .filter-btn{
+            padding:6px 12px;border-radius:8px;background:var(--bg-soft);border:1px solid var(--border);
+            cursor:pointer;font-size:12px;
+        }
+        .filter-btn.active{background:var(--primary);color:#000;}
+
+        .error-text{font-size:12px;color:var(--danger);min-height:16px;margin-top:2px;}
+
+        .stats{
+            display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+            gap:8px;margin-top:12px;
+        }
+        .stat-card{
+            border-radius:10px;border:1px solid rgba(31,41,55,.9);
+            padding:8px 9px;font-size:12px;
+            background:radial-gradient(circle at top left,rgba(56,189,248,.12),rgba(15,23,42,.95));
+        }
+        .stat-value{font-size:16px;font-weight:600;}
+        .stat-value.ok{color:var(--success);}
+        .stat-value.warn{color:var(--warning);}
+        .stat-value.bad{color:var(--danger);}
+
+        table{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px;}
+        th,td{padding:6px 8px;border-bottom:1px solid var(--border);white-space:nowrap;}
+        th{font-size:12px;font-weight:500;color:var(--text-muted);}
+        tbody tr:hover{background:rgba(15,23,42,.9);}
+
+        .status-pill{
+            padding:3px 8px;border-radius:999px;font-size:11px;cursor:pointer;
+            border:1px solid transparent;display:inline-block;
+        }
+        .done{background:rgba(34,197,94,.12);color:var(--success);border-color:rgba(34,197,94,.45);}
+        .late{background:rgba(250,204,21,.12);color:var(--warning);border-color:rgba(250,204,21,.4);}
+        .not_done{background:rgba(248,113,113,.12);color:var(--danger);border-color:rgba(248,113,113,.45);}
+
+        .delete-btn{
+            background:none;border:none;color:var(--danger);cursor:pointer;font-size:18px;
+        }
+
+        .empty-state{text-align:center;font-size:12px;color:var(--text-muted);padding:20px 0;}
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <header class="app-header">
+        <div>
+            <h1>Homework Progress Tracker — PRO</h1>
+            <p>Filter • Search • Delete • Edit Status • LocalStorage</p>
+        </div>
+        <div class="badge">Advanced JS Project</div>
+    </header>
+
+    <div class="layout">
+        <!-- LEFT -->
+        <section class="card">
+            <h2 class="card-title">Ավելացրու տնային</h2>
+            <form id="form">
+                <div class="form-group">
+                    <label>Ուսանողի անուն</label>
+                    <input id="student" type="text" placeholder="Օրինակ՝ Ani Harutyunyan">
+                </div>
+
+                <div class="form-group">
+                    <label>Տնայինի անվանում</label>
+                    <input id="task" type="text" placeholder="Օրինակ՝ Arrays Practice">
+                </div>
+
+                <div class="form-group">
+                    <label>Կարգավիճակ</label>
+                    <select id="status">
+                        <option value="">Ընտրիր</option>
+                        <option value="done">Կատարված</option>
+                        <option value="late">Ուշացած</option>
+                        <option value="not_done">Չարված</option>
+                    </select>
+                </div>
+
+                <button class="btn-primary btn" type="submit">+ Ավելացնել</button>
+                <div id="error" class="error-text"></div>
+            </form>
+
+            <!-- SEARCH -->
+            <div class="form-group" style="margin-top:20px;">
+                <label>Փնտրիր ըստ ուսանողի</label>
+                <input id="search" type="search" placeholder="Օրինակ՝ Ani">
+            </div>
+
+            <!-- FILTER BUTTONS -->
+            <div class="filters">
+                <button data-filter="all" class="filter-btn active">Բոլորը</button>
+                <button data-filter="done" class="filter-btn">Կատարված</button>
+                <button data-filter="late" class="filter-btn">Ուշացած</button>
+                <button data-filter="not_done" class="filter-btn">Չարված</button>
+            </div>
+
+            <!-- STATS -->
+            <div class="stats">
+                <div class="stat-card"><div class="stat-label">Ընդամենը</div><div id="s-total" class="stat-value">3</div></div>
+                <div class="stat-card"><div class="stat-label">Կատարված</div><div id="s-done" class="stat-value ok">2</div></div>
+                <div class="stat-card"><div class="stat-label">Ուշացած</div><div id="s-late" class="stat-value warn">0</div></div>
+                <div class="stat-card"><div class="stat-label">Չարված</div><div id="s-not" class="stat-value bad">1</div></div>
+                <div class="stat-card"><div class="stat-label">Կատարման տոկոս</div><div id="s-percent" class="stat-value ok">66.7%</div></div>
+            </div>
+        </section>
+
+        <!-- RIGHT -->
+        <section class="card">
+            <h2 class="card-title">Տնայինների աղյուսակ</h2>
+
+            <table>
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Ուսանող</th>
+                    <th>Տնային</th>
+                    <th>Կարգավիճակ</th>
+                    <th>Ջնջել</th>
+                </tr>
+                </thead>
+                <tbody id="table"><tr>
+                    <td>1</td>
+                    <td>SMBO</td>
+                    <td>Task 1</td>
+                    <td>
+          <span class="status-pill done" data-id="1764616592423">
+            Կատարված
+          </span>
+                    </td>
+                    <td>
+                        <button class="delete-btn" data-del="1764616592423">×</button>
+                    </td>
+                </tr><tr>
+                    <td>2</td>
+                    <td>Daniel</td>
+                    <td>task 2</td>
+                    <td>
+          <span class="status-pill not_done" data-id="1764616609801">
+            Չարված
+          </span>
+                    </td>
+                    <td>
+                        <button class="delete-btn" data-del="1764616609801">×</button>
+                    </td>
+                </tr><tr>
+                    <td>3</td>
+                    <td>Saqo</td>
+                    <td>task 3</td>
+                    <td>
+          <span class="status-pill done" data-id="1764616617051">
+            Կատարված
+          </span>
+                    </td>
+                    <td>
+                        <button class="delete-btn" data-del="1764616617051">×</button>
+                    </td>
+                </tr></tbody>
+            </table>
+
+            <div id="empty" class="empty-state" style="display: none;">Դատարկ է 🙂</div>
+        </section>
+    </div>
+</div>
+
+<script>
+    let homeworks=[];const statuses=["done","late","not_done"];let currentFilter="all",searchTerm="";function load(){const t=localStorage.getItem("homeworks");t&&(homeworks=JSON.parse(t))}function save(){localStorage.setItem("homeworks",JSON.stringify(homeworks))}load();const form=document.getElementById("form"),student=document.getElementById("student"),task=document.getElementById("task"),status=document.getElementById("status"),errorBox=document.getElementById("error"),tableBody=document.getElementById("table"),empty=document.getElementById("empty"),sTotal=document.getElementById("s-total"),sDone=document.getElementById("s-done"),sLate=document.getElementById("s-late"),sNot=document.getElementById("s-not"),sPercent=document.getElementById("s-percent"),filterButtons=document.querySelectorAll(".filter-btn"),searchInput=document.getElementById("search");function validate(t,e,n){return t.trim()?e.trim()?n?"":"Ընտրի՛ր կարգավիճակը։":"Գրի՛ր տնայինի անվանումը։":"Գրի՛ր ուսանողի անունը։"}function renderTable(){tableBody.innerHTML="";let t=homeworks;"all"!==currentFilter&&(t=t.filter((t=>t.status===currentFilter))),searchTerm&&(t=t.filter((t=>t.studentName.toLowerCase().includes(searchTerm)))),0!==t.length?(empty.style.display="none",t.forEach(((t,e)=>{const n=document.createElement("tr"),s="done"===t.status?"Կատարված":"late"===t.status?"Ուշացած":"Չարված";n.innerHTML=`\n        <td>${e+1}</td>\n        <td>${t.studentName}</td>\n        <td>${t.taskTitle}</td>\n        <td>\n          <span class="status-pill ${t.status}" data-id="${t.id}">\n            ${s}\n          </span>\n        </td>\n        <td>\n          <button class="delete-btn" data-del="${t.id}">×</button>\n        </td>\n      `,tableBody.appendChild(n)}))):empty.style.display="block"}function renderStats(){const t=homeworks.length,e=homeworks.filter((t=>"done"===t.status)).length,n=homeworks.filter((t=>"late"===t.status)).length,s=homeworks.filter((t=>"not_done"===t.status)).length;sTotal.textContent=t,sDone.textContent=e,sLate.textContent=n,sNot.textContent=s;const o=0===t?0:(e/t*100).toFixed(1);sPercent.textContent=o+"%"}function update(){renderTable(),renderStats(),save()}form.addEventListener("submit",(t=>{t.preventDefault(),errorBox.textContent="";const e=student.value,n=task.value,s=status.value,o=validate(e,n,s);o?errorBox.textContent=o:(homeworks.push({id:Date.now(),studentName:e.trim(),taskTitle:n.trim(),status:s}),form.reset(),student.focus(),update())})),filterButtons.forEach((t=>{t.addEventListener("click",(()=>{filterButtons.forEach((t=>t.classList.remove("active"))),t.classList.add("active"),currentFilter=t.dataset.filter,update()}))})),searchInput.addEventListener("input",(t=>{searchTerm=t.target.value.toLowerCase(),update()})),tableBody.addEventListener("click",(t=>{if(t.target.dataset.del){const e=Number(t.target.dataset.del);confirm("Ջնջե՞լ այս տարրը")&&(homeworks=homeworks.filter((t=>t.id!==e)),update())}else if(t.target.dataset.id){const e=Number(t.target.dataset.id),n=homeworks.find((t=>t.id===e)),s=(statuses.indexOf(n.status)+1)%statuses.length;n.status=statuses[s],update()}})),update();
+</script>
+
+</body>
+</html>

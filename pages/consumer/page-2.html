@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+    <style>
+        :root{
+            --bg:#0f172a;          /* slate-900 */
+            --panel:#111827;       /* gray-900 */
+            --card:#0b1220;        /* deep */
+            --muted:#94a3b8;       /* slate-400 */
+            --txt:#e5e7eb;         /* gray-200 */
+            --pri:#6366f1;         /* indigo-500 */
+            --ring:rgba(99,102,241,.35);
+            --ok:#22c55e;          /* green-500 */
+            --warn:#f59e0b;        /* amber-500 */
+        }
+        *{box-sizing:border-box}
+        html,body{height:100%}
+        body{
+            margin:0; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            background:
+                    radial-gradient(1200px 600px at 10% -10%, rgba(99,102,241,.15), transparent 60%),
+                    radial-gradient(900px 500px at 110% 10%, rgba(34,197,94,.12), transparent 55%),
+                    var(--bg);
+            color:var(--txt);
+            line-height:1.6;
+            padding:24px;
+        }
+
+        /* Container */
+        body>div:first-of-type{
+            max-width:1100px;
+            margin:0 auto 22px;
+            background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
+            border:1px solid rgba(148,163,184,.15);
+            border-radius:16px;
+            padding:18px 18px 6px;
+            backdrop-filter: blur(6px);
+            box-shadow: 0 8px 30px rgba(0,0,0,.25);
+        }
+        h3{
+            margin:0 0 10px;
+            font-size:1.05rem;
+            letter-spacing:.2px;
+            color:#fff;
+        }
+
+        /* Filters grid */
+        body>div:first-of-type>div{
+            display:grid;
+            grid-template-columns: repeat(6, minmax(0,1fr));
+            gap:12px;
+        }
+        body>div:first-of-type>div>div{
+            background:var(--panel);
+            border:1px solid rgba(148,163,184,.15);
+            border-radius:12px;
+            padding:10px 12px;
+        }
+        label{
+            display:block;
+            font-size:.8rem;
+            color:var(--muted);
+            margin-bottom:6px;
+            letter-spacing:.2px;
+        }
+        input[type="number"],
+        input[type="text"]{
+            width:100%;
+            background:#0b1220;
+            color:var(--txt);
+            border:1px solid rgba(148,163,184,.18);
+            border-radius:10px;
+            padding:8px 10px;
+            outline:none;
+            transition: box-shadow .15s, border-color .15s, transform .04s;
+        }
+        input[type="number"]:focus{
+            border-color:var(--pri);
+            box-shadow: 0 0 0 4px var(--ring);
+        }
+
+        /* Checkbox line-up */
+        input[type="checkbox"]{
+            accent-color: var(--pri);
+            width:18px; height:18px;
+            vertical-align: middle;
+            transform: translateY(1px);
+        }
+
+        /* Cards grid */
+        .list{
+            max-width:1100px;
+            margin:16px auto 0;
+            display:grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap:14px;
+        }
+        .card{
+            grid-column: span 4; /* 3 cards per row on desktop */
+            background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
+            border:1px solid rgba(148,163,184,.15);
+            border-radius:16px;
+            padding:16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,.25);
+            transition: transform .15s ease, box-shadow .2s ease, border-color .2s ease;
+        }
+        .card:hover{
+            transform: translateY(-3px);
+            border-color: rgba(99,102,241,.45);
+            box-shadow: 0 18px 40px rgba(99,102,241,.18);
+        }
+        .card h3{
+            margin:0 0 6px;
+            font-size:1.05rem;
+        }
+        .card p{
+            margin:6px 0;
+            color:var(--muted);
+            display:flex; justify-content:space-between; gap:10px;
+            border-bottom:1px dashed rgba(148,163,184,.16);
+            padding-bottom:6px;
+        }
+        .card p:last-child{ border-bottom:0; padding-bottom:0 }
+
+        /* Inline badges */
+        .card span{
+            color:#fff;
+            background: #0b1220;
+            border:1px solid rgba(148,163,184,.18);
+            padding:2px 8px;
+            border-radius:999px;
+            font-size:.8rem;
+            letter-spacing:.2px;
+        }
+
+        /* Accent styles for common fields if you add them later */
+        .badge-ok{ background: rgba(34,197,94,.12); border-color: rgba(34,197,94,.35); color:#bbf7d0 }
+        .badge-warn{ background: rgba(245,158,11,.12); border-color: rgba(245,158,11,.35); color:#fde68a }
+
+        /* Responsive */
+        @media (max-width: 1100px){
+            .card{ grid-column: span 6; } /* 2 per row */
+            body>div:first-of-type>div{ grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 640px){
+            .card{ grid-column: span 12; } /* 1 per row */
+            body{ padding:16px }
+            body>div:first-of-type>div{ grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div>
+    <h3>Filters</h3>
+    <div>
+        <div>
+            <label for="hasCar"> has car</label>
+            <input type="checkbox" id="hasCar">
+        </div>
+        <div>
+            <label for="children"> has children</label>
+
+            <select name="" id="children">
+                <option value="all">All</option>
+                <option value="0">Չունի</option>
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+            </select>
+        </div>
+        <div>
+            <label for="isEmployed"> has isEmployed</label>
+
+
+            <select name="" id="isEmployed">
+                <option value="all">All</option>
+                <option value="1">employed</option>
+                <option value="0">unemployed</option>
+            </select>
+
+        </div>
+        <div>
+            <label for="isExit"> has isExit</label>
+            <select name="" id="isExit">
+                <option value="all">All</option>
+                <option value="1">Exit</option>
+                <option value="0">Remain</option>
+            </select>
+
+
+        </div>
+        <div>
+            <label for="birthplace"> City</label>
+            <select name="" id="birthplace">
+                <option value="all">All</option>
+
+                <!-- Original -->
+                <option>Gyumri</option>
+                <option>Yerevan</option>
+                <option>Kapan</option>
+                <option>Vanadzor</option>
+                <option>Sevan</option>
+                <option>Stepanakert</option>
+                <option>Abovyan</option>
+                <option>Hrazdan</option>
+                <option>Artashat</option>
+                <option>Dilijan</option>
+
+                <!-- New from added data -->
+                <option>Echmiadzin</option>
+                <option>Charentsavan</option>
+                <option>Armavir</option>
+                <option>Gavar</option>
+                <option>Spitak</option>
+                <option>Ijevan</option>
+                <option>Yeghvard</option>
+                <option>Alaverdi</option>
+                <option>Masis</option>
+                <option>Kasakh</option>
+
+                <!-- More new cities (21–30 people) -->
+                <option>Artik</option>
+                <option>Ararat</option>
+                <option>Martuni</option>
+                <option>Berd</option>
+                <option>Sisian</option>
+                <option>Vanadzor</option> <!-- already in list but ok -->
+            </select>
+
+
+        </div>
+        <div>
+            <label for="isExit">Marital Status</label>
+            <select name="" id="maritalStatus">
+                <option value="all">All</option>
+                <option value="single">Single</option>
+                <option value="married">Married</option>
+            </select>
+
+
+        </div>
+        <div>
+            <label for="minAge"> min </label>
+            <input type="number" id="minAge" min="0" max="65" value="0">
+        </div>
+        <div>
+            <label for="maxAge"> max</label>
+            <input type="number" id="maxAge" min="0" max="65" value="65">
+        </div>
+    </div>
+</div>
+
+<div class="list">
+    <div class="card">
+        <h3>Arman</h3>
+        <p><span>City</span> Yerevan</p>
+        <p><span>Age</span> 43</p>
+        <p>Marital <span>ամուսնացած է</span></p>
+        <p>exit <span>Չլքել</span></p>
+        <p>car <span>Hyundai Elantra</span></p>
+        <p>Աշխատանք <span>ունի</span></p>
+        <p>Երեխա <span>Չունի</span></p>
+        <p>accountBalance <span>1250000</span></p>
+    </div>
+    <div class="card">
+        <h3>Mariam</h3>
+        <p><span>City</span> Gyumri</p>
+        <p><span>Age</span> 28</p>
+        <p>Marital <span>չամուսնացած է</span></p>
+        <p>exit <span>Չլքել</span></p>
+        <p>car <span>Չունի</span></p>
+        <p>Աշխատանք <span>ունի</span></p>
+        <p>Երեխա <span>1</span></p>
+        <p>accountBalance <span>890000</span></p>
+    </div>
+    <div class="card">
+        <h3>Hayk</h3>
+        <p><span>City</span> Vanadzor</p>
+        <p><span>Age</span> 31</p>
+        <p>Marital <span>չամուսնացած է</span></p>
+        <p>exit <span>լքել</span></p>
+        <p>car <span>Toyota Camry</span></p>
+        <p>Աշխատանք <span>ունի</span></p>
+        <p>Երեխա <span>2</span></p>
+        <p>accountBalance <span>350000</span></p>
+    </div>
+    <div class="card">
+        <h3>Ani</h3>
+        <p><span>City</span> Sevan</p>
+        <p><span>Age</span> 19</p>
+        <p>Marital <span>ամուսնացած է</span></p>
+        <p>exit <span>Չլքել</span></p>
+        <p>car <span>Չունի</span></p>
+        <p>Աշխատանք <span>Չունի</span></p>
+        <p>Երեխա <span>Չունի</span></p>
+        <p>accountBalance <span>42000</span></p>
+    </div>
+    <div class="card">
+        <h3>David</h3>
+        <p><span>City</span> Stepanakert</p>
+        <p><span>Age</span> 16</p>
+        <p>Marital <span>ամուսնացած է</span></p>
+        <p>exit <span>Չլքել</span></p>
+        <p>car <span>Lada Priora</span></p>
+        <p>Աշխատանք <span>ունի</span></p>
+        <p>Երեխա <span>Չունի</span></p>
+        <p>accountBalance <span>65000</span></p>
+    </div>
+    <div class="card">
+        <h3>Nare</h3>
+        <p><span>City</span> Abovyan</p>
+        <p><span>Age</span> 24</p>
+        <p>Marital <span>ամուսնացած է</span></p>
+        <p>exit <span>Չլքել</span></p>
+        <p>car <span>Mazda 3</span></p>
+        <p>Աշխատանք <span>ունի</span></p>
+        <p>Երեխա <span>Չունի</span></p>
+        <p>accountBalance <span>210000</span></p>
+    </div>
+    <div class="card">
+        <h3>Gevorg</h3>
+        <p><span>City</span> Hrazdan</p>
+        <p><span>Age</span> 16</p>
+        <p>Marital <span>ամուսնացած է</span></p>
+        <p>exit <span>Չլքել</span></p>
+        <p>car <span>Չունի</span></p>
+        <p>Աշխատանք <span>Չունի</span></p>
+        <p>Երեխա <span>2</span></p>
+        <p>accountBalance <span>37000</span></p>
+    </div>
+    <div class="card">
+        <h3>Sona</h3>
+        <p><span>City</span> Kapan</p>
+        <p><span>Age</span> 35</p>
+        <p>Marital <span>չամուսնացած է</span></p>
+        <p>exit <span>լքել</span></p>
+        <p>car <span>Nissan Juke</span></p>
+        <p>Աշխատանք <span>Չունի</span></p>
+        <p>Երեխա <span>3</span></p>
+        <p>accountBalance <span>40000</span></p>
+    </div>
+    <div class="card">
+        <h3>Tigran</h3>
+        <p><span>City</span> Artashat</p>
+        <p><span>Age</span> 29</p>
+        <p>Marital <span>չամուսնացած է</span></p>
+        <p>exit <span>Չլքել</span></p>
+        <p>car <span>Mercedes C200</span></p>
+        <p>Աշխատանք <span>ունի</span></p>
+        <p>Երեխա <span>1</span></p>
+        <p>accountBalance <span>520000</span></p>
+    </div>
+    <div class="card">
+        <h3>Lilit</h3>
+        <p><span>City</span> Dilijan</p>
+        <p><span>Age</span> 21</p>
+        <p>Marital <span>ամուսնացած է</span></p>
+        <p>exit <span>Չլքել</span></p>
+        <p>car <span>Չունի</span></p>
+        <p>Աշխատանք <span>Չունի</span></p>
+        <p>Երեխա <span>Չունի</span></p>
+        <p>accountBalance <span>75000</span></p>
+    </div>
+    <div class="card">
+        <h3>Karine</h3>
+        <p><span>City</span> Echmiadzin</p>
+        <p><span>Age</span> 33</p>
+        <p>Marital <span>չամուսնացած է</span></p>
+        <p>exit <span>Չլքել</span></p>
+        <p>car <span>Kia Rio</span></p>
+        <p>Աշխատանք <span>ունի</span></p>
+        <p>Երեխա <span>1</span></p>
+        <p>accountBalance <span>185000</span></p>
+    </div>
+    <div class="card">
+        <h3>Gor</h3>
+        <p><span>City</span> Charentsavan</p>
+        <p><span>Age</span> 27</p>
+        <p>Marital <span>ամուսնացած է</span></p>
+        <p>exit <span>լքել</span></p>
+        <p>car <span>Չունի</span></p>
+        <p>Աշխատանք <span>Չունի</span></p>
+        <p>Երեխա <span>Չունի</span></p>
+        <p>accountBalance <span>92000</span></p>
+    </div>
+    <div class="card">
+        <h3>Ella</h3>
+        <p><span>City</span> Armavir</p>
+        <p><span>Age</span> 30</p>
+        <p>Marital <span>չամուսնացած է</span></p>
+        <p>exit <span>Չլքել</span></p>
+        <p>car <span>Honda Civic</span></p>
+        <p>Աշխատանք <span>ունի</span></p>
+        <p>Երեխա <span>2</span></p>
+        <p>accountBalance <span>310000</span></p>
+    </div>
+    <div class="card">
+        <h3>Vahram</h3>
+        <p><span>City</span> Gavar</p>
+        <p><span>Age</span> 40</p>
+        <p>Marital <span>չամուսնացած է</span></p>
+        <p>exit <span>Չլքել</span></p>
+        <p>car <span>BMW 320</span></p>
+        <p>Աշխատանք <span>ունի</span></p>
+        <p>Երեխա <span>3</span></p>
+        <p>accountBalance <span>890000</span></p>
+    </div>
+    <div class="card">
+        <h3>Lia</h3>
+        <p><span>City</span> Spitak</p>
+        <p><span>Age</span> 22</p>
+        <p>Marital <span>ամուսնացած է</span></p>
+        <p>exit <span>լքել</span></p>
+        <p>car <span>Չունի</span></p>
+        <p>Աշխատանք <span>Չունի</span></p>
+        <p>Երեխա <span>Չունի</span></p>
+        <p>accountBalance <span>15000</span></p>
+    </div>
+    <div class="card">
+        <h3>Arsen</h3>
+        <p><span>City</span> Ijevan</p>
+        <p><span>Age</span> 36</p>
+        <p>Marital <span>չամուսնացած է</span></p>
+        <p>exit <span>Չլքել</span></p>
+        <p>car <span>Lexus RX350</span></p>
+        <p>Աշխատանք <span>ունի</span></p>
+        <p>Երեխա <span>2</span></p>
+        <p>accountBalance <span>1400000</span></p>
+    </div>
+    <div class="card">
+        <h3>Tatev</h3>
+        <p><span>City</span> Yeghvard</p>
+        <p><span>Age</span> 26</p>
+        <p>Marital <span>ամուսնացած է</span></p>
+        <p>exit <span>Չլքել</span></p>
+        <p>car <span>Volkswagen Golf</span></p>
+        <p>Աշխատանք <span>ունի</span></p>
+        <p>Երեխա <span>Չունի</span></p>
+        <p>accountBalance <span>265000</span></p>
+    </div>
+    <div class="card">
+        <h3>Samvel</h3>
+        <p><span>City</span> Alaverdi</p>
+        <p><span>Age</span> 45</p>
+        <p>Marital <span>չամուսնացած է</span></p>
+        <p>exit <span>Չլքել</span></p>
+        <p>car <span>Toyota RAV4</span></p>
+        <p>Աշխատանք <span>ունի</span></p>
+        <p>Երեխա <span>4</span></p>
+        <p>accountBalance <span>780000</span></p>
+    </div>
+    <div class="card">
+        <h3>Rima</h3>
+        <p><span>City</span> Masis</p>
+        <p><span>Age</span> 31</p>
+        <p>Marital <span>ամուսնացած է</span></p>
+        <p>exit <span>Չլքել</span></p>
+        <p>car <span>Չունի</span></p>
+        <p>Աշխատանք <span>Չունի</span></p>
+        <p>Երեխա <span>1</span></p>
+        <p>accountBalance <span>56000</span></p>
+    </div>
+    <div class="card">
+        <h3>Narek</h3>
+        <p><span>City</span> Kasakh</p>
+        <p><span>Age</span> 20</p>
+        <p>Marital <span>ամուսնացած է</span></p>
+        <p>exit <span>լքել</span></p>
+        <p>car <span>VAZ 2107</span></p>
+        <p>Աշխատանք <span>ունի</span></p>
+        <p>Երեխա <span>Չունի</span></p>
+        <p>accountBalance <span>22000</span></p>
+    </div>
+    <div class="card">
+        <h3>Elina</h3>
+        <p><span>City</span> Artik</p>
+        <p><span>Age</span> 32</p>
+        <p>Marital <span>չամուսնացած է</span></p>
+        <p>exit <span>Չլքել</span></p>
+        <p>car <span>Hyundai Tucson</span></p>
+        <p>Աշխատանք <span>ունի</span></p>
+        <p>Երեխա <span>1</span></p>
+        <p>accountBalance <span>345000</span></p>
+    </div>
+    <div class="card">
+        <h3>Rafael</h3>
+        <p><span>City</span> Ararat</p>
+        <p><span>Age</span> 38</p>
+        <p>Marital <span>ամուսնացած է</span></p>
+        <p>exit <span>Չլքել</span></p>
+        <p>car <span>Չունի</span></p>
+        <p>Աշխատանք <span>Չունի</span></p>
+        <p>Երեխա <span>Չունի</span></p>
+        <p>accountBalance <span>125000</span></p>
+    </div>
+    <div class="card">
+        <h3>Silva</h3>
+        <p><span>City</span> Martuni</p>
+        <p><span>Age</span> 27</p>
+        <p>Marital <span>ամուսնացած է</span></p>
+        <p>exit <span>լքել</span></p>
+        <p>car <span>Ford Fiesta</span></p>
+        <p>Աշխատանք <span>ունի</span></p>
+        <p>Երեխա <span>1</span></p>
+        <p>accountBalance <span>47000</span></p>
+    </div>
+    <div class="card">
+        <h3>Ashot</h3>
+        <p><span>City</span> Berd</p>
+        <p><span>Age</span> 50</p>
+        <p>Marital <span>չամուսնացած է</span></p>
+        <p>exit <span>Չլքել</span></p>
+        <p>car <span>Mercedes E300</span></p>
+        <p>Աշխատանք <span>ունի</span></p>
+        <p>Երեխա <span>3</span></p>
+        <p>accountBalance <span>1620000</span></p>
+    </div>
+    <div class="card">
+        <h3>Milena</h3>
+        <p><span>City</span> Hrazdan</p>
+        <p><span>Age</span> 23</p>
+        <p>Marital <span>ամուսնացած է</span></p>
+        <p>exit <span>Չլքել</span></p>
+        <p>car <span>Չունի</span></p>
+        <p>Աշխատանք <span>ունի</span></p>
+        <p>Երեխա <span>Չունի</span></p>
+        <p>accountBalance <span>52000</span></p>
+    </div>
+    <div class="card">
+        <h3>Arthur</h3>
+        <p><span>City</span> Gyumri</p>
+        <p><span>Age</span> 41</p>
+        <p>Marital <span>չամուսնացած է</span></p>
+        <p>exit <span>Չլքել</span></p>
+        <p>car <span>Toyota Corolla</span></p>
+        <p>Աշխատանք <span>ունի</span></p>
+        <p>Երեխա <span>2</span></p>
+        <p>accountBalance <span>298000</span></p>
+    </div>
+    <div class="card">
+        <h3>Marine</h3>
+        <p><span>City</span> Sisian</p>
+        <p><span>Age</span> 36</p>
+        <p>Marital <span>չամուսնացած է</span></p>
+        <p>exit <span>լքել</span></p>
+        <p>car <span>Renault Megane</span></p>
+        <p>Աշխատանք <span>Չունի</span></p>
+        <p>Երեխա <span>2</span></p>
+        <p>accountBalance <span>88000</span></p>
+    </div>
+    <div class="card">
+        <h3>Eduard</h3>
+        <p><span>City</span> Abovyan</p>
+        <p><span>Age</span> 30</p>
+        <p>Marital <span>ամուսնացած է</span></p>
+        <p>exit <span>Չլքել</span></p>
+        <p>car <span>Չունի</span></p>
+        <p>Աշխատանք <span>ունի</span></p>
+        <p>Երեխա <span>Չունի</span></p>
+        <p>accountBalance <span>41000</span></p>
+    </div>
+    <div class="card">
+        <h3>Tamara</h3>
+        <p><span>City</span> Vanadzor</p>
+        <p><span>Age</span> 34</p>
+        <p>Marital <span>չամուսնացած է</span></p>
+        <p>exit <span>Չլքել</span></p>
+        <p>car <span>Mazda 6</span></p>
+        <p>Աշխատանք <span>ունի</span></p>
+        <p>Երեխա <span>2</span></p>
+        <p>accountBalance <span>335000</span></p>
+    </div>
+    <div class="card">
+        <h3>Karen</h3>
+        <p><span>City</span> Yerevan</p>
+        <p><span>Age</span> 22</p>
+        <p>Marital <span>ամուսնացած է</span></p>
+        <p>exit <span>Չլքել</span></p>
+        <p>car <span>Opel Astra</span></p>
+        <p>Աշխատանք <span>Չունի</span></p>
+        <p>Երեխա <span>Չունի</span></p>
+        <p>accountBalance <span>67000</span></p>
+    </div></div>
+
+<script src="script.js">
+
+    let lists = [
+        // ----- Existing 10 items -----
+        {
+            id: 1, name: "Arman", exit: false, age: 43, height: 178, birthplace: "Yerevan",
+            car: "Hyundai Elantra", accountBalance: 1250000, maritalStatus: "single",
+            children: 0, isEmployed: true
+        },
+        {
+            id: 2, name: "Mariam", exit: false, age: 28, height: 165, birthplace: "Gyumri",
+            car: null, accountBalance: 890000, maritalStatus: "married",
+            children: 1, isEmployed: true
+            ,
+        },
+        {
+            id: 3, name: "Hayk", exit: true, age: 31, height: 182, birthplace: "Vanadzor",
+            car: "Toyota Camry", accountBalance: 350000, maritalStatus: "married",
+            children: 2, isEmployed: true
+        },
+        {
+            id: 4, name: "Ani", exit: false, age: 19, height: 160, birthplace: "Sevan",
+            car: null, accountBalance: 42000, maritalStatus: "single", children: 0,
+            isEmployed: false
+        },
+        {
+            id: 5, name: "David", exit: false, age: 16, height: 175, birthplace: "Stepanakert",
+            car: "Lada Priora", accountBalance: 65000, maritalStatus: "single",
+            children: 0, isEmployed: true
+        },
+        {
+            id: 6, name: "Nare", exit: false, age: 24, height: 167, birthplace: "Abovyan",
+            car: "Mazda 3", accountBalance: 210000, maritalStatus: "single",
+            children: 0, isEmployed: true
+        },
+        {
+            id: 7, name: "Gevorg", exit: false, age: 16, height: 170, birthplace: "Hrazdan",
+            car: null, accountBalance: 37000, maritalStatus: "single",
+            children: 2, isEmployed: false
+        },
+        {
+            id: 8, name: "Sona", exit: true, age: 35, height: 163, birthplace: "Kapan",
+            car: "Nissan Juke", accountBalance: 40000, maritalStatus: "married",
+            children: 3, isEmployed: false
+        },
+        {
+            id: 9, name: "Tigran", exit: false, age: 29, height: 180, birthplace: "Artashat",
+            car: "Mercedes C200", accountBalance: 520000, maritalStatus: "married",
+            children: 1, isEmployed: true
+        },
+        {
+            id: 10, name: "Lilit", exit: false, age: 21, height: 168, birthplace: "Dilijan",
+            car: null, accountBalance: 75000, maritalStatus: "single",
+            children: 0, isEmployed: false
+        },
+
+        // ----- Added 10 NEW items -----
+        {
+            id: 11, name: "Karine", exit: false, age: 33, height: 162, birthplace: "Echmiadzin",
+            car: "Kia Rio", accountBalance: 185000, maritalStatus: "married",
+            children: 1, isEmployed: true
+        },
+        {
+            id: 12, name: "Gor", exit: true, age: 27, height: 183, birthplace: "Charentsavan",
+            car: null, accountBalance: 92000, maritalStatus: "single",
+            children: 0, isEmployed: false
+        },
+        {
+            id: 13, name: "Ella", exit: false, age: 30, height: 158, birthplace: "Armavir",
+            car: "Honda Civic", accountBalance: 310000, maritalStatus: "married",
+            children: 2, isEmployed: true
+        },
+        {
+            id: 14, name: "Vahram", exit: false, age: 40, height: 176, birthplace: "Gavar",
+            car: "BMW 320", accountBalance: 890000, maritalStatus: "married",
+            children: 3, isEmployed: true
+        },
+        {
+            id: 15, name: "Lia", exit: true, age: 22, height: 161, birthplace: "Spitak",
+            car: null, accountBalance: 15000, maritalStatus: "single",
+            children: 0, isEmployed: false
+        },
+        {
+            id: 16, name: "Arsen", exit: false, age: 36, height: 185, birthplace: "Ijevan",
+            car: "Lexus RX350", accountBalance: 1400000, maritalStatus: "married",
+            children: 2, isEmployed: true
+        },
+        {
+            id: 17, name: "Tatev", exit: false, age: 26, height: 166, birthplace: "Yeghvard",
+            car: "Volkswagen Golf", accountBalance: 265000, maritalStatus: "single",
+            children: 0, isEmployed: true
+        },
+        {
+            id: 18, name: "Samvel", exit: false, age: 45, height: 181, birthplace: "Alaverdi",
+            car: "Toyota RAV4", accountBalance: 780000, maritalStatus: "married",
+            children: 4, isEmployed: true
+        },
+        {
+            id: 19, name: "Rima", exit: false, age: 31, height: 164, birthplace: "Masis",
+            car: null, accountBalance: 56000, maritalStatus: "single",
+            children: 1, isEmployed: false
+        },
+        {
+            id: 20, name: "Narek", exit: true, age: 20, height: 177, birthplace: "Kasakh",
+            car: "VAZ 2107", accountBalance: 22000, maritalStatus: "single",
+            children: 0, isEmployed: true
+        },{
+            id: 21,
+            name: "Elina",
+            exit: false,
+            age: 32,
+            height: 164,
+            birthplace: "Artik",
+            car: "Hyundai Tucson",
+            accountBalance: 345000,
+            maritalStatus: "married",
+            children: 1,
+            isEmployed: true
+        },
+        {
+            id: 22,
+            name: "Rafael",
+            exit: false,
+            age: 38,
+            height: 179,
+            birthplace: "Ararat",
+            car: null,
+            accountBalance: 125000,
+            maritalStatus: "single",
+            children: 0,
+            isEmployed: false
+        },
+        {
+            id: 23,
+            name: "Silva",
+            exit: true,
+            age: 27,
+            height: 160,
+            birthplace: "Martuni",
+            car: "Ford Fiesta",
+            accountBalance: 47000,
+            maritalStatus: "single",
+            children: 1,
+            isEmployed: true
+        },
+        {
+            id: 24,
+            name: "Ashot",
+            exit: false,
+            age: 50,
+            height: 182,
+            birthplace: "Berd",
+            car: "Mercedes E300",
+            accountBalance: 1620000,
+            maritalStatus: "married",
+            children: 3,
+            isEmployed: true
+        },
+        {
+            id: 25,
+            name: "Milena",
+            exit: false,
+            age: 23,
+            height: 167,
+            birthplace: "Hrazdan",
+            car: null,
+            accountBalance: 52000,
+            maritalStatus: "single",
+            children: 0,
+            isEmployed: true
+        },
+        {
+            id: 26,
+            name: "Arthur",
+            exit: false,
+            age: 41,
+            height: 185,
+            birthplace: "Gyumri",
+            car: "Toyota Corolla",
+            accountBalance: 298000,
+            maritalStatus: "married",
+            children: 2,
+            isEmployed: true
+        },
+        {
+            id: 27,
+            name: "Marine",
+            exit: true,
+            age: 36,
+            height: 162,
+            birthplace: "Sisian",
+            car: "Renault Megane",
+            accountBalance: 88000,
+            maritalStatus: "married",
+            children: 2,
+            isEmployed: false
+        },
+        {
+            id: 28,
+            name: "Eduard",
+            exit: false,
+            age: 30,
+            height: 175,
+            birthplace: "Abovyan",
+            car: null,
+            accountBalance: 41000,
+            maritalStatus: "single",
+            children: 0,
+            isEmployed: true
+        },
+        {
+            id: 29,
+            name: "Tamara",
+            exit: false,
+            age: 34,
+            height: 170,
+            birthplace: "Vanadzor",
+            car: "Mazda 6",
+            accountBalance: 335000,
+            maritalStatus: "married",
+            children: 2,
+            isEmployed: true
+        },
+        {
+            id: 30,
+            name: "Karen",
+            exit: false,
+            age: 22,
+            height: 180,
+            birthplace: "Yerevan",
+            car: "Opel Astra",
+            accountBalance: 67000,
+            maritalStatus: "single",
+            children: 0,
+            isEmployed: false
+        }
+    ];
+
+
+    const filter = {
+        isCar: false,
+        children: null,
+        isEmployed: null,
+        isMarital:null,
+        isExit: null,
+        ageMin: 0,
+        ageMax: 65,
+        city:null
+
+    }
+
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tasks / Values Admin UI</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #f3f4f6;
+            color: #111827;
+        }
+
+        .app {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .app-header {
+            margin-bottom: 20px;
+        }
+
+        .app-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .app-subtitle {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .layout {
+            display: flex;
+            gap: 20px;
+        }
+
+        /* LEFT: TASKS */
+        .tasks-panel {
+            width: 32%;
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+            display: flex;
+            flex-direction: column;
+            max-height: 560px;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .panel-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .panel-caption {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        .add-form {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .input {
+            flex: 1;
+            padding: 7px 10px;
+            border-radius: 999px;
+            border: 1px solid #e5e7eb;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .input:focus {
+            border-color: #111827;
+        }
+
+        .btn {
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            padding: 7px 12px;
+            border-radius: 999px;
+            background: #111827;
+            color: #f9fafb;
+            white-space: nowrap;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #111827;
+            border: 1px solid #d1d5db;
+        }
+
+        .tasks-list {
+            margin-top: 4px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .task-item {
+            border-radius: 12px;
+            padding: 10px 12px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: background 0.15s ease, transform 0.1s ease;
+        }
+
+
+
+        .task-item--active {
+            background: #111827;
+            color: #f9fafb;
+        }
+
+        .task-info {
+            max-width: 70%;
+        }
+
+        .task-title {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 3px;
+        }
+
+        .task-meta {
+            font-size: 11px;
+            color: #9ca3af;
+        }
+
+        .task-item--active .task-meta {
+            color: #e5e7eb;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .tag {
+            font-size: 10px;
+            padding: 3px 7px;
+            border-radius: 999px;
+            background: rgba(148, 163, 184, 0.16);
+            color: #6b7280;
+        }
+
+        .icon-btn {
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 14px;
+            line-height: 1;
+            padding: 4px;
+            color: #9ca3af;
+        }
+
+        .icon-btn:hover {
+            color: #ef4444;
+        }
+
+        /* RIGHT: VALUES */
+        .values-panel {
+            flex: 1;
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+            display: flex;
+            flex-direction: column;
+            max-height: 560px;
+        }
+
+        .values-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            gap: 16px;
+        }
+
+        .values-title-block {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .current-task-label {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        .current-task-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .filters {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .filter-pill {
+            font-size: 11px;
+            padding: 4px 9px;
+            border-radius: 999px;
+            border: 1px solid #e5e7eb;
+            background: #fff;
+            cursor: pointer;
+        }
+
+        .filter-pill--active {
+            background: #111827;
+            color: #f9fafb;
+            border-color: #111827;
+        }
+
+        .values-add-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .select {
+            padding: 7px 10px;
+            border-radius: 999px;
+            border: 1px solid #e5e7eb;
+            font-size: 12px;
+            background: #f9fafb;
+            outline: none;
+        }
+
+        .values-table {
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            overflow: hidden;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            margin-top: 4px;
+        }
+
+        .values-head {
+            display: grid;
+            grid-template-columns: 40% 22% 18% 20%;
+            padding: 8px 10px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: #f9fafb;
+            color: #9ca3af;
+        }
+
+        .values-body {
+            overflow-y: auto;
+        }
+
+        .value-row {
+            display: grid;
+            grid-template-columns: 40% 22% 18% 20%;
+            padding: 9px 10px;
+            font-size: 13px;
+            align-items: center;
+            border-top: 1px solid #f3f4f6;
+        }
+
+        .value-row:nth-child(even) {
+            background: #fafafa;
+        }
+
+        .value-main {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .value-text {
+            font-weight: 500;
+        }
+
+        .value-sub {
+            font-size: 11px;
+            color: #9ca3af;
+        }
+
+        .value-id {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .status-badge {
+            display: inline-block;
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 999px;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-inprogress {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .status-completed {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .value-actions {
+            display: flex;
+            gap: 6px;
+            justify-content: flex-end;
+        }
+
+        .link-btn {
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 11px;
+            padding: 3px 0;
+            color: #6b7280;
+            text-decoration: underline;
+        }
+
+        .link-btn:hover {
+            color: #111827;
+        }
+
+        .empty-state {
+            padding: 24px 16px;
+            font-size: 13px;
+            color: #9ca3af;
+            text-align: center;
+        }
+
+        @media (max-width: 960px) {
+            .layout {
+                flex-direction: column;
+            }
+
+            .tasks-panel {
+                width: 100%;
+                max-height: 320px;
+            }
+
+            .values-panel {
+                max-height: none;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .values-head,
+            .value-row {
+                grid-template-columns: 46% 24% 30%;
+            }
+
+            .values-head div:last-child,
+            .value-row div:last-child {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <header class="app-header">
+        <div class="app-title">Tasks / Values Admin</div>
+        <div class="app-subtitle">Static UI — later you can connect JavaScript to make it dynamic.</div>
+    </header>
+
+    <div class="layout">
+        <!-- LEFT: TASKS -->
+        <aside class="tasks-panel">
+            <div class="panel-header">
+                <div>
+                    <div class="panel-title">Users</div>
+                    <div class="panel-caption">Select a user to manage its values</div>
+                </div>
+            </div>
+
+            <!-- Add task form (static) -->
+            <div class="add-form">
+                <input class="input" id="field" type="text" placeholder="New user name...">
+                <button class="btn" id="addBtn">+ Add</button>
+            </div>
+
+            <!-- Tasks list (static examples) -->
+            <div class="tasks-list">
+<!--                <div class="task-item task-item&#45;&#45;active">-->
+<!--                    <div class="task-info">-->
+<!--                        <div class="task-title">Karo</div>-->
+<!--                        <div class="task-meta">ID: #1 • 3 values</div>-->
+<!--                    </div>-->
+<!--                    <div class="task-actions">-->
+<!--                        <span class="tag">Active</span>-->
+<!--                        <button class="icon-btn" title="Delete task">🗑</button>-->
+<!--                    </div>-->
+<!--                </div>-->
+
+            </div>
+        </aside>
+
+        <!-- RIGHT: VALUES -->
+        <section class="values-panel">
+            <div class="values-header">
+                <div class="values-title-block">
+                    <div class="panel-title">Tasks</div>
+                    <div class="current-task-label">For task:</div>
+                    <div class="current-task-name">Learn JavaScript <span style="color:#9ca3af;">(#1)</span></div>
+                </div>
+                <div class="filters">
+                    <button class="filter-pill filter-pill--active">All</button>
+                    <button class="filter-pill">Pending</button>
+                    <button class="filter-pill">In progress</button>
+                    <button class="filter-pill">Completed</button>
+                </div>
+            </div>
+
+            <!-- Add value row (static) -->
+            <div class="values-add-row">
+                <input class="input" type="text" placeholder="New value...">
+                <select class="select">
+                    <option>pending</option>
+                    <option>inprogress</option>
+                    <option>completed</option>
+                </select>
+                <button class="btn btn-outline">+ Add value</button>
+            </div>
+
+            <!-- Values table (static examples) -->
+            <div class="values-table">
+                <div class="values-head">
+                    <div>Value</div>
+                    <div>Value ID</div>
+                    <div>Status</div>
+                    <div>Actions</div>
+                </div>
+                <div class="values-body">
+<!--                    <div class="value-row">-->
+<!--                        <div>-->
+<!--                            <div class="value-main">-->
+<!--                                <span class="value-text">Array methods practice</span>-->
+<!--                                <span class="value-sub">taskId: 1</span>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                        <div class="value-id">#101</div>-->
+<!--                        <div>-->
+<!--                            <span class="status-badge status-inprogress">inprogress</span>-->
+<!--                        </div>-->
+<!--                        <div class="value-actions">-->
+<!--                            <button class="link-btn">Edit</button>-->
+<!--                            <button class="icon-btn" title="Delete value">🗑</button>-->
+<!--                        </div>-->
+<!--                    </div>-->
+
+
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+<script src="script.js"></script>
+
+</body>
+</html>

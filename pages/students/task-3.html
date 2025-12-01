@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Monthly Budget Analyzer – Base</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        :root {
+            --bg: #020617;
+            --bg-soft: #0b1120;
+            --card: #020617;
+            --primary: #38bdf8;
+            --danger: #f97373;
+            --success: #22c55e;
+            --text-main: #e5e7eb;
+            --text-muted: #9ca3af;
+            --border: #1f2937;
+            --warn: #facc15;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: radial-gradient(circle at top, #1e293b, #020617 55%);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .app {
+            width: 100%;
+            max-width: 1000px;
+            background: rgba(15, 23, 42, 0.96);
+            border-radius: 18px;
+            border: 1px solid var(--border);
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.9);
+            padding: 24px 20px 28px;
+        }
+
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .app-header h1 {
+            font-size: 22px;
+            margin: 0;
+        }
+
+        .app-header p {
+            margin: 4px 0 0;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .badge {
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.45);
+            color: var(--text-muted);
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.5fr);
+            gap: 18px;
+        }
+
+        @media (max-width: 768px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: rgba(15, 23, 42, 0.9);
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            padding: 16px 14px 18px;
+        }
+
+        .card-title {
+            font-size: 15px;
+            margin: 0 0 10px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+
+        label {
+            color: var(--text-muted);
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg-soft);
+            color: var(--text-main);
+            font-size: 14px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.4);
+        }
+
+        .btn {
+            border: none;
+            border-radius: 999px;
+            padding: 8px 14px;
+            font-size: 14px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.12s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0ea5e9, #22c55e);
+            color: #0b1120;
+            font-weight: 600;
+            box-shadow: 0 10px 30px rgba(34, 197, 94, 0.35);
+            width: 100%;
+            justify-content: center;
+            margin-top: 6px;
+        }
+
+        .btn-primary:active {
+            transform: translateY(1px) scale(0.99);
+            box-shadow: 0 4px 16px rgba(34, 197, 94, 0.4);
+        }
+
+        .error-text {
+            font-size: 12px;
+            color: var(--danger);
+            min-height: 16px;
+            margin-top: 2px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        @media (max-width: 640px) {
+            .stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        .stat-card {
+            border-radius: 10px;
+            border: 1px solid rgba(31, 41, 55, 0.9);
+            padding: 8px 9px;
+            font-size: 12px;
+            background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), rgba(15, 23, 42, 0.95));
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            margin-bottom: 2px;
+        }
+
+        .stat-value {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .stat-danger {
+            color: var(--danger);
+        }
+
+        .stat-good {
+            color: var(--success);
+        }
+
+        .stat-warn {
+            color: var(--warn);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+
+        thead {
+            background: rgba(15, 23, 42, 0.9);
+        }
+
+        th, td {
+            padding: 6px 8px;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        th {
+            font-weight: 500;
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        tbody tr:hover {
+            background: rgba(15, 23, 42, 0.9);
+        }
+
+        .empty-state {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: center;
+            padding: 16px 8px 4px;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            border: 1px solid rgba(148, 163, 184, 0.6);
+            color: var(--text-muted);
+        }
+
+        .tag-big {
+            border-color: rgba(248, 113, 113, 0.7);
+            color: var(--danger);
+            background: rgba(248, 113, 113, 0.08);
+        }
+
+        .tag-small {
+            border-color: rgba(34, 197, 94, 0.7);
+            color: var(--success);
+            background: rgba(34, 197, 94, 0.08);
+        }
+
+        .progress-wrapper {
+            margin-top: 12px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .progress-bar {
+            margin-top: 4px;
+            width: 100%;
+            height: 10px;
+            border-radius: 999px;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .progress-inner {
+            height: 100%;
+            background: linear-gradient(90deg, #f97373, #facc15, #22c55e);
+            width: 0%;
+            transition: width 0.25s ease;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <header class="app-header">
+        <div>
+            <h1>Monthly Budget Analyzer (Base)</h1>
+            <p>Մուտքագրիր եկամուտը և ծախսերը, տես՝ ինչքան գումար ես իրականում պահում։</p>
+        </div>
+        <div class="badge">Income • Expenses • Percent</div>
+    </header>
+
+    <div class="layout">
+        <!-- LEFT: INCOME + ADD EXPENSE -->
+        <section class="card">
+            <h2 class="card-title">Եկամուտ &amp; ծախսի ավելացում</h2>
+
+            <div class="form-group">
+                <label for="income">Ամսական զուտ եկամուտ (դրամ)</label>
+                <input type="number" id="income" placeholder="Օրինակ՝ 350000">
+            </div>
+
+            <hr style="border-color: rgba(31,41,55,0.7); margin: 10px 0 14px;">
+
+            <form id="expense-form">
+                <div class="form-group">
+                    <label for="category">Ծախսի կատեգորիա</label>
+                    <input type="text" id="category" placeholder="Օրինակ՝ Վարձ, Սնունդ, Տրանսպորտ">
+                </div>
+
+                <div class="form-group">
+                    <label for="amount">Գումար (դրամ)</label>
+                    <input type="number" id="amount" placeholder="Օրինակ՝ 120000">
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    + Ավելացնել ծախս
+                </button>
+
+                <div id="error" class="error-text"></div>
+            </form>
+
+            <div class="progress-wrapper">
+                <span id="progress-label">Ծախսեր՝ 0% եկամտից</span>
+                <div class="progress-bar">
+                    <div id="progress-inner" class="progress-inner"></div>
+                </div>
+            </div>
+
+            <div style="margin-top: 10px; font-size: 12px; color: var(--text-muted);">
+                💡 Խորհուրդ. փորձիր, որ ծախսերը չանցնեն 70%-ից, մնացորդը՝ savings։
+            </div>
+        </section>
+
+        <!-- RIGHT: STATS + TABLE -->
+        <section class="card">
+            <h2 class="card-title">Ընդհանուր պատկերը</h2>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-label">Եկամուտ (ամիս)</div>
+                    <div id="stat-income" class="stat-value">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Ընդհանուր ծախս</div>
+                    <div id="stat-expense" class="stat-value stat-danger">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Մնացորդ (savings)</div>
+                    <div id="stat-savings" class="stat-value stat-good">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Savings տոկոս</div>
+                    <div id="stat-savings-rate" class="stat-value stat-warn">0%</div>
+                </div>
+            </div>
+
+            <table>
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Կատեգորիա</th>
+                    <th>Գումար</th>
+                    <th>% եկամտից</th>
+                    <th>Դեր</th>
+                </tr>
+                </thead>
+                <tbody id="table-body">
+                <!-- Rows from JS -->
+                </tbody>
+            </table>
+
+            <div id="empty-state" class="empty-state">
+                Առայժմ ծախս գրանցված չէ 🙂
+            </div>
+        </section>
+    </div>
+</div>
+
+<script>
+    // =========================
+    // DATA
+    // =========================
+    const expenses = []; // { id, category, amount }
+
+    // =========================
+    // DOM ELEMENTS
+    // =========================
+    const incomeInput   = document.getElementById('income');
+
+    const expenseForm   = document.getElementById('expense-form');
+    const categoryInput = document.getElementById('category');
+    const amountInput   = document.getElementById('amount');
+    const errorBox      = document.getElementById('error');
+
+    const tableBody     = document.getElementById('table-body');
+    const emptyState    = document.getElementById('empty-state');
+
+    const statIncome       = document.getElementById('stat-income');
+    const statExpense      = document.getElementById('stat-expense');
+    const statSavings      = document.getElementById('stat-savings');
+    const statSavingsRate  = document.getElementById('stat-savings-rate');
+
+    const progressLabel = document.getElementById('progress-label');
+    const progressInner = document.getElementById('progress-inner');
+
+    // =========================
+    // HELPERS
+    // =========================
+    function getIncome() {
+        const value = Number(incomeInput.value);
+        return Number.isNaN(value) || value < 0 ? 0 : value;
+    }
+
+    function clearError() {
+        errorBox.textContent = '';
+    }
+
+    function clearExpenseForm() {
+        categoryInput.value = '';
+        amountInput.value = '';
+        categoryInput.focus();
+    }
+
+    function validateExpense(category, amount) {
+        if (!category.trim()) {
+            return 'Մուտքագրիր կատեգորիայի անունը։';
+        }
+
+        if (amount === '' || amount === null) {
+            return 'Մուտքագրիր գումարը։';
+        }
+
+        const numeric = Number(amount);
+        if (Number.isNaN(numeric) || numeric <= 0) {
+            return 'Գումարը պետք է դրական թիվ լինի։';
+        }
+
+        return '';
+    }
+
+    function formatCurrency(value) {
+        return value.toLocaleString('hy-AM'); // 350 000
+    }
+
+    // =========================
+    // RENDER
+    // =========================
+    function renderTable() {
+        tableBody.innerHTML = '';
+
+        if (expenses.length === 0) {
+            emptyState.style.display = 'block';
+            return;
+        }
+        emptyState.style.display = 'none';
+
+        const income = getIncome();
+        const totalExpense = expenses.reduce((sum, e) => sum + e.amount, 0);
+
+        expenses.forEach((expense, index) => {
+            const tr = document.createElement('tr');
+
+            let percent = 0;
+            if (income > 0) {
+                percent = (expense.amount / income) * 100;
+            }
+
+            let tagText = 'Նորմալ';
+            let tagClass = 'tag';
+
+            if (percent >= 30) {
+                tagText = 'Շատ մեծ ծախս';
+                tagClass = 'tag tag-big';
+            } else if (percent <= 5) {
+                tagText = 'Փոքր ծախս';
+                tagClass = 'tag tag-small';
+            }
+
+            tr.innerHTML = `
+        <td>${index + 1}</td>
+        <td>${expense.category}</td>
+        <td>${formatCurrency(expense.amount)}</td>
+        <td>${income === 0 ? '-' : percent.toFixed(1) + '%'}</td>
+        <td><span class="${tagClass}">${tagText}</span></td>
+      `;
+
+            tableBody.appendChild(tr);
+        });
+    }
+
+    function renderStats() {
+        const income = getIncome();
+        const totalExpense = expenses.reduce((sum, e) => sum + e.amount, 0);
+        const savings = income - totalExpense;
+        const savingsRate = income === 0 ? 0 : (savings / income) * 100;
+
+        statIncome.textContent      = formatCurrency(income);
+        statExpense.textContent     = formatCurrency(totalExpense);
+        statSavings.textContent     = formatCurrency(Math.max(savings, 0));
+        statSavingsRate.textContent = `${savingsRate.toFixed(1)}%`;
+
+        // Progress bar: ինչ % եկամտից է ծախսվում
+        const spentRate = income === 0 ? 0 : (totalExpense / income) * 100;
+        const clamped = Math.max(0, Math.min(100, spentRate));
+        progressInner.style.width = clamped + '%';
+        progressLabel.textContent = `Ծախսեր՝ ${spentRate.toFixed(1)}% եկամտից`;
+    }
+
+    function updateUI() {
+        renderTable();
+        renderStats();
+    }
+
+    // =========================
+    // EVENTS
+    // =========================
+    incomeInput.addEventListener('input', () => {
+        updateUI();
+    });
+
+    expenseForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        clearError();
+
+        const category = categoryInput.value;
+        const amount   = amountInput.value;
+
+        const errorMessage = validateExpense(category, amount);
+        if (errorMessage) {
+            errorBox.textContent = errorMessage;
+            return;
+        }
+
+        const numericAmount = Number(amount);
+
+        expenses.push({
+            id: Date.now(),
+            category: category.trim(),
+            amount: numericAmount
+        });
+
+        clearExpenseForm();
+        updateUI();
+    });
+</script>
+</body>
+</html>
