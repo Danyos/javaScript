@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8">
+    <title>Կատեգորիաներով Todo • Beautiful UI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body{
+            background: linear-gradient(135deg, #eef2ff, #e0f7fa);
+            min-height: 100vh;
+            padding: 40px;
+            font-family: "Segoe UI", sans-serif;
+        }
+
+        .todo-card{
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        }
+
+        .list-group-item{
+            border: none;
+            border-radius: 14px !important;
+            margin-bottom: 10px;
+            padding: 18px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+
+        .badge-cat{
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+
+        .cat-Աշխատանք{ background:#ffe0e0; color:#b30000; }
+        .cat-Ուսում{ background:#e6f0ff; color:#0041a8; }
+        .cat-Անձնական{ background:#e8ffe6; color:#0f7b29; }
+
+        h3 span{
+            background: #4f46e5;
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 10px;
+            font-size: 18px;
+        }
+
+        .btn-icon{
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+        }
+
+        #stats{
+            border-radius: 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            font-size: 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h3 class="mb-4"><span>📅 Կատեգորիաներով Todo List</span></h3>
+
+    <div class="todo-card mb-4">
+        <div class="row g-2">
+            <div class="col-md-4">
+                <input id="taskName" type="text" class="form-control" placeholder="Առաջադրանք">
+            </div>
+            <div class="col-md-3">
+                <select id="taskCategory" class="form-select">
+                    <option value="Աշխատանք">Աշխատանք</option>
+                    <option value="Ուսում">Ուսում</option>
+                    <option value="Անձնական">Անձնական</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <input id="taskDate" type="date" class="form-control">
+            </div>
+            <div class="col-md-2">
+                <button id="addBtn" class="btn btn-primary w-100">➕ Ավելացնել</button>
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <select id="filterCategory" class="form-select">
+                <option value="Բոլորը">Ֆիլտրել ըստ կատեգորիայի…</option>
+                <option value="Աշխատանք">Աշխատանք</option>
+                <option value="Ուսում">Ուսում</option>
+                <option value="Անձնական">Անձնական</option>
+            </select>
+        </div>
+    </div>
+
+    <ul id="taskList" class="list-group mb-4">
+
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <strong>Կոդ գրել</strong>
+                <span class="badge-cat cat-Ուսում">(Ուսում)</span>
+                <span class="text-muted ms-2">📅 2025-08-14</span>
+            </div>
+            <div>
+                <button class="btn btn-sm btn-success btn-icon me-2">✔</button>
+                <button class="btn btn-sm btn-danger btn-icon">✖</button>
+            </div>
+        </li>
+
+        <li class="list-group-item list-group-item-success d-flex justify-content-between align-items-center">
+            <div>
+                <strong>Դասավանդել</strong>
+                <span class="badge-cat cat-Աշխատանք">(Աշխատանք)</span>
+                <span class="text-muted ms-2">📅 2025-08-15</span>
+            </div>
+            <div>
+                <button class="btn btn-sm btn-warning btn-icon me-2">↩</button>
+                <button class="btn btn-sm btn-danger btn-icon">✖</button>
+            </div>
+        </li>
+
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <strong>Հաց ուտել</strong>
+                <span class="badge-cat cat-Անձնական">(Անձնական)</span>
+                <span class="text-muted ms-2">📅 2025-08-15</span>
+            </div>
+            <div>
+                <button class="btn btn-sm btn-success btn-icon me-2">✔</button>
+                <button class="btn btn-sm btn-danger btn-icon">✖</button>
+            </div>
+        </li>
+
+    </ul>
+
+    <div class="alert alert-info" id="stats">
+        📊 <strong>Առաջադրանքների վիճակագրություն</strong><br>
+        Ուսում: 1<br>
+        Աշխատանք: 1<br>
+        Անձնական: 1<br>
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Tasks Timer</title>
+    <style>
+        body{font-family:system-ui; padding:20px;}
+        input{padding:8px; margin-right:8px;}
+        button{padding:8px 12px; cursor:pointer;}
+        ul{margin-top:16px; padding-left:18px;}
+        li{margin:8px 0; display:flex; gap:10px; align-items:center;}
+        .time{
+            padding:4px 10px;
+            border:1px solid #ddd;
+            border-radius:999px;
+            font-size:12px;
+        }
+        .done{background:#eaffea; border-color:#b6e6b6;}
+    </style>
+</head>
+<body>
+
+<input id="taskText" type="text" placeholder="Task name">
+<input id="taskSeconds" type="number" placeholder="Seconds" min="1">
+<button id="addBtn">Add</button>
+
+<ul id="list">
+    <li>
+        my task <span class="time" data-sec="5">5</span>
+    </li>
+    <li>
+        my task 2 <span class="time done">finished</span>
+    </li>
+</ul>
+
+<script>
+    const taskText=document.getElementById("taskText"),taskSeconds=document.getElementById("taskSeconds"),addBtn=document.getElementById("addBtn"),list=document.getElementById("list");function startCountdown(t){const e=t.dataset.sec;if(!e)return;let n=Number(e);if(!Number.isFinite(n)||n<=0)return;t.textContent=n;const a=setInterval((()=>{if(n--,n<=0)return clearInterval(a),t.textContent="finished",t.classList.add("done"),void t.removeAttribute("data-sec");t.textContent=n,t.dataset.sec=n}),1e3)}document.querySelectorAll(".time[data-sec]").forEach(startCountdown),addBtn.addEventListener("click",(()=>{const t=taskText.value.trim(),e=Number(taskSeconds.value);if(!t)return void alert("Write task text");if(!Number.isFinite(e)||e<=0)return void alert("Enter seconds (>= 1)");const n=document.createElement("li"),a=document.createElement("span");a.className="time",a.dataset.sec=String(e),a.textContent=e,n.append(t+" "),n.appendChild(a),list.appendChild(n),startCountdown(a),taskText.value="",taskSeconds.value="",taskText.focus()}));
+</script>
+
+</body>
+</html>

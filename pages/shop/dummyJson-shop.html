@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DummyJSON Products Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        :root{--bg:#020617;--bg-soft:#0b1120;--card:#020617;--accent:#3b82f6;--accent-soft:rgba(59, 130, 246, 0.17);--danger:#f97373;--text-main:#e5e7eb;--text-muted:#9ca3af;--border-soft:#1e293b;--radius-lg:16px;--shadow-soft:0 18px 45px rgba(15, 23, 42, 0.9)}*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at top,#1d283a 0,#020617 45%,#000 100%);color:var(--text-main);min-height:100vh;display:flex;align-items:stretch;justify-content:center}.app{width:100%;max-width:1280px;margin:24px;padding:20px;background:linear-gradient(135deg,rgb(15 23 42 / .95),rgb(2 6 23 / .98));border-radius:24px;border:1px solid rgb(148 163 184 / .12);box-shadow:var(--shadow-soft);display:grid;grid-template-columns:minmax(260px,320px) 1fr;gap:20px}@media (max-width:900px){.app{display:flex;flex-direction:column;margin:10px;padding:14px}}.details{background:radial-gradient(circle at top left,rgb(56 189 248 / .25),transparent 55%) var(--bg-soft);border-radius:var(--radius-lg);border:1px solid var(--border-soft);padding:16px 16px 18px;display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden}.details-header{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:2px}.details-title{font-size:15px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--text-muted);display:flex;align-items:center;gap:6px}.details-title span.badge{padding:2px 8px;border-radius:999px;border:1px solid rgb(148 163 184 / .4);font-size:11px}.details-tagline{font-size:13px;color:var(--text-muted)}.details-main{margin-top:4px;background:rgb(15 23 42 / .8);border-radius:14px;padding:10px;display:grid;grid-template-rows:auto auto;gap:10px}.details-product{display:flex;gap:10px}.details-product-img{width:72px;height:72px;border-radius:12px;border:1px solid rgb(148 163 184 / .3);overflow:hidden;flex-shrink:0;background:radial-gradient(circle at top,#1f2937,#020617);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text-muted);text-align:center;padding:4px}.details-product-img img{width:100%;height:100%;object-fit:cover}.details-product-info h2{margin:0 0 4px;font-size:16px;font-weight:600}.details-product-info .category-chip{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;background:rgb(15 118 110 / .15);border:1px solid rgb(45 212 191 / .35);font-size:11px;color:#a5f3fc}.details-product-info .brand{font-size:12px;color:var(--text-muted);margin-top:3px}.details-product-info .price-line{font-size:13px;margin-top:6px;display:flex;gap:10px;align-items:baseline}.price-main{font-weight:600;color:#bef264;font-size:14px}.price-old{font-size:12px;text-decoration:line-through;color:#64748b}.discount-pill{font-size:11px;padding:2px 6px;border-radius:999px;background:rgb(239 68 68 / .1);color:#fecaca}.details-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}.meta-pill{font-size:11px;padding:4px 7px;border-radius:999px;border:1px solid rgb(148 163 184 / .35);color:var(--text-muted);display:inline-flex;align-items:center;gap:6px}.meta-pill strong{font-weight:500;color:var(--text-main)}.details-description{font-size:12px;color:var(--text-muted);line-height:1.4;max-height:80px;overflow:auto;padding-right:2px}.details-footer{display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:var(--text-muted)}.pill-label{padding:3px 7px;border-radius:999px;background:rgb(30 64 175 / .35);color:#bfdbfe;font-size:10px;text-transform:uppercase;letter-spacing:.08em}.right{display:flex;flex-direction:column;gap:10px}.topbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}.title-block{display:flex;flex-direction:column;gap:3px}.title-block h1{margin:0;font-size:20px;letter-spacing:.03em}.title-block span{font-size:12px;color:var(--text-muted)}.filters{display:flex;flex-wrap:wrap;gap:8px}.input,.select{background:rgb(15 23 42 / .95);border-radius:999px;border:1px solid rgb(148 163 184 / .35);color:var(--text-main);font-size:13px;padding:7px 11px;outline:none;min-width:150px}.input::placeholder{color:#64748b}.select{padding-right:20px}.select:focus,.input:focus{border-color:rgb(59 130 246 / .9);box-shadow:0 0 0 1px rgb(59 130 246 / .35)}.categories{margin-top:4px;display:flex;flex-wrap:wrap;gap:6px;max-height:80px;overflow-y:auto;padding-right:3px}.category-chip{font-size:11px;padding:4px 9px;border-radius:999px;border:1px solid rgb(148 163 184 / .35);color:var(--text-muted);cursor:pointer;background:rgb(15 23 42 / .8);transition:all 0.15s ease-out;white-space:nowrap}.category-chip.active{background:var(--accent-soft);border-color:rgb(59 130 246 / .9);color:#dbeafe}.category-chip:hover{border-color:rgb(59 130 246 / .7)}.products-wrapper{margin-top:6px;background:rgb(15 23 42 / .75);border-radius:var(--radius-lg);border:1px solid var(--border-soft);padding:10px;min-height:260px;display:flex;flex-direction:column;gap:10px}.products-header{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--text-muted)}.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-top:2px}.product-card{background:radial-gradient(circle at top left,rgb(59 130 246 / .2),transparent 55%) #020617;border-radius:14px;border:1px solid rgb(148 163 184 / .35);padding:7px;cursor:pointer;display:flex;flex-direction:column;gap:6px;transition:transform .12s ease-out,box-shadow .12s ease-out,border-color .12s ease-out}.product-card:hover{transform:translateY(-2px);border-color:rgb(59 130 246 / .9);box-shadow:0 10px 25px rgb(15 23 42 / .85)}.product-thumb{width:100%;aspect-ratio:4/3;border-radius:10px;overflow:hidden;background:radial-gradient(circle at top,#1f2937,#020617);display:flex;align-items:center;justify-content:center}.product-thumb img{width:100%;height:100%;object-fit:cover}.product-info{display:flex;flex-direction:column;gap:3px}.product-title{font-size:13px;font-weight:500;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}.product-meta-line{display:flex;justify-content:space-between;align-items:baseline;font-size:11px;color:var(--text-muted)}.product-price{color:#bef264;font-weight:600;font-size:12px}.product-rating{font-size:11px}.badge-stock{font-size:10px;padding:2px 6px;border-radius:999px;background:rgb(22 163 74 / .2);color:#bbf7d0}.badge-stock.low{background:rgb(234 179 8 / .18);color:#facc15}.products-empty{font-size:13px;color:var(--text-muted);text-align:center;margin-top:20px}.skeleton{background:linear-gradient(90deg,#020617,#111827,#020617);background-size:200% 100%;animation:skeleton 1.2s ease-in-out infinite}@keyframes skeleton{0%{background-position:200% 0}100%{background-position:-200% 0}}.skeleton-text{height:10px;border-radius:999px}.tag-api{font-size:10px;padding:3px 7px;border-radius:999px;background:rgb(15 23 42 / .9);border:1px solid rgb(148 163 184 / .4);color:#e5e7eb}.error{font-size:13px;color:var(--danger);margin-top:10px}
+    </style>
+</head>
+<body>
+<div class="app">
+    <!-- LEFT: DETAILS PANEL -->
+    <aside class="details" id="detailsPanel">
+        <div class="details-header">
+            <div>
+                <div class="details-title">
+                    Product details
+                    <span class="badge">dummyjson.com</span>
+                </div>
+                <div class="details-tagline">
+                    Սեղմիր աջ կողմի ապրանքներից որևէ մեկի վրա։
+                </div>
+            </div>
+            <span class="tag-api">Live API</span>
+        </div>
+
+        <div class="details-main">
+            <div class="details-product">
+                <div class="details-product-img skeleton">
+                    Select
+                </div>
+                <div class="details-product-info">
+                    <h2 id="detailsTitle">Չկա ընտրված ապրանք</h2>
+                    <div class="category-chip" id="detailsCategory" style="display:none;"></div>
+                    <div class="brand" id="detailsBrand"></div>
+                    <div class="price-line" id="detailsPriceLine" style="display:none;">
+                        <span class="price-main" id="detailsPrice"></span>
+                        <span class="price-old" id="detailsOldPrice"></span>
+                        <span class="discount-pill" id="detailsDiscount"></span>
+                    </div>
+                    <div class="details-meta">
+            <span class="meta-pill">
+              ⭐ <strong id="detailsRating">–</strong> rating
+            </span>
+                        <span class="meta-pill">
+              📦 <strong id="detailsStock">–</strong> in stock
+            </span>
+                        <span class="meta-pill">
+              🏷 <strong id="detailsId">–</strong> ID
+            </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="details-description" id="detailsDescription">
+                Ընտրիր որևէ քարտ աջ մասից, այստեղ կտեսնես մանրամասն նկարագրությունը, գինը, զեղչը և այլ ինֆո։
+            </div>
+        </div>
+
+        <div class="details-footer">
+            <span>Քաշում ենք տվյալները՝ <code>https://dummyjson.com/products</code></span>
+            <span class="pill-label">Demo dashboard</span>
+        </div>
+    </aside>
+
+    <!-- RIGHT: FILTERS + LIST -->
+    <section class="right">
+        <div class="topbar">
+            <div class="title-block">
+                <h1>Products overview</h1>
+                <span id="summaryText">Loading products…</span>
+            </div>
+
+            <div class="filters">
+                <input
+                        id="searchInput"
+                        class="input"
+                        type="text"
+                        placeholder="Search by title or description"
+                />
+                <select id="sortSelect" class="select">
+                    <option value="default">Sort: Default</option>
+                    <option value="price-asc">Price ↑</option>
+                    <option value="price-desc">Price ↓</option>
+                    <option value="rating-desc">Rating ↑</option>
+                    <option value="rating-asc">Rating ↓</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="categories" id="categoriesContainer">
+            <!-- category chips will be rendered here -->
+        </div>
+
+        <div class="products-wrapper">
+            <div class="products-header">
+                <span id="resultsCount">0 products</span>
+                <span>Dummy data • for JS practice</span>
+            </div>
+            <div class="products-grid" id="productsGrid">
+                <!-- product cards -->
+            </div>
+            <div class="error" id="errorBox" style="display:none;"></div>
+            <div class="products-empty" id="emptyBox" style="display:none;">
+                Ոչինչ չի գտնվել։ Փորձիր փոխել որոնումը կամ category–ն։
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+    const API_URL = "https://dummyjson.com/products?limit=100";
+    const state={allProducts:[],filtered:[],categories:[],activeCategory:"all",search:"",sort:"default",selected:null},productsGrid=document.getElementById("productsGrid"),searchInput=document.getElementById("searchInput"),sortSelect=document.getElementById("sortSelect"),categoriesContainer=document.getElementById("categoriesContainer"),resultsCount=document.getElementById("resultsCount"),summaryText=document.getElementById("summaryText"),errorBox=document.getElementById("errorBox"),emptyBox=document.getElementById("emptyBox"),detailsTitle=document.getElementById("detailsTitle"),detailsCategory=document.getElementById("detailsCategory"),detailsBrand=document.getElementById("detailsBrand"),detailsPriceLine=document.getElementById("detailsPriceLine"),detailsPrice=document.getElementById("detailsPrice"),detailsOldPrice=document.getElementById("detailsOldPrice"),detailsDiscount=document.getElementById("detailsDiscount"),detailsRating=document.getElementById("detailsRating"),detailsStock=document.getElementById("detailsStock"),detailsId=document.getElementById("detailsId"),detailsDescription=document.getElementById("detailsDescription"),detailsImgContainer=document.querySelector(".details-product-img");async function fetchProducts(){try{showSkeleton();const t=await fetch(API_URL);if(!t.ok)throw new Error("Failed to fetch products");const e=(await t.json()).products||[];state.allProducts=e,state.categories=getCategories(e),state.filtered=[...e],summaryText.textContent=`Loaded ${e.length} products • ${state.categories.length} categories`,renderCategories(),renderProducts()}catch(t){console.error(t),errorBox.style.display="block",errorBox.textContent="Չստացվեց բեռնել տվյալները dummyjson–ից։ Փորձիր թարմացնել էջը։",summaryText.textContent="Error while loading data"}finally{hideSkeleton()}}function getCategories(t){const e=new Set;return t.forEach((t=>e.add(t.category))),Array.from(e).sort()}function renderCategories(){categoriesContainer.innerHTML="";const t=document.createElement("button");t.textContent="All",t.className="category-chip"+("all"===state.activeCategory?" active":""),t.dataset.category="all",categoriesContainer.appendChild(t),state.categories.forEach((t=>{const e=document.createElement("button");e.textContent=t,e.className="category-chip"+(state.activeCategory===t?" active":""),e.dataset.category=t,categoriesContainer.appendChild(e)}))}function renderProducts(){const{allProducts:t,search:e,activeCategory:n,sort:a}=state;let o=[...t];if(""!==e.trim()){const t=e.toLowerCase();o=o.filter((e=>e.title.toLowerCase().includes(t)||e.description.toLowerCase().includes(t)))}if("all"!==n&&(o=o.filter((t=>t.category===n))),o.sort(((t,e)=>{switch(a){case"price-asc":return t.price-e.price;case"price-desc":return e.price-t.price;case"rating-asc":return t.rating-e.rating;case"rating-desc":return e.rating-t.rating;default:return t.id-e.id}})),state.filtered=o,productsGrid.innerHTML="",errorBox.style.display="none",0===o.length)return emptyBox.style.display="block",void(resultsCount.textContent="0 products");emptyBox.style.display="none",resultsCount.textContent=`${o.length} product${1===o.length?"":"s"}`,o.forEach((t=>{const e=document.createElement("article");e.className="product-card",e.dataset.id=t.id;const n=document.createElement("div");if(n.className="product-thumb",t.thumbnail){const e=document.createElement("img");e.src=t.thumbnail,e.alt=t.title,n.appendChild(e)}else n.textContent="No image";const a=document.createElement("div");a.className="product-info";const o=document.createElement("div");o.className="product-title",o.textContent=t.title;const s=document.createElement("div");s.className="product-meta-line";const i=document.createElement("span");i.className="product-price",i.textContent="$"+t.price;const r=document.createElement("span");r.className="product-rating",r.textContent=`⭐ ${t.rating.toFixed(1)}`,s.appendChild(i),s.appendChild(r);const d=document.createElement("div");d.className="product-meta-line";const c=document.createElement("span");c.textContent=t.category,c.style.fontSize="10px",c.style.textTransform="lowercase";const l=document.createElement("span"),u=t.stock<=10?"badge-stock low":"badge-stock";l.className=u,l.textContent=t.stock<=10?`Low stock: ${t.stock}`:`In stock: ${t.stock}`,d.appendChild(c),d.appendChild(l),a.appendChild(o),a.appendChild(s),a.appendChild(d),e.appendChild(n),e.appendChild(a),productsGrid.appendChild(e)}))}function renderDetails(t){if(!t)return detailsTitle.textContent="Չկա ընտրված ապրանք",detailsCategory.style.display="none",detailsBrand.textContent="",detailsPriceLine.style.display="none",detailsRating.textContent="–",detailsStock.textContent="–",detailsId.textContent="–",detailsDescription.textContent="Ընտրիր որևէ քարտ աջ մասից, այստեղ կտեսնես մանրամասն նկարագրությունը, գինը, զեղչը և այլ ինֆո։",detailsImgContainer.innerHTML="Select",void detailsImgContainer.classList.add("skeleton");if(state.selected=t,detailsImgContainer.classList.remove("skeleton"),detailsImgContainer.innerHTML="",t.thumbnail){const e=document.createElement("img");e.src=t.thumbnail,e.alt=t.title,detailsImgContainer.appendChild(e)}else detailsImgContainer.textContent="No image";if(detailsTitle.textContent=t.title,t.category?(detailsCategory.style.display="inline-flex",detailsCategory.textContent=t.category):detailsCategory.style.display="none",detailsBrand.textContent=t.brand?`Brand: ${t.brand}`:"",t.discountPercentage){const e=t.discountPercentage,n=t.price/(1-e/100);detailsPriceLine.style.display="flex",detailsPrice.textContent="$"+t.price.toFixed(2),detailsOldPrice.textContent="$"+n.toFixed(2),detailsDiscount.textContent=`-${e.toFixed(1)}%`}else detailsPriceLine.style.display="none",detailsPrice.textContent="",detailsOldPrice.textContent="",detailsDiscount.textContent="";detailsRating.textContent=t.rating.toFixed(1),detailsStock.textContent=t.stock,detailsId.textContent=t.id,detailsDescription.textContent=t.description}function showSkeleton(){summaryText.textContent="Loading products from dummyjson…"}function hideSkeleton(){}function attachEvents(){searchInput.addEventListener("input",(t=>{state.search=t.target.value,renderProducts()})),sortSelect.addEventListener("change",(t=>{state.sort=t.target.value,renderProducts()})),categoriesContainer.addEventListener("click",(t=>{const e=t.target.closest(".category-chip");e&&(state.activeCategory=e.dataset.category,renderCategories(),renderProducts())})),productsGrid.addEventListener("click",(t=>{const e=t.target.closest(".product-card");if(!e)return;const n=Number(e.dataset.id),a=state.allProducts.find((t=>t.id===n));a&&renderDetails(a)}))}attachEvents(),fetchProducts();
+
+</script>
+</body>
+</html>

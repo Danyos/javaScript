@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8">
+    <title>Օրվա Արդյունավետության Քութաթոր</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body{
+            background:#eef3f9;
+            padding:40px;
+            font-family:sans-serif;
+        }
+        .box{
+            max-width:650px;
+            margin:auto;
+            background:white;
+            padding:25px;
+            border-radius:15px;
+            box-shadow:0 4px 12px rgba(0,0,0,.1);
+        }
+        .title{
+            text-align:center;
+            color:#0d6efd;
+            margin-bottom:25px;
+        }
+    </style>
+</head>
+
+<body>
+<div class="box">
+    <h2 class="title">🔥 Օրվա Արդյունավետության Քութաթոր</h2>
+
+    <div id="taskList">
+        <!-- Tasks will appear here -->
+    </div>
+
+    <button class="btn btn-success w-100 my-3" onclick="addTask()">➕ Ավելացնել առաջադրանք</button>
+    <button class="btn btn-primary w-100" onclick="analyze()">📊 Վերլուծել</button>
+
+    <div id="result" class="mt-4"></div>
+</div>
+
+<script>
+    let index=0;function addTask(){const n=document.createElement("div");n.className="row mb-3 align-items-center",n.innerHTML=`\n        <div class="col-4">\n            <input type="text" class="form-control" placeholder="Անվանում" id="name-${index}">\n        </div>\n\n        <div class="col-2">\n            <input type="number" class="form-control" placeholder="Ժամ" min="0" id="time-${index}">\n        </div>\n\n        <div class="col-2">\n            <input type="number" class="form-control" placeholder="Բարդ." min="1" max="5" id="level-${index}">\n        </div>\n\n        <div class="col-3">\n            <input type="checkbox" class="form-check-input mt-2" id="done-${index}">\n            <label>Կատարված</label>\n        </div>\n    `,document.getElementById("taskList").appendChild(n),index++}function analyze(){let n=index,e=0,t=0,l=0;for(let n=0;n<index;n++){if(!document.getElementById(`name-${n}`))continue;const d=Number(document.getElementById(`time-${n}`).value||0),o=Number(document.getElementById(`level-${n}`).value||1);t+=d,document.getElementById(`done-${n}`).checked&&(e++,l+=d*o)}const d=n?(e/n*100).toFixed(1):0;document.getElementById("result").innerHTML=`\n        <p>📌 Ընդհանուր առաջադրանքներ՝ <strong>${n}</strong></p>\n        <p>✅ Կատարված՝ <strong>${e}</strong> (${d}%)</p>\n        <p>🕓 Ընդհանուր ժամ՝ <strong>${t}</strong></p>\n        <p>🔥 Արդյունավետության միավոր՝ <strong>${l}</strong></p>\n    `}
+</script>
+</body>
+</html>

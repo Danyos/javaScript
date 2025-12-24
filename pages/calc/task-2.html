@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8">
+    <title>Sales Tax + Discount Calculator Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        :root{
+            --bg1:#f7d9e9;
+            --bg2:#cfd9ff;
+            --card-bg:rgba(255,255,255,.9);
+            --accent:#6366f1;
+            --accent-soft:rgba(99,102,241,0.12);
+        }
+        *{
+            box-sizing:border-box;
+            font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+        }
+        body{
+            min-height:100vh;
+            margin:0;
+            display:flex;
+            align-items:flex-start;
+            justify-content:center;
+            padding:40px 10px;
+            background:radial-gradient(circle at 0 0,var(--bg1),transparent 55%),
+            radial-gradient(circle at 100% 100%,var(--bg2),#f3f4ff 60%);
+        }
+        .app-shell{
+            width:100%;
+            max-width:900px;
+        }
+        .glass-card{
+            background:var(--card-bg);
+            border-radius:20px;
+            box-shadow:0 18px 45px rgba(15,23,42,.25);
+            border:1px solid rgba(148,163,184,.35);
+            backdrop-filter:blur(14px);
+            padding:22px 26px 26px;
+        }
+        .app-title{
+            font-weight:700;
+            font-size:1.8rem;
+            letter-spacing:.03em;
+        }
+        .badge-accent{
+            background:var(--accent-soft);
+            color:var(--accent);
+            border-radius:999px;
+            padding:3px 12px;
+            font-size:.75rem;
+            font-weight:600;
+        }
+        .field-label{
+            font-size:.85rem;
+            font-weight:600;
+            color:#374151;
+        }
+        .input-prefix{
+            background:#f3f4f6;
+            border-right:none;
+        }
+        .input-prefix + .form-control{
+            border-left:none;
+        }
+        .input-prefix,
+        .form-control{
+            height:38px;
+        }
+        .summary-box{
+            background:var(--accent-soft);
+            border-radius:14px;
+            padding:14px 16px;
+            font-size:.9rem;
+        }
+        .summary-label{
+            color:#4b5563;
+        }
+        .summary-value{
+            font-weight:700;
+            color:#111827;
+        }
+        .summary-value.big{
+            font-size:1.3rem;
+        }
+        .btn-main{
+            background:var(--accent);
+            border-color:var(--accent);
+            font-weight:600;
+        }
+        .btn-main:hover{
+            filter:brightness(0.95);
+        }
+        .orders-title{
+            font-size:1.05rem;
+            font-weight:600;
+        }
+        .table-sm td,
+        .table-sm th{
+            padding:.4rem .45rem;
+            vertical-align:middle;
+        }
+        .empty-hint{
+            font-size:.85rem;
+            color:#6b7280;
+        }
+        @media (max-width: 768px){
+            .glass-card{
+                padding:18px 18px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="app-shell">
+    <div class="glass-card mb-3">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <div>
+                <h1 class="app-title mb-0">Sales + Discount Calculator</h1>
+                <div class="text-muted" style="font-size:.85rem;">Tax, Discount, Shipping, Promo + History և CSV ✨</div>
+            </div>
+            <span class="badge-accent d-none d-md-inline">Demo for students</span>
+        </div>
+
+        <hr class="mb-3">
+
+        <div class="row g-3">
+            <!-- LEFT SIDE: INPUTS -->
+            <div class="col-md-6">
+                <div class="mb-2">
+                    <label for="productName" class="field-label mb-1">Product name (ոչ պարտադիր)</label>
+                    <input id="productName" class="form-control form-control-sm" placeholder="მაგ․ Laptop, Mouse ...">
+                </div>
+
+                <div class="mb-2">
+                    <label class="field-label mb-1">Product price</label>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text input-prefix">$</span>
+                        <input id="productPrice" type="number" step="0.01" class="form-control" placeholder="0.00" value="154">
+                    </div>
+                </div>
+
+                <div class="mb-2">
+                    <label class="field-label mb-1">Quantity</label>
+                    <input id="quantity" type="number" min="1" class="form-control form-control-sm" value="3">
+                </div>
+
+                <div class="mb-2">
+                    <label class="field-label mb-1">Tax rate (%)</label>
+                    <div class="input-group input-group-sm">
+                        <input id="taxRate" type="number" class="form-control" value="3" step="0.1">
+                        <span class="input-group-text">%</span>
+                    </div>
+                    <div class="form-text" style="font-size:.75rem;">Օրինակ․ 3, 5, 20 և այլն</div>
+                </div>
+
+                <!-- ՆՈՐ ՄԱՍ — Discount / Shipping / Promo -->
+                <div class="mb-2">
+                    <label class="field-label mb-1">Discount (%)</label>
+                    <input id="discountRate" type="number" class="form-control form-control-sm" placeholder="օր. 10">
+                    <div class="form-text" style="font-size:.75rem;">0–100 միջակայքում</div>
+                </div>
+
+                <div class="mb-2">
+                    <label class="field-label mb-1">Shipping</label>
+                    <select id="shipping" class="form-select form-select-sm">
+                        <option value="0">Free pickup — $0</option>
+                        <option value="5">Standard — $5</option>
+                        <option value="12">Express — $12</option>
+                    </select>
+                </div>
+
+                <div class="mb-1">
+                    <label class="field-label mb-1">Promo code</label>
+                    <input id="promoCode" class="form-control form-control-sm" placeholder="PROMO10, PROMO5 ...">
+                    <div id="promoMsg" class="text-danger small d-none">❌ Invalid promo code</div>
+                    <div class="form-text" style="font-size:.75rem;">Օրինակ․ PROMO10 (-$10), PROMO5 (-5% subtotal-ից)</div>
+                </div>
+
+                <div class="d-flex gap-2 mt-3">
+                    <button id="btnCalculate" class="btn btn-main btn-sm flex-grow-1">
+                        Calculate
+                    </button>
+                    <button id="btnAddToList" class="btn btn-outline-secondary btn-sm flex-grow-1">
+                        Add to list
+                    </button>
+                </div>
+            </div>
+
+            <!-- RIGHT SIDE: LIVE SUMMARY -->
+            <div class="col-md-6">
+                <div class="summary-box mb-2">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="summary-label">Subtotal</span>
+                        <span id="summarySubtotal" class="summary-value">$0.00</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="summary-label">Discount</span>
+                        <span id="summaryDiscount" class="summary-value">$0.00</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-1">
+            <span class="summary-label">
+              Tax (<span id="summaryTaxRate">0</span>%)
+            </span>
+                        <span id="summaryTax" class="summary-value">$0.00</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="summary-label">Shipping</span>
+                        <span id="summaryShipping" class="summary-value">$0.00</span>
+                    </div>
+
+                    <hr class="my-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="summary-label">Total</span>
+                        <span id="summaryTotal" class="summary-value big">$0.00</span>
+                    </div>
+                </div>
+
+                <div class="row g-2">
+                    <div class="col-6">
+                        <button id="btnClearInputs" class="btn btn-outline-secondary btn-sm w-100">
+                            Clear inputs
+                        </button>
+                    </div>
+                    <div class="col-6">
+                        <button id="btnResetAll" class="btn btn-outline-danger btn-sm w-100">
+                            Clear history
+                        </button>
+                    </div>
+                    <div class="col-12 mt-1">
+                        <button id="btnDownloadCSV" class="btn btn-outline-dark btn-sm w-100">
+                            Download CSV of list
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ORDERS LIST -->
+    <div class="glass-card">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="orders-title">Orders list</span>
+            <span class="text-muted" style="font-size:.8rem;">Ամեն "Add to list"-ից հետո order-ը կավելանա այստեղ</span>
+        </div>
+
+        <div id="ordersEmpty" class="empty-hint d-none">
+            Պատմություն դեռ չունես 😊 Սկսի հաշվարկել և սեղմի <strong>Add to list</strong>։
+        </div>
+
+        <div class="table-responsive" id="ordersTableWrapper">
+            <table class="table table-sm table-striped align-middle mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th>#</th>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Qty</th>
+                    <th>Tax %</th>
+                    <th>Discount</th>
+                    <th>Shipping</th>
+                    <th>Subtotal</th>
+                    <th>Tax</th>
+                    <th>Total</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody id="ordersBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    let orders=[];const productNameInput=document.getElementById("productName"),productPriceInput=document.getElementById("productPrice"),quantityInput=document.getElementById("quantity"),taxRateInput=document.getElementById("taxRate"),discountRateInput=document.getElementById("discountRate"),shippingSelect=document.getElementById("shipping"),promoCodeInput=document.getElementById("promoCode"),promoMsg=document.getElementById("promoMsg"),summarySubtotal=document.getElementById("summarySubtotal"),summaryDiscount=document.getElementById("summaryDiscount"),summaryTax=document.getElementById("summaryTax"),summaryShipping=document.getElementById("summaryShipping"),summaryTotal=document.getElementById("summaryTotal"),summaryTaxRate=document.getElementById("summaryTaxRate"),ordersBody=document.getElementById("ordersBody"),ordersEmpty=document.getElementById("ordersEmpty"),ordersTableWrapper=document.getElementById("ordersTableWrapper");function formatMoney(t){return"$"+t.toFixed(2)}function getPromoDiscount(t){const e=promoCodeInput.value.trim().toUpperCase();let o=0;return e?("PROMO10"===e?(o=10,promoMsg.classList.add("d-none")):"PROMO5"===e?(o=.05*t,promoMsg.classList.add("d-none")):promoMsg.classList.remove("d-none"),o):(promoMsg.classList.add("d-none"),0)}function calculateValues(){const t=parseFloat(productPriceInput.value)||0,e=parseInt(quantityInput.value)||0,o=parseFloat(taxRateInput.value)||0;let n=parseFloat(discountRateInput.value)||0;const a=parseFloat(shippingSelect.value)||0;n<0&&(n=0),n>100&&(n=100);const r=t*e,d=r*(o/100);let u=r*(n/100)+getPromoDiscount(r);u>r&&(u=r);const s=r-u+d+a;return summaryTaxRate.textContent=o.toString(),summarySubtotal.textContent=formatMoney(r),summaryDiscount.textContent=formatMoney(u),summaryTax.textContent=formatMoney(d),summaryShipping.textContent=formatMoney(a),summaryTotal.textContent=formatMoney(s),{price:t,qty:e,taxRate:o,discountPct:n,shipping:a,subtotal:r,tax:d,totalDiscount:u,total:s,promoCode:promoCodeInput.value.trim().toUpperCase()}}function renderOrders(){if(!orders.length)return ordersEmpty.classList.remove("d-none"),ordersTableWrapper.classList.add("d-none"),void(ordersBody.innerHTML="");ordersEmpty.classList.add("d-none"),ordersTableWrapper.classList.remove("d-none"),ordersBody.innerHTML=orders.map(((t,e)=>`\n      <tr>\n        <td>${e+1}</td>\n        <td>${t.productName||"-"}</td>\n        <td>${formatMoney(t.price)}</td>\n        <td>${t.qty}</td>\n        <td>${t.taxRate.toFixed(1)}%</td>\n        <td>${formatMoney(t.totalDiscount)}</td>\n        <td>${formatMoney(t.shipping)}</td>\n        <td>${formatMoney(t.subtotal)}</td>\n        <td>${formatMoney(t.tax)}</td>\n        <td><strong>${formatMoney(t.total)}</strong></td>\n        <td class="text-end">\n          <button class="btn btn-sm btn-link text-danger p-0" data-id="${t.id}">✕</button>\n        </td>\n      </tr>\n    `)).join("")}function saveToStorage(){localStorage.setItem("salesOrdersPro",JSON.stringify(orders))}function loadFromStorage(){const t=localStorage.getItem("salesOrdersPro");if(t){try{orders=JSON.parse(t)||[]}catch{orders=[]}renderOrders()}}function addCurrentOrderToList(){const t=parseFloat(productPriceInput.value)||0,e=parseInt(quantityInput.value)||0;if(t<=0||e<=0)return void alert("Նախ գրիր product price և quantity (երկուսն էլ > 0)։");const o=calculateValues(),n={id:Date.now(),productName:productNameInput.value.trim(),...o};orders.push(n),saveToStorage(),renderOrders()}function downloadCSV(){if(!orders.length)return void alert("Պատմությունը դատարկ է, ներբեռնելու բան չկա 🙂");const t=[["Index","Product","Price","Quantity","TaxRate(%)","DiscountTotal","Shipping","Subtotal","Tax","Total","PromoCode"],...orders.map(((t,e)=>[e+1,`"${(t.productName||"").replace(/"/g,'""')}"`,t.price.toFixed(2),t.qty,t.taxRate.toFixed(1),t.totalDiscount.toFixed(2),t.shipping.toFixed(2),t.subtotal.toFixed(2),t.tax.toFixed(2),t.total.toFixed(2),t.promoCode||""]))].map((t=>t.join(","))).join("\n"),e=new Blob([t],{type:"text/csv;charset=utf-8;"}),o=URL.createObjectURL(e),n=document.createElement("a");n.href=o,n.download="sales-orders-advanced.csv",document.body.appendChild(n),n.click(),document.body.removeChild(n),URL.revokeObjectURL(o)}document.getElementById("btnCalculate").addEventListener("click",calculateValues),document.getElementById("btnAddToList").addEventListener("click",(()=>{calculateValues(),addCurrentOrderToList()})),document.getElementById("btnClearInputs").addEventListener("click",(()=>{productNameInput.value="",productPriceInput.value="",quantityInput.value=1,taxRateInput.value=0,discountRateInput.value="",shippingSelect.value="0",promoCodeInput.value="",promoMsg.classList.add("d-none"),calculateValues()})),document.getElementById("btnResetAll").addEventListener("click",(()=>{confirm("Համոզվա՞ծ ես, որ ուզում ես մաքրել ամբողջ history-ն։")&&(orders=[],saveToStorage(),renderOrders())})),document.getElementById("btnDownloadCSV").addEventListener("click",downloadCSV),[productPriceInput,quantityInput,taxRateInput,discountRateInput,shippingSelect].forEach((t=>t.addEventListener("input",calculateValues))),promoCodeInput.addEventListener("input",calculateValues),ordersBody.addEventListener("click",(t=>{const e=t.target.closest("button[data-id]");if(!e)return;const o=Number(e.dataset.id);orders=orders.filter((t=>t.id!==o)),saveToStorage(),renderOrders()})),[productPriceInput,quantityInput,taxRateInput,productNameInput,discountRateInput,promoCodeInput].forEach((t=>{t.addEventListener("keydown",(t=>{"Enter"===t.key&&(t.preventDefault(),calculateValues())}))})),calculateValues(),loadFromStorage();
+</script>
+</body>
+</html>

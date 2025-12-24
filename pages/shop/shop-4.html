@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mini Cart UI</title>
+    <style>
+        :root{
+            --bg: #ffffff;
+            --card: #ffffff;
+            --card2: #ffffff;
+            --text: #000000;
+            --muted: #666666;
+            --stroke: #dddddd;
+            --shadow: 0 10px 25px rgba(0,0,0,.08);
+            --radius: 16px;
+        }
+        *{ box-sizing:border-box; }
+        body{
+            margin:0; min-height:100vh;
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+            background: var(--bg); color: var(--text);
+            padding: 30px 16px;
+        }
+        .wrap{max-width: 900px;margin: 0 auto;display: grid;gap: 16px;}
+        .card{background: var(--card);border: 1px solid var(--stroke);border-radius: var(--radius);box-shadow: var(--shadow);}
+        .card-header{padding: 16px 18px;display:flex;justify-content:space-between;align-items:center;border-bottom: 1px solid var(--stroke);}
+        .title{font-weight: 700;letter-spacing: .3px;color: #000;}
+        .badge{font-size: 12px;padding: 5px 10px;border-radius: 999px;border: 1px solid var(--stroke);color: var(--muted);background: #f7f7f7;}
+        .total small{color: var(--muted);}
+        .total .price{font-size: 22px;font-weight: 800;color: #000;}
+
+        .form{padding: 18px;}
+        .grid{display:grid;grid-template-columns: 1.4fr 1fr 1fr auto;gap: 12px;}
+        @media (max-width: 720px){.grid{ grid-template-columns: 1fr 1fr; }.btn{ grid-column: 1 / -1; }}
+        .field input{
+            width:100%;height:44px;padding: 10px 12px;border-radius: 12px;
+            border: 1px solid var(--stroke);background:#fff;color:#000;outline:none;transition:.15s ease;
+        }
+        .field input::placeholder{color:#999;}
+        .field input:focus{border-color:#000;}
+        .btn{
+            height:44px;padding: 0 18px;border-radius: 12px;border: 1px solid #000;
+            background:#000;color:#fff;font-weight:800;cursor:pointer;transition:.15s ease;
+        }
+        .btn:hover{background:#fff;color:#000;}
+        .hint{margin-top:10px;font-size:12px;color:var(--muted);}
+
+        .list{padding: 14px;}
+        ul{list-style:none;margin:0;padding:0;display:grid;gap:10px;}
+        li{
+            display:flex;justify-content:space-between;align-items:center;
+            padding:14px;border-radius:14px;border:1px solid var(--stroke);background:#fafafa;
+        }
+        .name{font-weight:700;color:#000;}
+        .meta{display:flex;gap:8px;margin-top:6px;font-size:12px;color:var(--muted);}
+        .pill{padding:4px 9px;border-radius:999px;border:1px solid var(--stroke);background:#fff;}
+        .money{font-weight:800;font-size:16px;color:#000;}
+        .empty{
+            text-align:center;padding:20px;font-size:13px;color:var(--muted);
+            border:1px dashed var(--stroke);border-radius:14px;background:#fff;
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrap">
+
+    <!-- TOP: TOTAL -->
+    <div class="card">
+        <div class="card-header">
+            <div class="title">
+                <span>Cart Summary</span>
+                <span class="badge">local UI</span>
+            </div>
+
+            <div class="total">
+                <small>All price:</small>
+                <span class="price" id="totalPrice">33,000</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- FORM -->
+    <div class="card">
+        <div class="card-header">
+            <div class="title"><span>Add Item</span></div>
+            <span class="badge">title • price • qty</span>
+        </div>
+
+        <div class="form">
+            <div class="grid">
+                <div class="field">
+                    <input id="titleInput" type="text" placeholder="title">
+                </div>
+                <div class="field">
+                    <input id="priceInput" type="text" placeholder="price">
+                </div>
+                <div class="field">
+                    <input id="qtyInput" type="text" placeholder="qty">
+                </div>
+                <button class="btn" id="saveBtn">save</button>
+            </div>
+
+            <div class="hint">
+                Tip: price / qty դաշտերը կարող ես հետո regex-ով փակել, որ միայն թիվ ընդունեն 😉
+            </div>
+        </div>
+    </div>
+
+    <!-- LIST -->
+    <div class="card">
+        <div class="card-header">
+            <div class="title">Items</div>
+            <span class="badge" id="itemsCount">2 items</span>
+        </div>
+
+        <div class="list">
+            <div id="emptyState" class="empty" style="display: none;">No items yet. Add your first item 👆</div>
+            <ul id="itemsList"><li>
+                <div class="item-left">
+                    <div class="name">Mouse</div>
+                    <div class="meta">
+                        <span class="pill">qty: 5</span>
+                        <span class="pill">unit: 5,000</span>
+                    </div>
+                </div>
+                <div class="money">25,000</div>
+            </li><li>
+                <div class="item-left">
+                    <div class="name">qwerty</div>
+                    <div class="meta">
+                        <span class="pill">qty: 4</span>
+                        <span class="pill">unit: 2,000</span>
+                    </div>
+                </div>
+                <div class="money">8,000</div>
+            </li></ul>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    (()=>{const t="mini_cart_ui_v1",e=document.getElementById("titleInput"),n=document.getElementById("priceInput"),i=document.getElementById("qtyInput"),r=document.getElementById("saveBtn"),l=document.getElementById("itemsList"),a=document.getElementById("totalPrice"),c=document.getElementById("itemsCount"),o=document.getElementById("emptyState"),s=t=>String(t??"").replace(/[&<>"']/g,(t=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[t]))),u=t=>(Number(t)||0).toLocaleString("en-US");let d=function(){try{const e=localStorage.getItem(t);if(!e)return[];const n=JSON.parse(e);return Array.isArray(n)?n:[]}catch{return[]}}();function m(){if(c.textContent=`${d.length} items`,a.textContent=u(d.reduce(((t,e)=>t+e.price*e.qty),0)),l.innerHTML="",0!==d.length){o.style.display="none";for(const t of d){const e=document.createElement("li"),n=t.price*t.qty;e.innerHTML=`\n        <div class="item-left">\n          <div class="name">${s(t.title)}</div>\n          <div class="meta">\n            <span class="pill">qty: ${t.qty}</span>\n            <span class="pill">unit: ${u(t.price)}</span>\n          </div>\n        </div>\n        <div class="money">${u(n)}</div>\n      `,l.appendChild(e)}!function(e){localStorage.setItem(t,JSON.stringify(e))}(d)}else o.style.display="block"}function y(){const t=(e.value||"").trim(),r=(t=>{const e=String(t??"").replace(/[^\d.]/g,"");return""===e.trim()?NaN:Number(e)})(n.value),l=(t=>{const e=String(t??"").replace(/[^\d]/g,"");return""===e.trim()?NaN:parseInt(e,10)})(i.value);(function(t,e,n){return t.length<2?(alert("Title պետք է լինի առնվազն 2 տառ։"),!1):!Number.isFinite(e)||e<0?(alert("Price-ը պետք է լինի թիվ (>= 0)։"),!1):!(!Number.isInteger(n)||n<0)||(alert("Qty-ն պետք է լինի ամբողջ թիվ (>= 0)։"),!1)})(t,r,l)&&(d.push({id:Math.random().toString(16).slice(2)+Date.now().toString(16),title:t,price:Math.round(r),qty:l}),e.value="",n.value="",i.value="",e.focus(),m())}r.addEventListener("click",y),[e,n,i].forEach((t=>{t.addEventListener("keydown",(t=>{"Enter"===t.key&&y()}))})),m()})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8">
+    <title>Mobile Store — Filter + Cart</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap 5 -->
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+    >
+
+    <style>
+        :root{
+            --bg-main:#f5f5f7;
+            --bg-sidebar:#ffffff;
+            --bg-card:#ffffff;
+            --border-soft:#e2e2e8;
+            --text-main:#111827;
+            --text-muted:#6b7280;
+            --accent:#0d6efd;
+        }
+        *{
+            box-sizing:border-box;
+            font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+        }
+        body{
+            background:var(--bg-main);
+            color:var(--text-main);
+            min-height:100vh;
+        }
+        .app-shell{
+            min-height:100vh;
+        }
+        .sidebar{
+            background:var(--bg-sidebar);
+            border-right:1px solid var(--border-soft);
+        }
+        .sidebar h5{
+            font-weight:600;
+            letter-spacing:.03em;
+        }
+        .filter-group label{
+            font-size:.85rem;
+            color:var(--text-muted);
+            margin-bottom:.15rem;
+        }
+        .filter-group .form-control,
+        .filter-group .form-select{
+            background-color:#f9fafb;
+            border-color:var(--border-soft);
+            color:var(--text-main);
+            font-size:.9rem;
+        }
+        .filter-group .form-control::placeholder{
+            color:var(--text-muted);
+        }
+        .filter-group .form-control:focus,
+        .filter-group .form-select:focus{
+            box-shadow:none;
+            border-color:var(--accent);
+            background-color:#ffffff;
+        }
+        .main-area{
+            padding:20px 24px 32px;
+        }
+        .cart-bar{
+            background:var(--bg-card);
+            border-radius:16px;
+            border:1px solid var(--border-soft);
+            padding:14px 18px;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:10px;
+            margin-bottom:18px;
+        }
+        .cart-title{
+            font-size:.9rem;
+            text-transform:uppercase;
+            letter-spacing:.08em;
+            color:var(--text-muted);
+        }
+        .cart-summary-main{
+            font-size:1.1rem;
+            font-weight:600;
+        }
+        .cart-summary-sub{
+            font-size:.8rem;
+            color:var(--text-muted);
+        }
+        .product-card{
+            background:var(--bg-card);
+            border-radius:18px;
+            border:1px solid var(--border-soft);
+            padding:10px 10px 14px;
+            height:100%;
+            display:flex;
+            flex-direction:column;
+            justify-content:space-between;
+            transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+            cursor:pointer;
+        }
+        .product-card:hover{
+            transform:translateY(-3px);
+            border-color:var(--accent);
+            box-shadow:0 12px 28px rgba(15,23,42,.12);
+        }
+        .product-image-wrapper{
+            background:#f9fafb;
+            border-radius:14px;
+            overflow:hidden;
+            border:1px solid #e5e7eb;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            height:210px;
+            margin-bottom:10px;
+        }
+        .product-image-wrapper img{
+            max-height:200px;
+            width:auto;
+            display:block;
+        }
+        .product-name{
+            font-size:.95rem;
+            font-weight:600;
+            margin-bottom:2px;
+        }
+        .product-meta{
+            font-size:.8rem;
+            color:var(--text-muted);
+            margin-bottom:4px;
+        }
+        .price-row{
+            display:flex;
+            align-items:baseline;
+            gap:6px;
+            margin-top:4px;
+        }
+        .price-main{
+            font-weight:600;
+            font-size:.98rem;
+        }
+        .price-old{
+            font-size:.75rem;
+            text-decoration:line-through;
+            color:var(--text-muted);
+        }
+        .discount-badge{
+            font-size:.7rem;
+            padding:2px 6px;
+            border-radius:999px;
+            border:1px solid rgba(16,185,129,.4);
+            color:#047857;
+            background-color:#d1fae5;
+        }
+        .product-actions{
+            margin-top:10px;
+            display:flex;
+            justify-content:space-between;
+            gap:8px;
+        }
+        .btn{
+            border-radius:999px;
+            font-size:.8rem;
+            padding:6px 10px;
+        }
+        .btn-outline-dark{
+            border-color:var(--border-soft);
+            color:var(--text-main);
+            background:#ffffff;
+        }
+        .btn-outline-dark:hover{
+            background:#111827;
+            color:#ffffff;
+        }
+        .badge-pill{
+            border-radius:999px;
+            font-size:.7rem;
+            padding:3px 8px;
+        }
+        .modal-content{
+            background:var(--bg-card);
+            color:var(--text-main);
+            border-radius:18px;
+            border:1px solid var(--border-soft);
+        }
+        .modal-header{
+            border-bottom-color:var(--border-soft);
+        }
+        .modal-footer{
+            border-top-color:var(--border-soft);
+        }
+        .form-check-label{
+            font-size:.85rem;
+        }
+        .text-muted-2{
+            color:var(--text-muted);
+            font-size:.78rem;
+        }
+        @media (max-width: 991.98px){
+            .sidebar{
+                border-right:none;
+                border-bottom:1px solid var(--border-soft);
+            }
+            .main-area{
+                padding:16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid app-shell">
+    <div class="row h-100">
+        <!-- SIDEBAR FILTERS -->
+        <aside class="col-12 col-lg-3 sidebar p-3 p-lg-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0">Ֆիլտրեր</h5>
+                <button id="resetFiltersBtn" class="btn btn-sm btn-outline-dark">
+                    Մաքրել
+                </button>
+            </div>
+
+            <div class="filter-group mb-3">
+                <label for="categoryFilter">Կատեգորիա</label>
+                <select id="categoryFilter" class="form-select">
+                    <option value="">Բոլորը</option>
+                    <option value="1">Հեռախոսներ</option><option value="2">Պլանշետներ</option><option value="3">Աքսեսուարներ</option></select>
+            </div>
+
+            <div class="filter-group mb-3">
+                <label for="brandFilter">Բրենդ</label>
+                <select id="brandFilter" class="form-select">
+                    <option value="">Բոլորը</option>
+                    <option value="1">Apple</option><option value="2">Samsung</option><option value="3">Xiaomi</option><option value="4">Nokia</option><option value="5">Huawei</option><option value="6">Google</option><option value="7">OnePlus</option></select>
+            </div>
+
+            <div class="filter-group mb-3">
+                <label for="osFilter">Օպերացիոն համակարգ</label>
+                <select id="osFilter" class="form-select">
+                    <option value="">Բոլորը</option>
+                    <option value="1">iOS</option><option value="2">Android</option><option value="3">Windows</option></select>
+            </div>
+
+            <div class="filter-group mb-3">
+                <label for="ramFilter">RAM</label>
+                <select id="ramFilter" class="form-select">
+                    <option value="">Բոլորը</option>
+                    <option value="1">8GB</option><option value="2">16GB</option><option value="3">32GB</option><option value="4">64GB</option></select>
+            </div>
+
+            <div class="filter-group mb-3">
+                <label>Գին (AMD)</label>
+                <div class="d-flex gap-2">
+                    <input id="minPrice" type="number" class="form-control" placeholder="Մին.">
+                    <input id="maxPrice" type="number" class="form-control" placeholder="Մաքս.">
+                </div>
+            </div>
+
+            <div class="filter-group mb-4">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="discountOnly">
+                    <label class="form-check-label" for="discountOnly">
+                        Միայն զեղչով
+                    </label>
+                </div>
+            </div>
+
+            <p class="text-muted-2 mb-0">
+                Ֆիլտրերը ավտոմատ կիրառվում են փոփոխության պահին։
+            </p>
+        </aside>
+
+        <!-- MAIN AREA -->
+        <main class="col-12 col-lg-9 main-area">
+            <!-- CART BAR -->
+            <div class="cart-bar">
+                <div>
+                    <div class="cart-title">Զամբյուղ</div>
+                    <div class="cart-summary-main">
+                        <span id="cartItemsCount">0</span> ապրանք •
+                        <span id="cartTotal">0</span> ֏
+                    </div>
+                    <div class="cart-summary-sub" id="cartSummarySub">Զամբյուղում ապրանքներ չկան։</div>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-dark btn-sm" id="clearCartBtn">
+                        Մաքրել զամբյուղը
+                    </button>
+                    <button class="btn btn-primary btn-sm" id="openCartBtn" data-bs-toggle="modal" data-bs-target="#cartModal">
+                        Տեսնել զամբյուղը
+                    </button>
+                </div>
+            </div>
+
+            <!-- PRODUCT LIST -->
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="mb-0 text-uppercase text-muted">Ապրանքներ</h6>
+                <span class="text-muted-2">
+          Ցույց է տրված՝ <span id="visibleCount">18</span> / <span id="totalCount">18</span>
+        </span>
+            </div>
+
+            <div id="productsRow" class="row g-3"><div class="col-12 col-sm-6 col-md-4 col-xl-3"><div class="product-card">
+                <div>
+                    <div class="product-image-wrapper">
+                        <img src="https://placehold.co/350x500?text=iPhone%2017" alt="iPhone 17">
+                    </div>
+                    <div>
+                        <div class="product-name">iPhone 17</div>
+                        <div class="product-meta">
+                            Apple • 16GB • Հեռախոսներ
+                        </div>
+                        <div class="price-row">
+                            <div class="price-main">474 050 ֏</div>
+                            <div class="price-old">499 000 ֏</div>
+                            <span class="discount-badge">-5%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-actions">
+                    <button class="btn btn-outline-dark btn-sm w-50 details-btn">
+                        Մանրամասներ
+                    </button>
+                    <button class="btn btn-primary btn-sm w-50 add-btn">
+                        Զամբյուղ
+                    </button>
+                </div>
+            </div></div><div class="col-12 col-sm-6 col-md-4 col-xl-3"><div class="product-card">
+                <div>
+                    <div class="product-image-wrapper">
+                        <img src="https://placehold.co/350x500?text=iPhone%2017%20Pro" alt="iPhone 17 Pro">
+                    </div>
+                    <div>
+                        <div class="product-name">iPhone 17 Pro</div>
+                        <div class="product-meta">
+                            Apple • 16GB • Հեռախոսներ
+                        </div>
+                        <div class="price-row">
+                            <div class="price-main">539 100 ֏</div>
+                            <div class="price-old">599 000 ֏</div>
+                            <span class="discount-badge">-10%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-actions">
+                    <button class="btn btn-outline-dark btn-sm w-50 details-btn">
+                        Մանրամասներ
+                    </button>
+                    <button class="btn btn-primary btn-sm w-50 add-btn">
+                        Զամբյուղ
+                    </button>
+                </div>
+            </div></div><div class="col-12 col-sm-6 col-md-4 col-xl-3"><div class="product-card">
+                <div>
+                    <div class="product-image-wrapper">
+                        <img src="https://placehold.co/350x500?text=iPhone%2017%20Pro%20Max" alt="iPhone 17 Pro Max">
+                    </div>
+                    <div>
+                        <div class="product-name">iPhone 17 Pro Max</div>
+                        <div class="product-meta">
+                            Apple • 32GB • Հեռախոսներ
+                        </div>
+                        <div class="price-row">
+                            <div class="price-main">597 080 ֏</div>
+                            <div class="price-old">649 000 ֏</div>
+                            <span class="discount-badge">-8%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-actions">
+                    <button class="btn btn-outline-dark btn-sm w-50 details-btn">
+                        Մանրամասներ
+                    </button>
+                    <button class="btn btn-primary btn-sm w-50 add-btn">
+                        Զամբյուղ
+                    </button>
+                </div>
+            </div></div><div class="col-12 col-sm-6 col-md-4 col-xl-3"><div class="product-card">
+                <div>
+                    <div class="product-image-wrapper">
+                        <img src="https://placehold.co/350x500?text=Samsung%20Galaxy%20S26" alt="Samsung Galaxy S26">
+                    </div>
+                    <div>
+                        <div class="product-name">Samsung Galaxy S26</div>
+                        <div class="product-meta">
+                            Samsung • 16GB • Հեռախոսներ
+                        </div>
+                        <div class="price-row">
+                            <div class="price-main">417 570 ֏</div>
+                            <div class="price-old">449 000 ֏</div>
+                            <span class="discount-badge">-7%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-actions">
+                    <button class="btn btn-outline-dark btn-sm w-50 details-btn">
+                        Մանրամասներ
+                    </button>
+                    <button class="btn btn-primary btn-sm w-50 add-btn">
+                        Զամբյուղ
+                    </button>
+                </div>
+            </div></div><div class="col-12 col-sm-6 col-md-4 col-xl-3"><div class="product-card">
+                <div>
+                    <div class="product-image-wrapper">
+                        <img src="https://placehold.co/350x500?text=Samsung%20Galaxy%20S26%20Ultra" alt="Samsung Galaxy S26 Ultra">
+                    </div>
+                    <div>
+                        <div class="product-name">Samsung Galaxy S26 Ultra</div>
+                        <div class="product-meta">
+                            Samsung • 32GB • Հեռախոսներ
+                        </div>
+                        <div class="price-row">
+                            <div class="price-main">476 100 ֏</div>
+                            <div class="price-old">529 000 ֏</div>
+                            <span class="discount-badge">-10%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-actions">
+                    <button class="btn btn-outline-dark btn-sm w-50 details-btn">
+                        Մանրամասներ
+                    </button>
+                    <button class="btn btn-primary btn-sm w-50 add-btn">
+                        Զամբյուղ
+                    </button>
+                </div>
+            </div></div><div class="col-12 col-sm-6 col-md-4 col-xl-3"><div class="product-card">
+                <div>
+                    <div class="product-image-wrapper">
+                        <img src="https://placehold.co/350x500?text=Samsung%20Galaxy%20A98" alt="Samsung Galaxy A98">
+                    </div>
+                    <div>
+                        <div class="product-name">Samsung Galaxy A98</div>
+                        <div class="product-meta">
+                            Samsung • 8GB • Հեռախոսներ
+                        </div>
+                        <div class="price-row">
+                            <div class="price-main">263 120 ֏</div>
+                            <div class="price-old">299 000 ֏</div>
+                            <span class="discount-badge">-12%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-actions">
+                    <button class="btn btn-outline-dark btn-sm w-50 details-btn">
+                        Մանրամասներ
+                    </button>
+                    <button class="btn btn-primary btn-sm w-50 add-btn">
+                        Զամբյուղ
+                    </button>
+                </div>
+            </div></div><div class="col-12 col-sm-6 col-md-4 col-xl-3"><div class="product-card">
+                <div>
+                    <div class="product-image-wrapper">
+                        <img src="https://placehold.co/350x500?text=Xiaomi%20Mi%2015" alt="Xiaomi Mi 15">
+                    </div>
+                    <div>
+                        <div class="product-name">Xiaomi Mi 15</div>
+                        <div class="product-meta">
+                            Xiaomi • 8GB • Հեռախոսներ
+                        </div>
+                        <div class="price-row">
+                            <div class="price-main">246 050 ֏</div>
+                            <div class="price-old">259 000 ֏</div>
+                            <span class="discount-badge">-5%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-actions">
+                    <button class="btn btn-outline-dark btn-sm w-50 details-btn">
+                        Մանրամասներ
+                    </button>
+                    <button class="btn btn-primary btn-sm w-50 add-btn">
+                        Զամբյուղ
+                    </button>
+                </div>
+            </div></div><div class="col-12 col-sm-6 col-md-4 col-xl-3"><div class="product-card">
+                <div>
+                    <div class="product-image-wrapper">
+                        <img src="https://placehold.co/350x500?text=Xiaomi%20Redmi%20Note%2014" alt="Xiaomi Redmi Note 14">
+                    </div>
+                    <div>
+                        <div class="product-name">Xiaomi Redmi Note 14</div>
+                        <div class="product-meta">
+                            Xiaomi • 8GB • Հեռախոսներ
+                        </div>
+                        <div class="price-row">
+                            <div class="price-main">186 150 ֏</div>
+                            <div class="price-old">219 000 ֏</div>
+                            <span class="discount-badge">-15%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-actions">
+                    <button class="btn btn-outline-dark btn-sm w-50 details-btn">
+                        Մանրամասներ
+                    </button>
+                    <button class="btn btn-primary btn-sm w-50 add-btn">
+                        Զամբյուղ
+                    </button>
+                </div>
+            </div></div><div class="col-12 col-sm-6 col-md-4 col-xl-3"><div class="product-card">
+                <div>
+                    <div class="product-image-wrapper">
+                        <img src="https://placehold.co/350x500?text=Google%20Pixel%2010" alt="Google Pixel 10">
+                    </div>
+                    <div>
+                        <div class="product-name">Google Pixel 10</div>
+                        <div class="product-meta">
+                            Google • 16GB • Հեռախոսներ
+                        </div>
+                        <div class="price-row">
+                            <div class="price-main">403 260 ֏</div>
+                            <div class="price-old">429 000 ֏</div>
+                            <span class="discount-badge">-6%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-actions">
+                    <button class="btn btn-outline-dark btn-sm w-50 details-btn">
+                        Մանրամասներ
+                    </button>
+                    <button class="btn btn-primary btn-sm w-50 add-btn">
+                        Զամբյուղ
+                    </button>
+                </div>
+            </div></div><div class="col-12 col-sm-6 col-md-4 col-xl-3"><div class="product-card">
+                <div>
+                    <div class="product-image-wrapper">
+                        <img src="https://placehold.co/350x500?text=OnePlus%2013%20Pro" alt="OnePlus 13 Pro">
+                    </div>
+                    <div>
+                        <div class="product-name">OnePlus 13 Pro</div>
+                        <div class="product-meta">
+                            OnePlus • 32GB • Հեռախոսներ
+                        </div>
+                        <div class="price-row">
+                            <div class="price-main">363 090 ֏</div>
+                            <div class="price-old">399 000 ֏</div>
+                            <span class="discount-badge">-9%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-actions">
+                    <button class="btn btn-outline-dark btn-sm w-50 details-btn">
+                        Մանրամասներ
+                    </button>
+                    <button class="btn btn-primary btn-sm w-50 add-btn">
+                        Զամբյուղ
+                    </button>
+                </div>
+            </div></div><div class="col-12 col-sm-6 col-md-4 col-xl-3"><div class="product-card">
+                <div>
+                    <div class="product-image-wrapper">
+                        <img src="https://placehold.co/350x500?text=Nokia%20XR50" alt="Nokia XR50">
+                    </div>
+                    <div>
+                        <div class="product-name">Nokia XR50</div>
+                        <div class="product-meta">
+                            Nokia • 8GB • Հեռախոսներ
+                        </div>
+                        <div class="price-row">
+                            <div class="price-main">189 050 ֏</div>
+                            <div class="price-old">199 000 ֏</div>
+                            <span class="discount-badge">-5%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-actions">
+                    <button class="btn btn-outline-dark btn-sm w-50 details-btn">
+                        Մանրամասներ
+                    </button>
+                    <button class="btn btn-primary btn-sm w-50 add-btn">
+                        Զամբյուղ
+                    </button>
+                </div>
+            </div></div><div class="col-12 col-sm-6 col-md-4 col-xl-3"><div class="product-card">
+                <div>
+                    <div class="product-image-wrapper">
+                        <img src="https://placehold.co/350x500?text=Huawei%20P80%20Pro" alt="Huawei P80 Pro">
+                    </div>
+                    <div>
+                        <div class="product-name">Huawei P80 Pro</div>
+                        <div class="product-meta">
+                            Huawei • 16GB • Հեռախոսներ
+                        </div>
+                        <div class="price-row">
+                            <div class="price-main">319 510 ֏</div>
+                            <div class="price-old">359 000 ֏</div>
+                            <span class="discount-badge">-11%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-actions">
+                    <button class="btn btn-outline-dark btn-sm w-50 details-btn">
+                        Մանրամասներ
+                    </button>
+                    <button class="btn btn-primary btn-sm w-50 add-btn">
+                        Զամբյուղ
+                    </button>
+                </div>
+            </div></div><div class="col-12 col-sm-6 col-md-4 col-xl-3"><div class="product-card">
+                <div>
+                    <div class="product-image-wrapper">
+                        <img src="https://placehold.co/350x500?text=iPad%20Air%207" alt="iPad Air 7">
+                    </div>
+                    <div>
+                        <div class="product-name">iPad Air 7</div>
+                        <div class="product-meta">
+                            Apple • 16GB • Պլանշետներ
+                        </div>
+                        <div class="price-row">
+                            <div class="price-main">360 050 ֏</div>
+                            <div class="price-old">379 000 ֏</div>
+                            <span class="discount-badge">-5%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-actions">
+                    <button class="btn btn-outline-dark btn-sm w-50 details-btn">
+                        Մանրամասներ
+                    </button>
+                    <button class="btn btn-primary btn-sm w-50 add-btn">
+                        Զամբյուղ
+                    </button>
+                </div>
+            </div></div><div class="col-12 col-sm-6 col-md-4 col-xl-3"><div class="product-card">
+                <div>
+                    <div class="product-image-wrapper">
+                        <img src="https://placehold.co/350x500?text=Samsung%20Galaxy%20Tab%20S11" alt="Samsung Galaxy Tab S11">
+                    </div>
+                    <div>
+                        <div class="product-name">Samsung Galaxy Tab S11</div>
+                        <div class="product-meta">
+                            Samsung • 16GB • Պլանշետներ
+                        </div>
+                        <div class="price-row">
+                            <div class="price-main">305 970 ֏</div>
+                            <div class="price-old">329 000 ֏</div>
+                            <span class="discount-badge">-7%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-actions">
+                    <button class="btn btn-outline-dark btn-sm w-50 details-btn">
+                        Մանրամասներ
+                    </button>
+                    <button class="btn btn-primary btn-sm w-50 add-btn">
+                        Զամբյուղ
+                    </button>
+                </div>
+            </div></div><div class="col-12 col-sm-6 col-md-4 col-xl-3"><div class="product-card">
+                <div>
+                    <div class="product-image-wrapper">
+                        <img src="https://placehold.co/350x500?text=Xiaomi%20Pad%208" alt="Xiaomi Pad 8">
+                    </div>
+                    <div>
+                        <div class="product-name">Xiaomi Pad 8</div>
+                        <div class="product-meta">
+                            Xiaomi • 8GB • Պլանշետներ
+                        </div>
+                        <div class="price-row">
+                            <div class="price-main">224 100 ֏</div>
+                            <div class="price-old">249 000 ֏</div>
+                            <span class="discount-badge">-10%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-actions">
+                    <button class="btn btn-outline-dark btn-sm w-50 details-btn">
+                        Մանրամասներ
+                    </button>
+                    <button class="btn btn-primary btn-sm w-50 add-btn">
+                        Զամբյուղ
+                    </button>
+                </div>
+            </div></div><div class="col-12 col-sm-6 col-md-4 col-xl-3"><div class="product-card">
+                <div>
+                    <div class="product-image-wrapper">
+                        <img src="https://placehold.co/350x500?text=Baseus%2065W%20Charger" alt="Baseus 65W Charger">
+                    </div>
+                    <div>
+                        <div class="product-name">Baseus 65W Charger</div>
+                        <div class="product-meta">
+                            Baseus • Աքսեսուարներ
+                        </div>
+                        <div class="price-row">
+                            <div class="price-main">19 000 ֏</div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="product-actions">
+                    <button class="btn btn-outline-dark btn-sm w-50 details-btn">
+                        Մանրամասներ
+                    </button>
+                    <button class="btn btn-primary btn-sm w-50 add-btn">
+                        Զամբյուղ
+                    </button>
+                </div>
+            </div></div><div class="col-12 col-sm-6 col-md-4 col-xl-3"><div class="product-card">
+                <div>
+                    <div class="product-image-wrapper">
+                        <img src="https://placehold.co/350x500?text=Spigen%20Ultra%20Hybrid%20Case%20iPhone%2017" alt="Spigen Ultra Hybrid Case iPhone 17">
+                    </div>
+                    <div>
+                        <div class="product-name">Spigen Ultra Hybrid Case iPhone 17</div>
+                        <div class="product-meta">
+                            Spigen • Աքսեսուարներ
+                        </div>
+                        <div class="price-row">
+                            <div class="price-main">14 250 ֏</div>
+                            <div class="price-old">15 000 ֏</div>
+                            <span class="discount-badge">-5%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-actions">
+                    <button class="btn btn-outline-dark btn-sm w-50 details-btn">
+                        Մանրամասներ
+                    </button>
+                    <button class="btn btn-primary btn-sm w-50 add-btn">
+                        Զամբյուղ
+                    </button>
+                </div>
+            </div></div><div class="col-12 col-sm-6 col-md-4 col-xl-3"><div class="product-card">
+                <div>
+                    <div class="product-image-wrapper">
+                        <img src="https://placehold.co/350x500?text=Anker%20PowerCore%2020K%20Powerbank" alt="Anker PowerCore 20K Powerbank">
+                    </div>
+                    <div>
+                        <div class="product-name">Anker PowerCore 20K Powerbank</div>
+                        <div class="product-meta">
+                            Anker • Աքսեսուարներ
+                        </div>
+                        <div class="price-row">
+                            <div class="price-main">26 680 ֏</div>
+                            <div class="price-old">29 000 ֏</div>
+                            <span class="discount-badge">-8%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-actions">
+                    <button class="btn btn-outline-dark btn-sm w-50 details-btn">
+                        Մանրամասներ
+                    </button>
+                    <button class="btn btn-primary btn-sm w-50 add-btn">
+                        Զամբյուղ
+                    </button>
+                </div>
+            </div></div></div>
+        </main>
+    </div>
+</div>
+<!-- PRODUCT DETAILS MODAL -->
+<div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="productModalTitle">Ապրանք</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Փակել"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="product-image-wrapper mb-2">
+                            <img id="modalProductImage" src="" alt="">
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <h5 id="modalProductName" class="mb-1"></h5>
+                        <p class="text-muted-2 mb-2" id="modalProductShort"></p>
+
+                        <div class="mb-2">
+                            <span class="badge bg-light text-dark badge-pill me-1" id="modalBrand"></span>
+                            <span class="badge bg-light text-dark badge-pill me-1" id="modalCategory"></span>
+                            <span class="badge bg-light text-dark badge-pill me-1" id="modalOs"></span>
+                            <span class="badge bg-light text-dark badge-pill me-1" id="modalRam"></span>
+                        </div>
+
+                        <div class="mb-2" id="modalColors"></div>
+
+                        <div class="price-row mb-2">
+                            <div class="price-main" id="modalFinalPrice"></div>
+                            <div class="price-old" id="modalOldPrice"></div>
+                            <span class="discount-badge d-none" id="modalDiscountBadge"></span>
+                        </div>
+
+                        <p class="text-muted-2 mb-0" id="modalStock"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <span class="text-muted-2">Սեղմեք «Ավելացնել զամբյուղում»՝ գնումը շարունակելու համար։</span>
+                <button type="button" class="btn btn-primary" id="modalAddToCartBtn">
+                    Ավելացնել զամբյուղում
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- CART MODAL -->
+<div class="modal fade" id="cartModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Զամբյուղ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Փակել"></button>
+            </div>
+            <div class="modal-body">
+                <div id="cartContent"><p class="text-muted-2 mb-0">Զամբյուղը դատարկ է։ Ավելացրեք ապրանքներ։</p></div>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <span class="text-muted-2" id="cartModalSummary"></span>
+                <button type="button" class="btn btn-success btn-sm">
+                    Checkout
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // -----------------------
+    // DATA
+    // -----------------------
+    const categories = [
+        { id: 1, name: "Հեռախոսներ" },
+        { id: 2, name: "Պլանշետներ" },
+        { id: 3, name: "Աքսեսուարներ" }
+    ];
+
+    const colors = [
+        { id: 1, name: "Red" },
+        { id: 2, name: "Black" },
+        { id: 3, name: "White" },
+        { id: 4, name: "Blue" },
+        { id: 5, name: "Green" },
+        { id: 6, name: "Yellow" },
+        { id: 7, name: "Orange" },
+        { id: 8, name: "Purple" },
+        { id: 9, name: "Silver" }
+    ];
+
+    const brands = [
+        { id: 1, name: "Apple" },
+        { id: 2, name: "Samsung" },
+        { id: 3, name: "Xiaomi" },
+        { id: 4, name: "Nokia" },
+        { id: 5, name: "Huawei" },
+        { id: 6, name: "Google" },
+        { id: 7, name: "OnePlus" },
+        { id: 8, name: "Baseus" },
+        { id: 9, name: "Spigen" },
+        { id: 10, name: "Anker" }
+    ];
+
+    const operationSystems = [
+        { id: 1, name: "iOS" },
+        { id: 2, name: "Android" },
+        { id: 3, name: "Windows" }
+    ];
+
+    const ram = [
+        { id: 1, name: "8GB" },
+        { id: 2, name: "16GB" },
+        { id: 3, name: "32GB" },
+        { id: 4, name: "64GB" }
+    ];
+
+    const products = [
+        {
+            id: 1,
+            categoryId: 1,
+            brandId: 1,
+            colorIds: [2, 3, 9],
+            name: "iPhone 17",
+            price: 499000,
+            discount: 5,
+            stock: 25,
+            opSysId: 1,
+            ramId: 2,
+            image: "https://placehold.co/350x500?text=iPhone%2017"
+        },
+        {
+            id: 2,
+            categoryId: 1,
+            brandId: 1,
+            colorIds: [2, 3, 8],
+            name: "iPhone 17 Pro",
+            price: 599000,
+            discount: 10,
+            stock: 18,
+            opSysId: 1,
+            ramId: 2,
+            image: "https://placehold.co/350x500?text=iPhone%2017%20Pro"
+        },
+        {
+            id: 3,
+            categoryId: 1,
+            brandId: 1,
+            colorIds: [2, 9],
+            name: "iPhone 17 Pro Max",
+            price: 649000,
+            discount: 8,
+            stock: 12,
+            opSysId: 1,
+            ramId: 3,
+            image: "https://placehold.co/350x500?text=iPhone%2017%20Pro%20Max"
+        },
+        {
+            id: 4,
+            categoryId: 1,
+            brandId: 2,
+            colorIds: [2, 4, 5],
+            name: "Samsung Galaxy S26",
+            price: 449000,
+            discount: 7,
+            stock: 30,
+            opSysId: 2,
+            ramId: 2,
+            image: "https://placehold.co/350x500?text=Samsung%20Galaxy%20S26"
+        },
+        {
+            id: 5,
+            categoryId: 1,
+            brandId: 2,
+            colorIds: [2, 4],
+            name: "Samsung Galaxy S26 Ultra",
+            price: 529000,
+            discount: 10,
+            stock: 20,
+            opSysId: 2,
+            ramId: 3,
+            image: "https://placehold.co/350x500?text=Samsung%20Galaxy%20S26%20Ultra"
+        },
+        {
+            id: 6,
+            categoryId: 1,
+            brandId: 2,
+            colorIds: [5, 6],
+            name: "Samsung Galaxy A98",
+            price: 299000,
+            discount: 12,
+            stock: 40,
+            opSysId: 2,
+            ramId: 1,
+            image: "https://placehold.co/350x500?text=Samsung%20Galaxy%20A98"
+        },
+        {
+            id: 7,
+            categoryId: 1,
+            brandId: 3,
+            colorIds: [2, 3],
+            name: "Xiaomi Mi 15",
+            price: 259000,
+            discount: 5,
+            stock: 35,
+            opSysId: 2,
+            ramId: 1,
+            image: "https://placehold.co/350x500?text=Xiaomi%20Mi%2015"
+        },
+        {
+            id: 8,
+            categoryId: 1,
+            brandId: 3,
+            colorIds: [4, 6],
+            name: "Xiaomi Redmi Note 14",
+            price: 219000,
+            discount: 15,
+            stock: 50,
+            opSysId: 2,
+            ramId: 1,
+            image: "https://placehold.co/350x500?text=Xiaomi%20Redmi%20Note%2014"
+        },
+        {
+            id: 9,
+            categoryId: 1,
+            brandId: 6,
+            colorIds: [2, 3],
+            name: "Google Pixel 10",
+            price: 429000,
+            discount: 6,
+            stock: 22,
+            opSysId: 2,
+            ramId: 2,
+            image: "https://placehold.co/350x500?text=Google%20Pixel%2010"
+        },
+        {
+            id: 10,
+            categoryId: 1,
+            brandId: 7,
+            colorIds: [2, 4],
+            name: "OnePlus 13 Pro",
+            price: 399000,
+            discount: 9,
+            stock: 28,
+            opSysId: 2,
+            ramId: 3,
+            image: "https://placehold.co/350x500?text=OnePlus%2013%20Pro"
+        },
+        {
+            id: 11,
+            categoryId: 1,
+            brandId: 4,
+            colorIds: [2, 5],
+            name: "Nokia XR50",
+            price: 199000,
+            discount: 5,
+            stock: 32,
+            opSysId: 2,
+            ramId: 1,
+            image: "https://placehold.co/350x500?text=Nokia%20XR50"
+        },
+        {
+            id: 12,
+            categoryId: 1,
+            brandId: 5,
+            colorIds: [3, 9],
+            name: "Huawei P80 Pro",
+            price: 359000,
+            discount: 11,
+            stock: 26,
+            opSysId: 2,
+            ramId: 2,
+            image: "https://placehold.co/350x500?text=Huawei%20P80%20Pro"
+        },
+        {
+            id: 13,
+            categoryId: 2,
+            brandId: 1,
+            colorIds: [3, 9],
+            name: "iPad Air 7",
+            price: 379000,
+            discount: 5,
+            stock: 15,
+            opSysId: 1,
+            ramId: 2,
+            image: "https://placehold.co/350x500?text=iPad%20Air%207"
+        },
+        {
+            id: 14,
+            categoryId: 2,
+            brandId: 2,
+            colorIds: [2, 4],
+            name: "Samsung Galaxy Tab S11",
+            price: 329000,
+            discount: 7,
+            stock: 18,
+            opSysId: 2,
+            ramId: 2,
+            image: "https://placehold.co/350x500?text=Samsung%20Galaxy%20Tab%20S11"
+        },
+        {
+            id: 15,
+            categoryId: 2,
+            brandId: 3,
+            colorIds: [2, 3],
+            name: "Xiaomi Pad 8",
+            price: 249000,
+            discount: 10,
+            stock: 20,
+            opSysId: 2,
+            ramId: 1,
+            image: "https://placehold.co/350x500?text=Xiaomi%20Pad%208"
+        },
+        {
+            id: 16,
+            categoryId: 3,
+            brandId: 8,
+            colorIds: [3],
+            name: "Baseus 65W Charger",
+            price: 19000,
+            discount: 0,
+            stock: 60,
+            opSysId: null,
+            ramId: null,
+            image: "https://placehold.co/350x500?text=Baseus%2065W%20Charger"
+        },
+        {
+            id: 17,
+            categoryId: 3,
+            brandId: 9,
+            colorIds: [2],
+            name: "Spigen Ultra Hybrid Case iPhone 17",
+            price: 15000,
+            discount: 5,
+            stock: 70,
+            opSysId: null,
+            ramId: null,
+            image: "https://placehold.co/350x500?text=Spigen%20Ultra%20Hybrid%20Case%20iPhone%2017"
+        },
+        {
+            id: 18,
+            categoryId: 3,
+            brandId: 10,
+            colorIds: [2, 3],
+            name: "Anker PowerCore 20K Powerbank",
+            price: 29000,
+            discount: 8,
+            stock: 45,
+            opSysId: null,
+            ramId: null,
+            image: "https://placehold.co/350x500?text=Anker%20PowerCore%2020K%20Powerbank"
+        }
+    ];
+
+    const getCategory=t=>categories.find((e=>e.id===t)),getBrand=t=>brands.find((e=>e.id===t)),getOs=t=>operationSystems.find((e=>e.id===t)),getRam=t=>ram.find((e=>e.id===t)),getColors=t=>colors.filter((e=>t&&t.includes(e.id))),formatPrice=t=>t.toString().replace(/\B(?=(\d{3})+(?!\d))/g," "),getFinalPrice=t=>Math.round(t.price*(1-(t.discount||0)/100)),cart=[];function addToCart(t){const e=cart.find((e=>e.productId===t));e?e.qty+=1:cart.push({productId:t,qty:1}),renderCartSummary()}function changeCartQty(t,e){const n=cart.find((e=>e.productId===t));if(n){if(n.qty+=e,n.qty<=0){const t=cart.indexOf(n);t>-1&&cart.splice(t,1)}renderCartSummary()}}function removeFromCart(t){const e=cart.findIndex((e=>e.productId===t));e>-1&&cart.splice(e,1),renderCartSummary()}function clearCart(){cart.length=0,renderCartSummary()}function getCartTotal(){return cart.reduce(((t,e)=>{const n=products.find((t=>t.id===e.productId));return n?t+getFinalPrice(n)*e.qty:t}),0)}function getCartItemsCount(){return cart.reduce(((t,e)=>t+e.qty),0)}function renderCartSummary(){const t=getCartItemsCount(),e=getCartTotal();document.getElementById("cartItemsCount").textContent=t,document.getElementById("cartTotal").textContent=formatPrice(e);const n=document.getElementById("cartSummarySub");n.textContent=t?`Միջին գին ≈ ${formatPrice(t?Math.round(e/t):0)} ֏ / ապրանք`:"Զամբյուղում ապրանքներ չկան։";const d=document.getElementById("cartContent"),r=document.getElementById("cartModalSummary");if(d.innerHTML="",!t)return d.innerHTML="<p class='text-muted-2 mb-0'>Զամբյուղը դատարկ է։ Ավելացրեք ապրանքներ։</p>",void(r.textContent="");const a=document.createElement("div");a.className="list-group",cart.forEach((t=>{const e=products.find((e=>e.id===t.productId));if(!e)return;const n=getBrand(e.brandId),d=document.createElement("div");d.className="list-group-item d-flex justify-content-between align-items-center border-0 border-bottom",d.innerHTML=`\n        <div class="me-3">\n          <div class="fw-semibold">${e.name}</div>\n          <div class="text-muted-2">${n?n.name:""}</div>\n        </div>\n        <div class="text-end">\n          <div class="fw-semibold mb-1">${formatPrice(getFinalPrice(e)*t.qty)} ֏</div>\n          <div class="d-flex align-items-center justify-content-end gap-1">\n            <button class="btn btn-sm btn-outline-secondary minus-btn">-</button>\n            <span class="px-2 text-muted">${t.qty}</span>\n            <button class="btn btn-sm btn-outline-secondary plus-btn">+</button>\n            <button class="btn btn-sm btn-outline-danger ms-1 remove-btn">&times;</button>\n          </div>\n          <small class="text-muted-2 d-block mt-1">1 հատ — ${formatPrice(getFinalPrice(e))} ֏</small>\n        </div>\n      `,d.querySelector(".plus-btn").addEventListener("click",(t=>{t.stopPropagation(),changeCartQty(e.id,1)})),d.querySelector(".minus-btn").addEventListener("click",(t=>{t.stopPropagation(),changeCartQty(e.id,-1)})),d.querySelector(".remove-btn").addEventListener("click",(t=>{t.stopPropagation(),removeFromCart(e.id)})),d.addEventListener("click",(()=>openProductModal(e))),a.appendChild(d)})),d.appendChild(a),r.textContent=`Ընդամենը ${t} ապրանք • ${formatPrice(e)} ֏`}const filterState={categoryId:"",brandId:"",osId:"",ramId:"",minPrice:"",maxPrice:"",discountOnly:!1};function applyFilters(){return products.filter((t=>{if(filterState.categoryId&&t.categoryId!==Number(filterState.categoryId))return!1;if(filterState.brandId&&t.brandId!==Number(filterState.brandId))return!1;if(filterState.osId&&t.opSysId!==Number(filterState.osId))return!1;if(filterState.ramId&&t.ramId!==Number(filterState.ramId))return!1;const e=getFinalPrice(t);return!(filterState.minPrice&&e<Number(filterState.minPrice))&&(!(filterState.maxPrice&&e>Number(filterState.maxPrice))&&!(filterState.discountOnly&&(!t.discount||t.discount<=0)))}))}function renderFilterOptions(){const t=document.getElementById("categoryFilter");categories.forEach((e=>{const n=document.createElement("option");n.value=e.id,n.textContent=e.name,t.appendChild(n)}));const e=document.getElementById("brandFilter");brands.filter((t=>[1,2,3,4,5,6,7].includes(t.id))).forEach((t=>{const n=document.createElement("option");n.value=t.id,n.textContent=t.name,e.appendChild(n)}));const n=document.getElementById("osFilter");operationSystems.forEach((t=>{const e=document.createElement("option");e.value=t.id,e.textContent=t.name,n.appendChild(e)}));const d=document.getElementById("ramFilter");ram.forEach((t=>{const e=document.createElement("option");e.value=t.id,e.textContent=t.name,d.appendChild(e)}))}function renderProducts(){const t=document.getElementById("productsRow");t.innerHTML="";const e=applyFilters();document.getElementById("totalCount").textContent=products.length,document.getElementById("visibleCount").textContent=e.length,e.length?e.forEach((e=>{const n=document.createElement("div");n.className="col-12 col-sm-6 col-md-4 col-xl-3";const d=getBrand(e.brandId),r=getCategory(e.categoryId),a=getRam(e.ramId),o=getFinalPrice(e),c=document.createElement("div");c.className="product-card",c.innerHTML=`\n        <div>\n          <div class="product-image-wrapper">\n            <img src="${e.image}" alt="${e.name}">\n          </div>\n          <div>\n            <div class="product-name">${e.name}</div>\n            <div class="product-meta">\n              ${d?d.name:""}${a?" • "+a.name:""}${r?" • "+r.name:""}\n            </div>\n            <div class="price-row">\n              <div class="price-main">${formatPrice(o)} ֏</div>\n              ${e.discount?`<div class="price-old">${formatPrice(e.price)} ֏</div>\n                     <span class="discount-badge">-${e.discount}%</span>`:""}\n            </div>\n          </div>\n        </div>\n        <div class="product-actions">\n          <button class="btn btn-outline-dark btn-sm w-50 details-btn">\n            Մանրամասներ\n          </button>\n          <button class="btn btn-primary btn-sm w-50 add-btn">\n            Զամբյուղ\n          </button>\n        </div>\n      `,c.querySelector(".details-btn").addEventListener("click",(t=>{t.stopPropagation(),openProductModal(e)})),c.querySelector(".add-btn").addEventListener("click",(t=>{t.stopPropagation(),addToCart(e.id)})),c.addEventListener("click",(()=>openProductModal(e))),n.appendChild(c),t.appendChild(n)})):t.innerHTML="<p class='text-muted-2 mt-2'>Համապատասխան արդյունքներ չկան։ Փորձեք փոխել ֆիլտրերը։</p>"}let currentModalProduct=null;function openProductModal(t){currentModalProduct=t;const e=getBrand(t.brandId),n=getCategory(t.categoryId),d=getOs(t.opSysId),r=getRam(t.ramId),a=getColors(t.colorIds),o=getFinalPrice(t);document.getElementById("productModalTitle").textContent=t.name,document.getElementById("modalProductName").textContent=t.name,document.getElementById("modalProductImage").src=t.image,document.getElementById("modalProductImage").alt=t.name,document.getElementById("modalProductShort").textContent="Պայմանական նկարագրություն․ բարձր արտադրողականություն, որակյալ էկրան, երկարատև մարտկոց — հարմար թե՛ աշխատանքի, թե՛ խաղերի համար։",document.getElementById("modalBrand").textContent=e?e.name:"",document.getElementById("modalCategory").textContent=n?n.name:"",document.getElementById("modalOs").textContent=d?d.name:"Առանց OS",document.getElementById("modalRam").textContent=r?r.name:"—";const c=document.getElementById("modalColors");if(c.innerHTML="",a.length){const t=document.createElement("div");t.className="text-muted-2 mb-1",t.textContent="Մատչելի գույներ",c.appendChild(t),a.forEach((t=>{const e=document.createElement("span");e.className="badge bg-light text-dark badge-pill me-1 mb-1",e.textContent=t.name,c.appendChild(e)}))}document.getElementById("modalFinalPrice").textContent=formatPrice(o)+" ֏";const i=document.getElementById("modalOldPrice"),l=document.getElementById("modalDiscountBadge");t.discount?(i.textContent=formatPrice(t.price)+" ֏",l.textContent="-"+t.discount+"%",l.classList.remove("d-none")):(i.textContent="",l.classList.add("d-none"));const m=document.getElementById("modalStock");t.stock<=0?m.textContent="Պահեստում չկա (պատվերով)":t.stock<5?m.textContent=`Մնացել է ընդամենը ${t.stock} հատ։`:m.textContent=`Պահեստում՝ ${t.stock} հատ։`;const s=document.getElementById("productModal");bootstrap.Modal.getOrCreateInstance(s).show()}document.getElementById("modalAddToCartBtn").addEventListener("click",(()=>{if(!currentModalProduct)return;addToCart(currentModalProduct.id);const t=document.getElementById("productModal"),e=bootstrap.Modal.getInstance(t);e&&e.hide()})),document.getElementById("categoryFilter").addEventListener("change",(t=>{filterState.categoryId=t.target.value,renderProducts()})),document.getElementById("brandFilter").addEventListener("change",(t=>{filterState.brandId=t.target.value,renderProducts()})),document.getElementById("osFilter").addEventListener("change",(t=>{filterState.osId=t.target.value,renderProducts()})),document.getElementById("ramFilter").addEventListener("change",(t=>{filterState.ramId=t.target.value,renderProducts()})),document.getElementById("minPrice").addEventListener("input",(t=>{filterState.minPrice=t.target.value,renderProducts()})),document.getElementById("maxPrice").addEventListener("input",(t=>{filterState.maxPrice=t.target.value,renderProducts()})),document.getElementById("discountOnly").addEventListener("change",(t=>{filterState.discountOnly=t.target.checked,renderProducts()})),document.getElementById("resetFiltersBtn").addEventListener("click",(()=>{filterState.categoryId="",filterState.brandId="",filterState.osId="",filterState.ramId="",filterState.minPrice="",filterState.maxPrice="",filterState.discountOnly=!1,document.getElementById("categoryFilter").value="",document.getElementById("brandFilter").value="",document.getElementById("osFilter").value="",document.getElementById("ramFilter").value="",document.getElementById("minPrice").value="",document.getElementById("maxPrice").value="",document.getElementById("discountOnly").checked=!1,renderProducts()})),document.getElementById("clearCartBtn").addEventListener("click",(()=>{clearCart()})),renderFilterOptions(),renderProducts(),renderCartSummary();
+</script>
+</body>
+</html>

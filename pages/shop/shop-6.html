@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mini Cart UI</title>
+    <style>
+        :root{
+            --bg:#fff; --card:#fff; --text:#000; --muted:#666;
+            --stroke:#ddd; --shadow:0 10px 25px rgba(0,0,0,.08);
+            --radius:16px;
+        }
+        *{box-sizing:border-box}
+        body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text);padding:30px 16px;}
+        .wrap{max-width:900px;margin:0 auto;display:grid;gap:16px;}
+        .card{background:var(--card);border:1px solid var(--stroke);border-radius:var(--radius);box-shadow:var(--shadow);}
+        .card-header{padding:16px 18px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--stroke);gap:10px;}
+        .title{font-weight:700;letter-spacing:.3px;color:#000;}
+        .badge{font-size:12px;padding:5px 10px;border-radius:999px;border:1px solid var(--stroke);color:var(--muted);background:#f7f7f7;}
+        .total small{color:var(--muted);}
+        .total .price{font-size:22px;font-weight:800;color:#000;}
+
+        .form{padding:18px;}
+        .grid{display:grid;grid-template-columns:1.4fr 1fr 1fr auto;gap:12px;}
+        @media (max-width:720px){.grid{grid-template-columns:1fr 1fr}.btn{grid-column:1 / -1}}
+        .field input{width:100%;height:44px;padding:10px 12px;border-radius:12px;border:1px solid var(--stroke);background:#fff;color:#000;outline:none;transition:.15s ease;}
+        .field input::placeholder{color:#999}
+        .field input:focus{border-color:#000}
+        .btn{height:44px;padding:0 18px;border-radius:12px;border:1px solid #000;background:#000;color:#fff;font-weight:800;cursor:pointer;transition:.15s ease;}
+        .btn:hover{background:#fff;color:#000}
+        .hint{margin-top:10px;font-size:12px;color:var(--muted);}
+
+        .list{padding:14px;}
+        ul{list-style:none;margin:0;padding:0;display:grid;gap:10px;}
+        li{
+            display:flex;justify-content:space-between;align-items:center;gap:12px;
+            padding:14px;border-radius:14px;border:1px solid var(--stroke);background:#fafafa;
+        }
+        .name{font-weight:700;color:#000;}
+        .meta{display:flex;gap:8px;margin-top:6px;font-size:12px;color:var(--muted);flex-wrap:wrap;}
+        .pill{padding:4px 9px;border-radius:999px;border:1px solid var(--stroke);background:#fff;}
+        .money{font-weight:800;font-size:16px;color:#000;white-space:nowrap;}
+        .empty{text-align:center;padding:20px;font-size:13px;color:var(--muted);border:1px dashed var(--stroke);border-radius:14px;background:#fff;}
+
+        /* NEW: controls */
+        .actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
+        .iconbtn{
+            width:38px;height:38px;border-radius:12px;border:1px solid var(--stroke);
+            background:#fff;cursor:pointer;font-weight:900;transition:.15s ease;
+        }
+        .iconbtn:hover{border-color:#000}
+        .delbtn:hover{border-color:#a00010;color:#a00010}
+    </style>
+</head>
+<body>
+
+<div class="wrap">
+
+    <!-- TOP: TOTAL -->
+    <div class="card">
+        <div class="card-header">
+            <div class="title">
+                <span>Cart Summary</span>
+                <span class="badge">local UI</span>
+            </div>
+
+            <div class="total">
+                <small>All price:</small>
+                <span class="price" id="totalPrice">0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- FORM -->
+    <div class="card">
+        <div class="card-header">
+            <div class="title"><span>Add Item</span></div>
+            <span class="badge">title • price • qty</span>
+        </div>
+
+        <div class="form">
+            <div class="grid">
+                <div class="field"><input id="titleInput" type="text" placeholder="title" /></div>
+                <div class="field"><input id="priceInput" type="text" placeholder="price" /></div>
+                <div class="field"><input id="qtyInput" type="text" placeholder="qty" /></div>
+                <button class="btn" id="saveBtn">save</button>
+            </div>
+
+            <div class="hint">
+                Tip: price / qty դաշտերը կարող ես հետո regex-ով փակել, որ միայն թիվ ընդունեն 😉
+            </div>
+        </div>
+    </div>
+
+    <!-- LIST -->
+    <div class="card">
+        <div class="card-header">
+            <div class="title">Items</div>
+            <span class="badge" id="itemsCount">0 items</span>
+        </div>
+
+        <div class="list">
+            <div id="emptyState" class="empty" style="display:none;">No items yet. Add your first item 👆</div>
+            <ul id="itemsList"></ul>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    (() => {
+        const LS_KEY = "mini_cart_ui_v2";
+
+        // DOM
+        const titleInput = document.getElementById("titleInput");
+        const priceInput = document.getElementById("priceInput");
+        const qtyInput   = document.getElementById("qtyInput");
+        const saveBtn    = document.getElementById("saveBtn");
+
+        const itemsList  = document.getElementById("itemsList");
+        const totalPriceEl = document.getElementById("totalPrice");
+        const itemsCountEl = document.getElementById("itemsCount");
+        const emptyState = document.getElementById("emptyState");
+
+        // Helpers
+        const uid = () => Math.random().toString(16).slice(2) + Date.now().toString(16);
+
+        const esc = (s) =>
+            String(s ?? "").replace(/[&<>"']/g, (c) => ({
+                "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+            }[c]));
+
+        const toNumber = (v) => {
+            const s = String(v ?? "").replace(/[^\d.]/g, "");
+            if (s.trim() === "") return NaN;
+            return Number(s);
+        };
+
+        const toInt = (v) => {
+            const s = String(v ?? "").replace(/[^\d]/g, "");
+            if (s.trim() === "") return NaN;
+            return parseInt(s, 10);
+        };
+
+        const money = (n) => (Number(n) || 0).toLocaleString("en-US");
+
+        function load() {
+            try {
+                const raw = localStorage.getItem(LS_KEY);
+                if (!raw) return [];
+                const data = JSON.parse(raw);
+                return Array.isArray(data) ? data : [];
+            } catch {
+                return [];
+            }
+        }
+
+        function save() {
+            localStorage.setItem(LS_KEY, JSON.stringify(items));
+        }
+
+        // State
+        let items = load();
+
+        function calcTotal() {
+            return items.reduce((sum, it) => sum + (it.price * it.qty), 0);
+        }
+
+        function render() {
+            itemsCountEl.textContent = `${items.length} items`;
+            totalPriceEl.textContent = money(calcTotal());
+
+            itemsList.innerHTML = "";
+
+            if (items.length === 0) {
+                emptyState.style.display = "block";
+                save();
+                return;
+            }
+            emptyState.style.display = "none";
+
+            for (const it of items) {
+                const li = document.createElement("li");
+                const itemTotal = it.price * it.qty;
+
+                li.innerHTML = `
+        <div class="item-left">
+          <div class="name">${esc(it.title)}</div>
+          <div class="meta">
+            <span class="pill">qty: ${it.qty}</span>
+            <span class="pill">unit: ${money(it.price)}</span>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="iconbtn" data-action="dec" data-id="${it.id}">−</button>
+          <button class="iconbtn" data-action="inc" data-id="${it.id}">+</button>
+          <div class="money">${money(itemTotal)}</div>
+          <button class="iconbtn delbtn" data-action="del" data-id="${it.id}">×</button>
+        </div>
+      `;
+
+                itemsList.appendChild(li);
+            }
+
+            save();
+        }
+
+        function validate(title, price, qty) {
+            if (title.length < 2) return alert("Title պետք է լինի առնվազն 2 տառ։"), false;
+            if (!Number.isFinite(price) || price < 0) return alert("Price-ը պետք է լինի թիվ (>= 0)։"), false;
+            if (!Number.isInteger(qty) || qty < 0) return alert("Qty-ն պետք է լինի ամբողջ թիվ (>= 0)։"), false;
+            return true;
+        }
+
+        function addItem() {
+            const title = (titleInput.value || "").trim();
+            const price = toNumber(priceInput.value);
+            const qty = toInt(qtyInput.value);
+
+            if (!validate(title, price, qty)) return;
+
+            items.push({ id: uid(), title, price: Math.round(price), qty });
+
+            titleInput.value = "";
+            priceInput.value = "";
+            qtyInput.value = "";
+            titleInput.focus();
+
+            render();
+        }
+
+        function incQty(id) {
+            items = items.map(it => it.id === id ? { ...it, qty: it.qty + 1 } : it);
+            render();
+        }
+
+        function decQty(id) {
+            items = items
+                .map(it => it.id === id ? { ...it, qty: it.qty - 1 } : it)
+                .filter(it => it.qty > 0); // qty == 0 -> remove
+            render();
+        }
+
+        function delItem(id) {
+            items = items.filter(it => it.id !== id);
+            render();
+        }
+
+        // Events
+        saveBtn.addEventListener("click", addItem);
+        [titleInput, priceInput, qtyInput].forEach(inp => {
+            inp.addEventListener("keydown", (e) => {
+                if (e.key === "Enter") addItem();
+            });
+        });
+
+        // event delegation for buttons
+        itemsList.addEventListener("click", (e) => {
+            const btn = e.target.closest("button[data-action]");
+            if (!btn) return;
+
+            const id = btn.dataset.id;
+            const action = btn.dataset.action;
+
+            if (action === "inc") incQty(id);
+            if (action === "dec") decQty(id);
+            if (action === "del") {
+                if (confirm("Delete this item?")) delItem(id);
+            }
+        });
+
+        // initial
+        render();
+    })();
+</script>
+
+</body>
+</html>

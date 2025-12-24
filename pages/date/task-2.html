@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="hy">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>People Analytics — Task 2</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        :root{
+            --bg1:#f7f7ff; --bg2:#eef2ff;
+            --card:rgba(255,255,255,.92);
+            --ink:#0f172a; --muted:#64748b;
+            --accent:#6366f1; --ok:#22c55e; --bad:#ef4444;
+            --shadow: 0 18px 45px rgba(2,6,23,.10);
+            --shadow2: 0 10px 30px rgba(2,6,23,.08);
+            --radius: 18px;
+        }
+        body{
+            min-height:100vh;
+            background: radial-gradient(1200px 600px at 10% 10%, var(--bg2), transparent 60%),
+            radial-gradient(900px 500px at 90% 10%, #fde7f3, transparent 55%),
+            linear-gradient(180deg, var(--bg1), #fff 65%);
+            color:var(--ink);
+        }
+        .glass{ background:var(--card); border:1px solid rgba(15,23,42,.08); box-shadow:var(--shadow); border-radius:var(--radius); backdrop-filter:blur(10px);}
+        .soft{ box-shadow:var(--shadow2); border-radius:16px; border:1px solid rgba(15,23,42,.06); background:rgba(255,255,255,.96);}
+        .brand-badge{display:inline-flex;align-items:center;gap:.5rem;padding:.45rem .75rem;border-radius:999px;background:rgba(99,102,241,.12);color:#4338ca;font-weight:700;}
+        .dot{width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 6px rgba(99,102,241,.12);}
+        .kpi{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;}
+        .kpi .label{color:var(--muted);font-size:.9rem;}
+        .kpi .value{font-size:1.35rem;font-weight:900;letter-spacing:-.02em;}
+        .mono{font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;}
+        .small-muted{color:var(--muted);font-size:.9rem;}
+        .btn-accent{background:var(--accent);border-color:var(--accent);font-weight:800;}
+        .btn-accent:hover{filter:brightness(.95);}
+        .form-control,.form-select{border-radius:14px;border:1px solid rgba(15,23,42,.10);}
+        .pill{padding:.25rem .6rem;border-radius:999px;font-size:.82rem;font-weight:800;border:1px solid rgba(15,23,42,.08);background:rgba(2,6,23,.02);color:#334155;display:inline-flex;align-items:center;gap:.35rem;}
+        .pill.alive{background:rgba(34,197,94,.10);color:#166534;border-color:rgba(34,197,94,.25);}
+        .pill.dead{background:rgba(239,68,68,.10);color:#991b1b;border-color:rgba(239,68,68,.25);}
+        .table thead th{color:#334155;font-weight:800;border-bottom:1px solid rgba(15,23,42,.08);}
+        .table td{vertical-align:middle;border-top:1px solid rgba(15,23,42,.06);}
+        .sticky-tools{position:sticky;top:14px;}
+        .nav-pills .nav-link{border-radius:999px;font-weight:800;}
+        .nav-pills .nav-link.active{background:rgba(99,102,241,.14);color:#3730a3;}
+        .toast-wrap{position:fixed;right:16px;bottom:16px;z-index:9999;}
+    </style>
+</head>
+
+<body>
+<div class="container py-4">
+
+    <!-- Header -->
+    <div class="glass p-4 mb-4">
+        <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3">
+            <div>
+                <div class="brand-badge mb-2"><span class="dot"></span> People Analytics — Task 2</div>
+                <h1 class="h3 fw-black mb-1" style="font-weight:900;letter-spacing:-.02em;">Կառուցվածքային վահանակ (CRUD + Storage)</h1>
+                <div class="small-muted">Task-2․ ավելացնել/խմբագրել/ջնջել, պահել localStorage-ում, հաշվարկել KPI/Reports</div>
+            </div>
+            <div class="text-md-end">
+                <div class="small-muted">Այսօրվա օր</div>
+                <div class="fw-bold" id="todayText">—</div>
+            </div>
+        </div>
+
+        <!-- KPIs -->
+        <div class="row g-3 mt-3">
+            <div class="col-12 col-md-3">
+                <div class="soft kpi">
+                    <div><div class="label">Մարդկանց քանակ</div><div class="value" id="kpiTotal">—</div></div>
+                    <span class="dot"></span>
+                </div>
+            </div>
+            <div class="col-12 col-md-3">
+                <div class="soft kpi">
+                    <div><div class="label">Մահացածների թիվ</div><div class="value" id="kpiDead">—</div></div>
+                    <span class="dot" style="background:var(--bad);box-shadow:0 0 0 6px rgba(239,68,68,.12)"></span>
+                </div>
+            </div>
+            <div class="col-12 col-md-3">
+                <div class="soft kpi">
+                    <div><div class="label">Կենդանիքների թիվ</div><div class="value" id="kpiAlive">—</div></div>
+                    <span class="dot" style="background:var(--ok);box-shadow:0 0 0 6px rgba(34,197,94,.12)"></span>
+                </div>
+            </div>
+            <div class="col-12 col-md-3">
+                <div class="soft kpi">
+                    <div><div class="label">Միջին ապրած տարիներ</div><div class="value" id="kpiAvgYears">—</div></div>
+                    <span class="dot"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Left tools -->
+        <div class="col-12 col-lg-4">
+            <div class="glass p-3 sticky-tools">
+                <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
+                    <h2 class="h5 mb-0" style="font-weight:900;">Կառավարում</h2>
+                    <button id="btnAdd" class="btn btn-accent btn-sm">+ Add person</button>
+                </div>
+
+                <ul class="nav nav-pills gap-2 mb-3" id="tabs">
+                    <li class="nav-item"><button class="nav-link active" data-tab="tab-people" type="button">People</button></li>
+                    <li class="nav-item"><button class="nav-link" data-tab="tab-reports" type="button">Reports</button></li>
+                </ul>
+
+                <!-- People tab -->
+                <div id="tab-people">
+                    <div class="mb-3">
+                        <label class="form-label small-muted">Որոնում անունով</label>
+                        <input id="searchInput" class="form-control" placeholder="օր․ Jack, Liam..." />
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label small-muted">Ամիս (ծնվածները)</label>
+                            <select id="monthSelect" class="form-select">
+                                <option value="">Բոլորը</option>
+                                <option value="1">Հունվար</option><option value="2">Փետրվար</option><option value="3">Մարտ</option>
+                                <option value="4">Ապրիլ</option><option value="5">Մայիս</option><option value="6">Հունիս</option>
+                                <option value="7">Հուլիս</option><option value="8">Օգոստոս</option><option value="9">Սեպտեմբեր</option>
+                                <option value="10">Հոկտեմբեր</option><option value="11">Նոյեմբեր</option><option value="12">Դեկտեմբեր</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small-muted">Սորտավորում</label>
+                            <select id="sortSelect" class="form-select">
+                                <option value="age_desc">Տարիքով՝ մեծից փոքր</option>
+                                <option value="age_asc">Տարիքով՝ փոքրից մեծ</option>
+                                <option value="name_asc">Անուն՝ A → Z</option>
+                                <option value="nextbday_asc">Մոտակա ծնունդ՝ շուտից</option>
+                                <option value="died_recent">Մահը՝ վերջերսից</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" role="switch" id="onlyDeadSwitch">
+                        <label class="form-check-label" for="onlyDeadSwitch">Ցույց տալ միայն մահացածներին</label>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button id="btnReset" class="btn btn-outline-secondary">Reset ֆիլտրերը</button>
+                        <button id="btnFactoryReset" class="btn btn-outline-danger">Factory reset (seed տվյալները)</button>
+                    </div>
+
+                    <hr class="my-4">
+                    <div class="small-muted mb-2">Արագ արդյունքներ</div>
+                    <div class="soft p-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="fw-bold">Ամենաերիտասարդ</div>
+                            <div id="youngestText" class="mono small-muted">—</div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="fw-bold">Ամենատարեց</div>
+                            <div id="oldestText" class="mono small-muted">—</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reports tab -->
+                <div id="tab-reports" class="d-none">
+                    <div class="soft p-3 mb-3">
+                        <div class="fw-bold mb-1">Decade Groups</div>
+                        <div class="small-muted mb-2">Խմբավորում ըստ ծննդյան տասնամյակների</div>
+                        <div id="decadeGroups" class="d-flex flex-wrap gap-2"></div>
+                    </div>
+
+                    <div class="soft p-3">
+                        <div class="fw-bold mb-2">Quick Report</div>
+                        <ul class="small-muted mb-0">
+                            <li><span class="fw-bold">Dead total</span>՝ <span id="repDead" class="mono">—</span></li>
+                            <li><span class="fw-bold">Average lived years</span>՝ <span id="repAvg" class="mono">—</span></li>
+                            <li><span class="fw-bold">Next birthdays (Top 5)</span></li>
+                        </ul>
+                        <div id="repNextBdays" class="mt-2 d-flex flex-column gap-1"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Right: table -->
+        <div class="col-12 col-lg-8">
+            <div class="glass p-3">
+                <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-2 mb-3">
+                    <div>
+                        <h2 class="h5 mb-1" style="font-weight:900;">People Table (CRUD enabled)</h2>
+                        <div class="small-muted">Edit/Delete կոճակներով + հաշվարկված դաշտեր</div>
+                    </div>
+                    <div class="small-muted">Ցուցադրված՝ <span class="fw-bold" id="shownCount">—</span></div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Անուն</th>
+                            <th>Ծնունդ</th>
+                            <th>Կարգավիճակ</th>
+                            <th class="text-end">Տարիք</th>
+                            <th class="text-end">Ապրած տարիներ</th>
+                            <th class="text-end">Մինչև ծնունդ (օր)</th>
+                            <th class="text-end">Մահվանից անցած օրեր</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody id="tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal (Add/Edit) -->
+<div class="modal fade" id="personModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius:18px;">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="modalTitle">Add Person</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form id="personForm">
+                <div class="modal-body">
+                    <input type="hidden" id="formId" />
+
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        <input id="formName" class="form-control" placeholder="օր․ Daniel" required />
+                        <div class="form-text">Պետք է լինի առնվազն 2 նիշ</div>
+                    </div>
+
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label class="form-label">Birthday</label>
+                            <input id="formBirthday" type="date" class="form-control" required />
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Die (optional)</label>
+                            <input id="formDie" type="date" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="alert alert-danger mt-3 d-none" id="formError"></div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-accent" id="btnSave">Save</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    /******************************************************************
+     * TASK-2 STRUCTURE (Ավելի պրոֆեսիոնալ բաժանում)
+     * 1) SEED (նախնական տվյալներ)
+     * 2) STORAGE (localStorage)
+     * 3) DATE/ANALYTICS (հաշվարկներ)
+     * 4) STATE (current state + derived)
+     * 5) UI (renderers)
+     * 6) CONTROLLERS (events / actions)
+     ******************************************************************/
+
+        // -------------------------
+        // 1) SEED
+        // -------------------------
+    const SEED = [
+            { id: 1, name: "Arno", birthday: "1987-09-19", die: "2020-04-30" },
+            { id: 2, name: "Robin", birthday: "1963-02-04", die: "2024-09-01" },
+            { id: 3, name: "Jack", birthday: "2001-03-03", die: null },
+            { id: 4, name: "Elizabeth", birthday: "1995-08-23", die: null },
+            { id: 5, name: "Sean", birthday: "1980-09-23", die: "2006-02-16" },
+            { id: 6, name: "Liam", birthday: "1983-07-15", die: null },
+            { id: 7, name: "Sophia", birthday: "1990-05-28", die: "2015-03-10" },
+            { id: 8, name: "Emma", birthday: "2007-11-10", die: null },
+            { id: 9, name: "Oliver", birthday: "1974-01-05", die: "2023-07-20" },
+            { id: 10, name: "Ava", birthday: "1998-06-25", die: null },
+            { id: 11, name: "Mason", birthday: "1985-03-14", die: "2010-12-31" },
+            { id: 12, name: "Isabella", birthday: "1991-10-20", die: null },
+            { id: 13, name: "Jacob", birthday: "1967-02-12", die: "2018-08-07" },
+            { id: 14, name: "Emily", birthday: "2002-04-18", die: null },
+            { id: 15, name: "Lucas", birthday: "1996-08-11", die: null },
+            { id: 16, name: "Mia", birthday: "1979-12-30", die: "2014-05-15" },
+            { id: 17, name: "Noah", birthday: "1989-03-19", die: null },
+            { id: 18, name: "Charlotte", birthday: "1994-07-02", die: null },
+            { id: 19, name: "Elijah", birthday: "2000-09-08", die: null },
+            { id: 20, name: "Amelia", birthday: "1981-06-12", die: "2008-01-22" },
+            { id: 21, name: "James", birthday: "1975-11-30", die: "2016-09-13" },
+            { id: 22, name: "Evelyn", birthday: "1988-10-05", die: null },
+            { id: 23, name: "Logan", birthday: "1993-01-14", die: null },
+            { id: 24, name: "Lily", birthday: "2006-04-27", die: null },
+            { id: 25, name: "Benjamin", birthday: "1976-08-18", die: "2021-11-05" },
+            { id: 26, name: "Ella", birthday: "2003-05-03", die: null },
+            { id: 27, name: "Henry", birthday: "1984-02-17", die: null },
+            { id: 28, name: "Aiden", birthday: "1997-12-08", die: null },
+            { id: 29, name: "Scarlett", birthday: "1978-09-25", die: "2022-10-30" },
+            { id: 30, name: "Victoria", birthday: "1992-11-15", die: null },
+            { id: 31, name: "Matthew", birthday: "1982-01-01", die: "2019-07-12" },
+            { id: 32, name: "Layla", birthday: "2004-06-21", die: null },
+            { id: 33, name: "Harper", birthday: "2008-03-09", die: null },
+            { id: 34, name: "Jack", birthday: "1977-12-22", die: "2020-06-25" },
+            { id: 35, name: "Liam", birthday: "1999-08-01", die: null },
+            { id: 36, name: "Zoe", birthday: "1990-04-04", die: null },
+            { id: 37, name: "Chloe", birthday: "1986-10-11", die: null },
+            { id: 38, name: "Hannah", birthday: "1973-02-27", die: "2017-02-14" },
+            { id: 39, name: "Ryan", birthday: "1980-07-30", die: null },
+            { id: 40, name: "Abigail", birthday: "2005-01-19", die: null },
+        ];
+    const STORAGE_KEY="people_task2_v1",Storage={load(){try{const e=localStorage.getItem(STORAGE_KEY);if(!e)return null;const t=JSON.parse(e);return Array.isArray(t)?t:null}catch(e){return null}},save(e){localStorage.setItem(STORAGE_KEY,JSON.stringify(e))},clear(){localStorage.removeItem(STORAGE_KEY)}},MS_DAY=864e5,DateX={today(){const e=new Date;return e.setHours(12,0,0,0),e},parseISO(e){const[t,a,n]=e.split("-").map(Number);return new Date(t,a-1,n,12,0,0)},format(e){if(!e)return"—";const t=this.parseISO(e);return`${String(t.getDate()).padStart(2,"0")}.${String(t.getMonth()+1).padStart(2,"0")}.${t.getFullYear()}`},diffDays:(e,t)=>Math.floor((t-e)/MS_DAY),ageYears(e,t){let a=t.getFullYear()-e.getFullYear();const n=t.getMonth()-e.getMonth();return(n<0||0===n&&t.getDate()<e.getDate())&&a--,a},livedYears:(e,t)=>(t-e)/MS_DAY/365.2425,nextBirthdayDays(e,t){const a=t.getFullYear(),n=new Date(a,e.getMonth(),e.getDate(),12,0,0);return n<t&&n.setFullYear(a+1),Math.max(0,this.diffDays(t,n))},decade(e){const t=e.getFullYear();return 10*Math.floor(t/10)+"s"}},Analytics={buildRows:(e,t)=>e.map((e=>{const a=DateX.parseISO(e.birthday),n=e.die?DateX.parseISO(e.die):null,s=!!n,r=s?n:t,o=DateX.ageYears(a,r),d=DateX.livedYears(a,r);return{...e,birthDate:a,dieDate:n,isDead:s,age:o,livedYears:d,nextBdayDays:DateX.nextBirthdayDays(a,t),daysSinceDeath:s?Math.max(0,DateX.diffDays(n,t)):null,decade:DateX.decade(a)}})),avgLivedYears:e=>e.reduce(((e,t)=>e+t.livedYears),0)/(e.length||1),decadeGroups:e=>e.reduce(((e,t)=>(e[t.decade]=(e[t.decade]||0)+1,e)),{}),youngestOldest(e){if(!e.length)return{youngest:null,oldest:null};const t=[...e].sort(((e,t)=>e.age-t.age));return{youngest:t[0],oldest:t[t.length-1]}}},State={list:[],get today(){return DateX.today()},init(){const e=Storage.load();this.list=e??SEED,Storage.save(this.list)},nextId(){return(this.list.reduce(((e,t)=>Math.max(e,t.id)),0)||0)+1},add(e){this.list=[e,...this.list],Storage.save(this.list)},update(e,t){this.list=this.list.map((a=>a.id===e?{...a,...t}:a)),Storage.save(this.list)},remove(e){this.list=this.list.filter((t=>t.id!==e)),Storage.save(this.list)},factoryReset(){this.list=[...SEED],Storage.clear(),Storage.save(this.list)}},$=e=>document.getElementById(e),Toast={show(e,t="info"){const a=$("toastWrap"),n=document.createElement("div");n.className="alert alert-"+("success"===t?"success":"danger"===t?"danger":"primary")+" py-2 px-3 mb-2 soft",n.style.borderRadius="14px",n.innerHTML=`<div class="fw-bold">${e}</div>`,a.appendChild(n),setTimeout((()=>{n.remove()}),2200)}},UI={setToday(e){const t=String(e.getDate()).padStart(2,"0"),a=String(e.getMonth()+1).padStart(2,"0");$("todayText").textContent=`${t}.${a}.${e.getFullYear()}`},renderKPIs(e){const t=e.length,a=e.filter((e=>e.isDead)).length,n=t-a,s=Analytics.avgLivedYears(e);$("kpiTotal").textContent=t,$("kpiDead").textContent=a,$("kpiAlive").textContent=n,$("kpiAvgYears").textContent=s.toFixed(1),$("repDead").textContent=a,$("repAvg").textContent=s.toFixed(2)},pill:e=>e?'<span class="pill dead">● Մահացած</span>':'<span class="pill alive">● Կենդանի</span>',renderYoungOld(e){const{youngest:t,oldest:a}=Analytics.youngestOldest(e);$("youngestText").textContent=t?`${t.name} (${t.age})`:"—",$("oldestText").textContent=a?`${a.name} (${a.age})`:"—"},renderDecades(e){const t=Analytics.decadeGroups(e),a=Object.entries(t).sort(((e,t)=>parseInt(e[0],10)-parseInt(t[0],10)));$("decadeGroups").innerHTML=a.map((([e,t])=>`<span class="pill"><span class="mono">${e}</span> · ${t}</span>`)).join("")},renderReportNextBirthdays(e){const t=[...e].sort(((e,t)=>e.nextBdayDays-t.nextBdayDays)).slice(0,5);$("repNextBdays").innerHTML=t.map((e=>`\n          <div class="d-flex justify-content-between small-muted">\n            <span class="fw-bold">${e.name}</span>\n            <span class="mono">${e.nextBdayDays} օր</span>\n          </div>\n        `)).join("")||'<div class="small-muted">—</div>'},renderTable(e){$("shownCount").textContent=e.length,$("tbody").innerHTML=e.map(((e,t)=>`\n          <tr>\n            <td class="mono text-muted">${t+1}</td>\n            <td class="fw-bold">${e.name}</td>\n            <td class="mono">${DateX.format(e.birthday)}</td>\n            <td>${UI.pill(e.isDead)}</td>\n            <td class="text-end mono">${e.age}</td>\n            <td class="text-end mono">${e.livedYears.toFixed(1)}</td>\n            <td class="text-end mono">${e.nextBdayDays}</td>\n            <td class="text-end mono">${e.isDead?e.daysSinceDeath:"—"}</td>\n            <td class="text-end">\n              <div class="btn-group btn-group-sm" role="group">\n                <button class="btn btn-outline-primary" data-action="edit" data-id="${e.id}">Edit</button>\n                <button class="btn btn-outline-danger" data-action="del" data-id="${e.id}">Del</button>\n              </div>\n            </td>\n          </tr>\n        `)).join("")}},Filters={apply(e){const t=$("searchInput").value.trim().toLowerCase(),a=$("monthSelect").value?Number($("monthSelect").value):null,n=$("onlyDeadSwitch").checked,s=$("sortSelect").value;let r=[...e];switch(a&&(r=r.filter((e=>e.birthDate.getMonth()+1===a))),t&&(r=r.filter((e=>e.name.toLowerCase().includes(t)))),n&&(r=r.filter((e=>e.isDead))),s){case"age_asc":r.sort(((e,t)=>e.age-t.age));break;case"age_desc":r.sort(((e,t)=>t.age-e.age));break;case"name_asc":r.sort(((e,t)=>e.name.localeCompare(t.name)));break;case"nextbday_asc":r.sort(((e,t)=>e.nextBdayDays-t.nextBdayDays));break;case"died_recent":r.sort(((e,t)=>{const a=e.dieDate?e.dieDate.getTime():-1/0;return(t.dieDate?t.dieDate.getTime():-1/0)-a}))}return r}},ModalX={modal:null,openForAdd(){$("modalTitle").textContent="Add Person",$("formId").value="",$("formName").value="",$("formBirthday").value="",$("formDie").value="",this.setError(""),this.modal.show()},openForEdit(e){$("modalTitle").textContent="Edit Person",$("formId").value=String(e.id),$("formName").value=e.name,$("formBirthday").value=e.birthday,$("formDie").value=e.die??"",this.setError(""),this.modal.show()},setError(e){const t=$("formError");if(!e)return t.classList.add("d-none"),void(t.textContent="");t.classList.remove("d-none"),t.textContent=e}};function validatePerson({name:e,birthday:t,die:a}){if(e.trim().length<2)return"Անունը պետք է լինի առնվազն 2 նիշ։";if(!t)return"Ծննդյան օրը պարտադիր է։";const n=DateX.parseISO(t),s=State.today;if(n>s)return"Ծնունդը չի կարող լինել ապագայում։";if(a){const e=DateX.parseISO(a);if(e<n)return"Մահվան օրը չի կարող լինել ծնունդից շուտ։";if(e>s)return"Մահվան օրը չի կարող լինել ապագայում։"}return null}function recalc(){const e=State.today;UI.setToday(e);const t=Analytics.buildRows(State.list,e);UI.renderKPIs(t),UI.renderYoungOld(t),UI.renderDecades(t),UI.renderReportNextBirthdays(t);const a=Filters.apply(t);UI.renderTable(a)}function setTab(e){document.querySelectorAll("#tabs .nav-link").forEach((t=>{t.classList.toggle("active",t.getAttribute("data-tab")===e)})),["tab-people","tab-reports"].forEach((t=>{$(t).classList.toggle("d-none",t!==e)}))}function onTableClick(e){const t=e.target.closest("button[data-action]");if(!t)return;const a=Number(t.getAttribute("data-id")),n=t.getAttribute("data-action"),s=State.list.find((e=>e.id===a));if(s&&("edit"===n&&ModalX.openForEdit(s),"del"===n)){if(!confirm(`Ջնջե՞լ "${s.name}" տվյալը։`))return;State.remove(a),Toast.show("Ջնջվեց ✅","success"),recalc()}}function onFormSubmit(e){e.preventDefault();const t=$("formId").value.trim(),a={name:$("formName").value,birthday:$("formBirthday").value,die:$("formDie").value||null},n=validatePerson(a);if(n)ModalX.setError(n);else{if(t){const e=Number(t);State.update(e,a),Toast.show("Թարմացվեց ✅","success")}else{const e={id:State.nextId(),...a};State.add(e),Toast.show("Ավելացվեց ✅","success")}ModalX.modal.hide(),recalc()}}function resetFilters(){$("searchInput").value="",$("monthSelect").value="",$("sortSelect").value="age_desc",$("onlyDeadSwitch").checked=!1,recalc()}State.init(),ModalX.modal=new bootstrap.Modal(document.getElementById("personModal")),$("btnAdd").addEventListener("click",(()=>ModalX.openForAdd())),$("personForm").addEventListener("submit",onFormSubmit),$("tbody").addEventListener("click",onTableClick),["searchInput","monthSelect","sortSelect","onlyDeadSwitch"].forEach((e=>{$(e).addEventListener("input",recalc),$(e).addEventListener("change",recalc)})),$("btnReset").addEventListener("click",resetFilters),$("btnFactoryReset").addEventListener("click",(()=>{confirm("Factory reset անե՞լ ու վերադարձնել SEED տվյալները։")&&(State.factoryReset(),Toast.show("Factory reset ✅","success"),resetFilters())})),document.querySelectorAll("#tabs .nav-link").forEach((e=>{e.addEventListener("click",(()=>setTab(e.getAttribute("data-tab"))))})),recalc();
+</script>
+</body>
+</html>

@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8">
+    <title>Academy Database Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        :root {
+            --bg: #020617;
+            --bg-soft: #020617;
+            --panel: #020617;
+            --accent: #a855f7;
+            --accent-soft: rgba(168,85,247,0.14);
+            --accent-2: #22c55e;
+            --danger: #f97373;
+            --text-main: #e5e7eb;
+            --text-muted: #9ca3af;
+            --border: #1f2937;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: radial-gradient(circle at top, #111827, #020617 55%);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .app {
+            width: 100%;
+            max-width: 1150px;
+            background: rgba(15, 23, 42, 0.96);
+            border-radius: 18px;
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.9);
+            padding: 20px 18px 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .app-title {
+            margin: 0;
+            font-size: 20px;
+            letter-spacing: 0.02em;
+        }
+
+        .app-subtitle {
+            margin: 4px 0 0;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .badge {
+            font-size: 11px;
+            padding: 4px 9px;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.55);
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 280px minmax(0, 1fr);
+            gap: 14px;
+        }
+
+        @media (max-width: 900px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: rgba(15, 23, 42, 0.98);
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            padding: 12px 11px 14px;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            gap: 8px;
+        }
+
+        .panel-title {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .panel-subtitle {
+            margin: 0;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .chip {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: rgba(15, 23, 42, 0.96);
+            border: 1px solid rgba(55, 65, 81, 0.9);
+            color: var(--text-muted);
+        }
+
+        .courses-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 280px;
+            overflow: auto;
+            padding-right: 3px;
+            margin-bottom: 10px;
+        }
+
+        .course-item {
+            border-radius: 10px;
+            border: 1px solid rgba(31, 41, 55, 0.9);
+            padding: 8px 9px;
+            font-size: 12px;
+            cursor: pointer;
+            background: radial-gradient(circle at top left, rgba(168, 85, 247, 0.10), rgba(15, 23, 42, 0.96));
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            transition: transform 0.08s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+        }
+
+        .course-item:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 1px rgba(168, 85, 247, 0.3);
+        }
+
+        .course-item.active {
+            border-color: var(--accent);
+            background: radial-gradient(circle at top left, rgba(168, 85, 247, 0.25), rgba(15, 23, 42, 0.98));
+            box-shadow: 0 12px 30px rgba(168, 85, 247, 0.35);
+        }
+
+        .course-title {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .course-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 2px;
+        }
+
+        .pill {
+            border-radius: 999px;
+            padding: 2px 7px;
+            font-size: 10px;
+            border: 1px solid rgba(55, 65, 81, 0.9);
+            color: var(--text-muted);
+        }
+
+        .pill.level {
+            border-color: rgba(56, 189, 248, 0.65);
+            color: #7dd3fc;
+        }
+
+        .pill.type {
+            border-color: rgba(34, 197, 94, 0.65);
+            color: #86efac;
+        }
+
+        .pill.count {
+            border-color: rgba(148, 163, 184, 0.65);
+        }
+
+        .section-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin: 6px 1px 4px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            margin-bottom: 6px;
+            font-size: 12px;
+        }
+
+        .form-group label {
+            color: var(--text-muted);
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="search"],
+        select {
+            padding: 7px 9px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: #020617;
+            color: var(--text-main);
+            font-size: 13px;
+            outline: none;
+        }
+
+        input::placeholder,
+        input[type="search"]::placeholder {
+            color: #6b7280;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 1px rgba(168, 85, 247, 0.5);
+        }
+
+        .btn {
+            border-radius: 999px;
+            border: none;
+            padding: 7px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #0ea5e9, #22c55e);
+            color: #020617;
+            font-weight: 500;
+            width: 100%;
+            margin-top: 4px;
+        }
+
+        .btn:active {
+            transform: translateY(1px) scale(.99);
+        }
+
+        .error-text {
+            font-size: 11px;
+            color: var(--danger);
+            min-height: 14px;
+            margin-top: 2px;
+        }
+
+        .filters-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 4px 0 8px;
+            align-items: center;
+        }
+
+        .search-input {
+            flex: 1 1 160px;
+            min-width: 0;
+        }
+
+        .filter-chip {
+            border-radius: 999px;
+            padding: 5px 9px;
+            font-size: 11px;
+            border: 1px solid var(--border);
+            background: #020617;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .filter-chip.active {
+            border-color: var(--accent);
+            background: var(--accent-soft);
+            color: #e9d5ff;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 7px;
+            margin-bottom: 9px;
+        }
+
+        @media (max-width: 700px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        .stat-card {
+            border-radius: 10px;
+            border: 1px solid rgba(31, 41, 55, 0.95);
+            padding: 7px 8px;
+            font-size: 11px;
+            background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.14), rgba(15, 23, 42, 0.98));
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            margin-bottom: 2px;
+        }
+
+        .stat-value {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .stat-value.good {
+            color: var(--accent-2);
+        }
+
+        .stat-value.warn {
+            color: #facc15;
+        }
+
+        .stat-value.bad {
+            color: var(--danger);
+        }
+
+        .table-wrapper {
+            max-height: 250px;
+            overflow: auto;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        th, td {
+            padding: 6px 7px;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        th {
+            font-weight: 500;
+            color: var(--text-muted);
+            font-size: 11px;
+            background: rgba(15, 23, 42, 0.98);
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        tbody tr:nth-child(2n) {
+            background: rgba(15, 23, 42, 0.75);
+        }
+
+        tbody tr:hover {
+            background: rgba(15, 23, 42, 0.95);
+        }
+
+        .status-tag {
+            border-radius: 999px;
+            padding: 2px 7px;
+            font-size: 10px;
+            border: 1px solid transparent;
+            display: inline-block;
+        }
+
+        .status-ongoing {
+            border-color: rgba(56, 189, 248, 0.8);
+            background: rgba(56, 189, 248, 0.1);
+            color: #7dd3fc;
+        }
+
+        .status-completed {
+            border-color: rgba(34, 197, 94, 0.8);
+            background: rgba(34, 197, 94, 0.12);
+            color: #bbf7d0;
+        }
+
+        .status-dropped {
+            border-color: rgba(248, 113, 113, 0.8);
+            background: rgba(248, 113, 113, 0.12);
+            color: #fecaca;
+        }
+
+        .empty-state {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: center;
+            padding: 14px 8px 4px;
+        }
+
+        .level-dot {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 999px;
+            margin-right: 4px;
+            background: #22c55e;
+        }
+
+        .level-dot.mid {
+            background: #eab308;
+        }
+
+        .level-dot.adv {
+            background: #f97316;
+        }
+
+        .sub-panel {
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px dashed rgba(55, 65, 81, 0.7);
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <header class="app-header">
+        <div>
+            <h1 class="app-title">Academy Database Admin</h1>
+            <p class="app-subtitle">
+                Students / Courses / Enrollments — դիտում + նոր ավելացում
+            </p>
+        </div>
+        <div class="badge">Relations • Filter • Reduce • Forms</div>
+    </header>
+
+    <div class="layout">
+        <!-- LEFT: COURSES + ADD COURSE -->
+        <section class="panel">
+            <div class="panel-header">
+                <div>
+                    <h2 class="panel-title">Դասընթացների բազա</h2>
+                    <p class="panel-subtitle">Ընտրիր կամ ավելացրու նոր դասընթաց</p>
+                </div>
+                <span class="chip" id="course-count-chip">0 դասընթաց</span>
+            </div>
+
+            <div id="courses-list" class="courses-list"></div>
+
+            <div class="sub-panel">
+                <div class="section-label">➕ Ավելացնել նոր դասընթաց</div>
+                <form id="course-form">
+                    <div class="form-group">
+                        <label for="course-title">Վերնագիր</label>
+                        <input id="course-title" type="text" placeholder="Օրինակ՝ Full Stack JS">
+                    </div>
+                    <div class="form-group">
+                        <label for="course-type">Տիպ</label>
+                        <input id="course-type" type="text" placeholder="Օրինակ՝ Web ծրագրավորում">
+                    </div>
+                    <div class="form-group">
+                        <label for="course-level">Մակարդակ</label>
+                        <select id="course-level">
+                            <option value="">Ընտրիր</option>
+                            <option value="Beginner">Beginner</option>
+                            <option value="Intermediate">Intermediate</option>
+                            <option value="Advanced">Advanced</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="course-duration">Տևողություն (ամիս)</label>
+                        <input id="course-duration" type="number" min="1" placeholder="Օրինակ՝ 6">
+                    </div>
+                    <button class="btn" type="submit">Պահպանել դասընթացը</button>
+                    <div id="course-error" class="error-text"></div>
+                </form>
+            </div>
+        </section>
+
+        <!-- RIGHT: ENROLLMENTS + ADD ENROLLMENT -->
+        <section class="panel">
+            <div class="panel-header">
+                <div>
+                    <h2 class="panel-title" id="selected-course-title">Ընտրված դասընթաց չկա</h2>
+                    <p class="panel-subtitle" id="selected-course-subtitle"></p>
+                </div>
+            </div>
+
+            <div class="filters-row">
+                <input
+                        type="search"
+                        id="search-input"
+                        class="search-input"
+                        placeholder="Փնտրիր ըստ ուսանողի անվան (օրինակ՝ Ani)"
+                >
+                <button class="filter-chip active" data-status="all">Բոլորը</button>
+                <button class="filter-chip" data-status="ongoing">Ընթացքում</button>
+                <button class="filter-chip" data-status="completed">Ավարտած</button>
+                <button class="filter-chip" data-status="dropped">Դադարեցրած</button>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Գրանցված ուսանող</div>
+                    <div id="stat-total-students" class="stat-value">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Ընթացքում</div>
+                    <div id="stat-ongoing" class="stat-value good">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Ավարտած</div>
+                    <div id="stat-completed" class="stat-value good">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Դադարեցրած</div>
+                    <div id="stat-dropped" class="stat-value bad">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Ընդամենը վճարված</div>
+                    <div id="stat-total-paid" class="stat-value">0 ֏</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Միջին վճարում</div>
+                    <div id="stat-average-paid" class="stat-value">0 ֏</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Ավարտման տոկոս</div>
+                    <div id="stat-completion-rate" class="stat-value warn">0%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Drop rate</div>
+                    <div id="stat-drop-rate" class="stat-value bad">0%</div>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Ուսանող</th>
+                        <th>Մակարդակ</th>
+                        <th>Գրանցման ստատուս</th>
+                        <th>Վճարում (֏)</th>
+                    </tr>
+                    </thead>
+                    <tbody id="table-body"></tbody>
+                </table>
+            </div>
+
+            <div id="empty-state" class="empty-state" style="display: none;">
+                Այս դասընթացում գրանցված ուսանող չկա 🙂
+            </div>
+
+            <div class="sub-panel">
+                <div class="section-label">➕ Ավելացնել գրանցում (ընտրված դասընթացի համար)</div>
+                <form id="enroll-form">
+                    <div class="form-group">
+                        <label for="enroll-name">Ուսանողի անուն</label>
+                        <input id="enroll-name" type="text" placeholder="Օրինակ՝ Ani Harutyunyan">
+                    </div>
+                    <div class="form-group">
+                        <label for="enroll-level">Մակարդակ</label>
+                        <select id="enroll-level">
+                            <option value="">Ընտրիր</option>
+                            <option value="beginner">Beginner</option>
+                            <option value="intermediate">Intermediate</option>
+                            <option value="advanced">Advanced</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="enroll-status">Գրանցման ստատուս</label>
+                        <select id="enroll-status">
+                            <option value="">Ընտրիր</option>
+                            <option value="ongoing">Ընթացքում</option>
+                            <option value="completed">Ավարտած</option>
+                            <option value="dropped">Դադարեցրած</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="enroll-paid">Վճարված գումար (֏)</label>
+                        <input id="enroll-paid" type="number" min="0" placeholder="Օրինակ՝ 90000">
+                    </div>
+                    <button class="btn" type="submit">Ավելացնել գրանցում</button>
+                    <div id="enroll-error" class="error-text"></div>
+                </form>
+            </div>
+        </section>
+    </div>
+</div>
+
+<script>
+    // ------------ "DATABASES" (fake) ------------
+    const students = [
+        { id: 1, name: "Ani Harutyunyan", level: "beginner" },
+        { id: 2, name: "Gor Petrosyan", level: "intermediate" },
+        { id: 3, name: "Mariam Hakobyan", level: "beginner" },
+        { id: 4, name: "David Sargsyan", level: "advanced" },
+        { id: 5, name: "Lilit Hovhannisyan", level: "intermediate" },
+        { id: 6, name: "Narek Grigoryan", level: "advanced" },
+        { id: 7, name: "Sona Mkrtchyan", level: "beginner" },
+        { id: 8, name: "Edgar Manukyan", level: "intermediate" }
+    ];
+
+    const courses = [
+        { id: "js-core", title: "JavaScript Core", type: "Web ծրագրավորում", level: "Intermediate", durationMonths: 4 },
+        { id: "react-bootcamp", title: "React Bootcamp", type: "Frontend", level: "Advanced", durationMonths: 3 },
+        { id: "html-css", title: "HTML/CSS Foundation", type: "Web հիմնականներ", level: "Beginner", durationMonths: 2 },
+        { id: "node-api", title: "Node.js & REST API", type: "Backend", level: "Intermediate", durationMonths: 4 }
+    ];
+
+    const enrollments = [
+        // course js-core
+        { id: 1, studentId: 1, courseId: "js-core", status: "ongoing", paid: 90000 },
+        { id: 2, studentId: 2, courseId: "js-core", status: "completed", paid: 120000 },
+        { id: 3, studentId: 3, courseId: "js-core", status: "dropped", paid: 30000 },
+        { id: 4, studentId: 5, courseId: "js-core", status: "ongoing", paid: 60000 },
+
+        // course react-bootcamp
+        { id: 5, studentId: 2, courseId: "react-bootcamp", status: "ongoing", paid: 100000 },
+        { id: 6, studentId: 4, courseId: "react-bootcamp", status: "completed", paid: 130000 },
+        { id: 7, studentId: 6, courseId: "react-bootcamp", status: "dropped", paid: 50000 },
+
+        // course html-css
+        { id: 8, studentId: 1, courseId: "html-css", status: "completed", paid: 60000 },
+        { id: 9, studentId: 3, courseId: "html-css", status: "completed", paid: 60000 },
+        { id: 10, studentId: 7, courseId: "html-css", status: "ongoing", paid: 30000 },
+
+        // course node-api
+        { id: 11, studentId: 4, courseId: "node-api", status: "ongoing", paid: 80000 },
+        { id: 12, studentId: 6, courseId: "node-api", status: "ongoing", paid: 80000 },
+        { id: 13, studentId: 8, courseId: "node-api", status: "dropped", paid: 20000 }
+    ];
+
+    let selectedCourseId=courses[0]?.id||null,statusFilter="all",searchTerm="";const coursesListEl=document.getElementById("courses-list"),courseCountChip=document.getElementById("course-count-chip"),selectedTitleEl=document.getElementById("selected-course-title"),selectedSubtitleEl=document.getElementById("selected-course-subtitle"),searchInputEl=document.getElementById("search-input"),filterChips=document.querySelectorAll(".filter-chip"),statTotalStudentsEl=document.getElementById("stat-total-students"),statOngoingEl=document.getElementById("stat-ongoing"),statCompletedEl=document.getElementById("stat-completed"),statDroppedEl=document.getElementById("stat-dropped"),statTotalPaidEl=document.getElementById("stat-total-paid"),statAveragePaidEl=document.getElementById("stat-average-paid"),statCompletionRateEl=document.getElementById("stat-completion-rate"),statDropRateEl=document.getElementById("stat-drop-rate"),tableBodyEl=document.getElementById("table-body"),emptyStateEl=document.getElementById("empty-state"),courseForm=document.getElementById("course-form"),courseTitleInput=document.getElementById("course-title"),courseTypeInput=document.getElementById("course-type"),courseLevelSelect=document.getElementById("course-level"),courseDurationInput=document.getElementById("course-duration"),courseErrorEl=document.getElementById("course-error"),enrollForm=document.getElementById("enroll-form"),enrollNameInput=document.getElementById("enroll-name"),enrollLevelSelect=document.getElementById("enroll-level"),enrollStatusSelect=document.getElementById("enroll-status"),enrollPaidInput=document.getElementById("enroll-paid"),enrollErrorEl=document.getElementById("enroll-error");function formatCurrency(e){return e.toLocaleString("hy-AM")}function levelLabel(e){return"beginner"===e?"Սկզբնակ":"intermediate"===e?"Միջին":"advanced"===e?"Լավ մակարդակ":e}function levelDotClass(e){return"beginner"===e?"":"intermediate"===e?"mid":"advanced"===e?"adv":""}function enrollmentStatusLabel(e){return"ongoing"===e?"Ընթացքում":"completed"===e?"Ավարտած":"dropped"===e?"Դադարեցրած":e}function enrollmentStatusClass(e){return"ongoing"===e?"status-ongoing":"completed"===e?"status-completed":"dropped"===e?"status-dropped":""}function renderCoursesList(){courseCountChip.textContent=`${courses.length} դասընթաց`,coursesListEl.innerHTML="",courses.forEach((e=>{const t=enrollments.filter((t=>t.courseId===e.id)),n=document.createElement("div");n.className="course-item",e.id===selectedCourseId&&n.classList.add("active"),n.innerHTML=`\n        <div class="course-title">${e.title}</div>\n        <div class="course-meta">\n          <span class="pill type">${e.type}</span>\n          <span class="pill level">${e.level}</span>\n          <span class="pill count">${t.length} ուսանող</span>\n          <span class="pill">Տևողություն՝ ${e.durationMonths} ամիս</span>\n        </div>\n      `,n.addEventListener("click",(()=>{selectedCourseId=e.id,renderCoursesList(),updateMainPanel()})),coursesListEl.appendChild(n)}))}function getSelectedCourse(){return courses.find((e=>e.id===selectedCourseId))||null}function getEnrollmentsForSelectedCourse(){return selectedCourseId?enrollments.filter((e=>e.courseId===selectedCourseId)):[]}function getJoinedRows(){let e=getEnrollmentsForSelectedCourse().map((e=>{const t=students.find((t=>t.id===e.studentId));return{...e,studentName:t?t.name:"Unknown",studentLevel:t?t.level:"unknown"}}));if("all"!==statusFilter&&(e=e.filter((e=>e.status===statusFilter))),searchTerm){const t=searchTerm.toLowerCase();e=e.filter((e=>e.studentName.toLowerCase().includes(t)))}return e}function updateMainPanel(){const e=getSelectedCourse();if(!e)return selectedTitleEl.textContent="Ընտրված դասընթաց չկա",selectedSubtitleEl.textContent="",tableBodyEl.innerHTML="",emptyStateEl.style.display="block",void renderStats([]);selectedTitleEl.textContent=e.title,selectedSubtitleEl.textContent=`${e.type} • Մակարդակ՝ ${e.level} • ${e.durationMonths} ամիս`;const t=getJoinedRows();tableBodyEl.innerHTML="",0===t.length?emptyStateEl.style.display="block":(emptyStateEl.style.display="none",t.forEach(((e,t)=>{const n=document.createElement("tr");n.innerHTML=`\n          <td>${t+1}</td>\n          <td>${e.studentName}</td>\n          <td>\n            <span class="level-dot ${levelDotClass(e.studentLevel)}"></span>\n            ${levelLabel(e.studentLevel)}\n          </td>\n          <td>\n            <span class="status-tag ${enrollmentStatusClass(e.status)}">\n              ${enrollmentStatusLabel(e.status)}\n            </span>\n          </td>\n          <td>${formatCurrency(e.paid)}</td>\n        `,tableBodyEl.appendChild(n)})));renderStats(getEnrollmentsForSelectedCourse())}function renderStats(e){const t=e.length,n=e.filter((e=>"ongoing"===e.status)).length,l=e.filter((e=>"completed"===e.status)).length,o=e.filter((e=>"dropped"===e.status)).length,r=e.reduce(((e,t)=>e+t.paid),0),s=0===t?0:Math.round(r/t),d=0===t?0:(l/t*100).toFixed(1),a=0===t?0:(o/t*100).toFixed(1);statTotalStudentsEl.textContent=t,statOngoingEl.textContent=n,statCompletedEl.textContent=l,statDroppedEl.textContent=o,statTotalPaidEl.textContent=`${formatCurrency(r)} ֏`,statAveragePaidEl.textContent=`${formatCurrency(s)} ֏`,statCompletionRateEl.textContent=`${d}%`,statDropRateEl.textContent=`${a}%`}searchInputEl.addEventListener("input",(e=>{searchTerm=e.target.value,updateMainPanel()})),filterChips.forEach((e=>{e.addEventListener("click",(()=>{filterChips.forEach((e=>e.classList.remove("active"))),e.classList.add("active"),statusFilter=e.dataset.status,updateMainPanel()}))})),courseForm.addEventListener("submit",(e=>{e.preventDefault(),courseErrorEl.textContent="";const t=courseTitleInput.value.trim(),n=courseTypeInput.value.trim(),l=courseLevelSelect.value,o=Number(courseDurationInput.value);if(!t)return void(courseErrorEl.textContent="Գրի՛ր դասընթացի վերնագիրը։");if(!n)return void(courseErrorEl.textContent="Գրի՛ր դասընթացի տիպը։");if(!l)return void(courseErrorEl.textContent="Ընտրի՛ր մակարդակը։");if(!o||o<=0)return void(courseErrorEl.textContent="Գրի՛ր տևողությունը (ամիս)։");const r="course-"+Date.now();courses.push({id:r,title:t,type:n,level:l,durationMonths:o}),selectedCourseId=r,courseForm.reset(),renderCoursesList(),updateMainPanel()})),enrollForm.addEventListener("submit",(e=>{e.preventDefault(),enrollErrorEl.textContent="";const t=getSelectedCourse();if(!t)return void(enrollErrorEl.textContent="Սկզբում ընտրի՛ր դասընթացը ձախ կողմից։");const n=enrollNameInput.value.trim(),l=enrollLevelSelect.value,o=enrollStatusSelect.value,r=Number(enrollPaidInput.value);if(!n)return void(enrollErrorEl.textContent="Գրի՛ր ուսանողի անունը։");if(!l)return void(enrollErrorEl.textContent="Ընտրի՛ր ուսանողի մակարդակը։");if(!o)return void(enrollErrorEl.textContent="Ընտրի՛ր գրանցման ստատուսը։");if(Number.isNaN(r)||r<0)return void(enrollErrorEl.textContent="Գրի՛ր ճիշտ գումար (֏)։");let s=students.find((e=>e.name.toLowerCase()===n.toLowerCase()));if(s)s.level=l;else{s={id:students.length?Math.max(...students.map((e=>e.id)))+1:1,name:n,level:l},students.push(s)}const d=enrollments.length?Math.max(...enrollments.map((e=>e.id)))+1:1;enrollments.push({id:d,studentId:s.id,courseId:t.id,status:o,paid:r}),enrollForm.reset(),updateMainPanel()})),renderCoursesList(),updateMainPanel();
+</script>
+
+</body>
+</html>

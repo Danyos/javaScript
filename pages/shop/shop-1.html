@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8">
+    <title>Mini Online Shop with Cart</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #020617;
+            --border: #1f2937;
+            --text-main: #e5e7eb;
+            --text-muted: #9ca3af;
+            --accent: #38bdf8;
+            --accent-soft: rgba(56, 189, 248, 0.15);
+            --danger: #f97373;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: radial-gradient(circle at top, #1e293b, #020617 55%);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .app {
+            width: 100%;
+            max-width: 1024px;
+            background: rgba(15, 23, 42, 0.96);
+            border-radius: 18px;
+            border: 1px solid var(--border);
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.9);
+            padding: 18px 16px 20px;
+        }
+
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .app-header h1 {
+            font-size: 20px;
+            margin: 0;
+        }
+
+        .app-header p {
+            margin: 4px 0 0;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .cart-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: #020617;
+            font-size: 12px;
+        }
+
+        .cart-count {
+            padding: 2px 6px;
+            border-radius: 999px;
+            background: var(--accent);
+            color: #020617;
+            font-weight: 600;
+            font-size: 11px;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 2.1fr) minmax(0, 1.4fr);
+            gap: 14px;
+        }
+
+        @media (max-width: 800px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: rgba(15, 23, 42, 0.98);
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            padding: 10px 10px 12px;
+        }
+
+        .card-title {
+            font-size: 14px;
+            margin: 0 0 6px;
+            font-weight: 500;
+        }
+
+        .card-subtitle {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin: 0 0 8px;
+        }
+
+        /* PRODUCTS GRID */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 10px;
+        }
+
+        .product-item {
+            border-radius: 12px;
+            border: 1px solid rgba(31, 41, 55, 0.9);
+            background: #020617;
+            padding: 9px 9px 10px;
+            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .product-name {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .product-price {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .product-footer {
+            margin-top: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn {
+            border-radius: 999px;
+            border: none;
+            padding: 6px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #0ea5e9, #22c55e);
+            color: #020617;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .btn:active {
+            transform: translateY(1px) scale(.99);
+        }
+
+        /* CART */
+        .cart-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .cart-summary {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .cart-summary span {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        th, td {
+            padding: 6px 7px;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+        }
+
+        th {
+            font-weight: 500;
+            color: var(--text-muted);
+            font-size: 11px;
+            background: rgba(15, 23, 42, 0.98);
+        }
+
+        tbody tr:nth-child(2n) {
+            background: rgba(15, 23, 42, 0.85);
+        }
+
+        tbody tr:hover {
+            background: rgba(15, 23, 42, 0.95);
+        }
+
+        .cart-empty {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: center;
+            padding: 10px 0 4px;
+        }
+
+        .cart-total-row {
+            font-weight: 600;
+            border-top: 1px solid var(--border);
+        }
+
+        .qty-controls {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .qty-btn {
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: #020617;
+            color: var(--text-main);
+            font-size: 11px;
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .qty-value {
+            min-width: 18px;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .remove-btn {
+            border: none;
+            background: none;
+            color: var(--danger);
+            font-size: 14px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <header class="app-header">
+        <div>
+            <h1>Mini Online Shop</h1>
+            <p>Պարզ shop structure + cart logic (qty increment on second click) 🛒</p>
+        </div>
+        <div class="cart-badge">
+            Cart
+            <span id="cart-count" class="cart-count">0</span>
+        </div>
+    </header>
+
+    <div class="layout">
+        <!-- LEFT: PRODUCTS -->
+        <section class="card">
+            <h2 class="card-title">Ապրանքներ</h2>
+            <p class="card-subtitle">Սեղմիր «Add to cart» – 2-րդ անգամ սեղմելուց quantity-ն է ավելանում</p>
+
+            <div id="products-grid" class="products-grid"><div class="product-item">
+                <div class="product-name">JavaScript Book</div>
+                <div class="product-price">12,000 ֏</div>
+                <div class="product-footer">
+                    <span style="font-size:11px;color:var(--text-muted);">ID: 1</span>
+                    <button class="btn" data-product-id="1">
+                        + Add to cart
+                    </button>
+                </div>
+            </div><div class="product-item">
+                <div class="product-name">React Course Access</div>
+                <div class="product-price">55,000 ֏</div>
+                <div class="product-footer">
+                    <span style="font-size:11px;color:var(--text-muted);">ID: 2</span>
+                    <button class="btn" data-product-id="2">
+                        + Add to cart
+                    </button>
+                </div>
+            </div><div class="product-item">
+                <div class="product-name">Wireless Mouse</div>
+                <div class="product-price">9,000 ֏</div>
+                <div class="product-footer">
+                    <span style="font-size:11px;color:var(--text-muted);">ID: 3</span>
+                    <button class="btn" data-product-id="3">
+                        + Add to cart
+                    </button>
+                </div>
+            </div><div class="product-item">
+                <div class="product-name">Mechanical Keyboard</div>
+                <div class="product-price">35,000 ֏</div>
+                <div class="product-footer">
+                    <span style="font-size:11px;color:var(--text-muted);">ID: 4</span>
+                    <button class="btn" data-product-id="4">
+                        + Add to cart
+                    </button>
+                </div>
+            </div></div>
+        </section>
+
+        <!-- RIGHT: CART -->
+        <section class="card">
+            <div class="cart-header-row">
+                <h2 class="card-title">Քո զամբյուղը</h2>
+                <div class="cart-summary">
+                    Ընդհանուր քանակ: <span id="summary-qty">0</span> •
+                    Ընդհանուր գումար: <span id="summary-total">0 ֏</span>
+                </div>
+            </div>
+
+            <table>
+                <thead>
+                <tr>
+                    <th>Ապրանք</th>
+                    <th>Գին</th>
+                    <th>Քանակ</th>
+                    <th>Միջագումար</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody id="cart-body"></tbody>
+            </table>
+
+            <div id="cart-empty" class="cart-empty" style="display: block;">
+                Զամբյուղը հիմա դատարկ է 🙂
+            </div>
+        </section>
+    </div>
+</div>
+
+<script>
+    // --- Products "database" ---
+    const products = [
+        { id: 1, name: "JavaScript Book", price: 12000 },
+        { id: 2, name: "React Course Access", price: 55000 },
+        { id: 3, name: "Wireless Mouse", price: 9000 },
+        { id: 4, name: "Mechanical Keyboard", price: 35000 }
+    ];
+
+    // Cart: [{ id, name, price, qty }]
+    const cart = [];
+    const productsGridEl=document.getElementById("products-grid"),cartBodyEl=document.getElementById("cart-body"),cartEmptyEl=document.getElementById("cart-empty"),cartCountEl=document.getElementById("cart-count"),summaryQtyEl=document.getElementById("summary-qty"),summaryTotalEl=document.getElementById("summary-total");function formatPrice(t){return t.toLocaleString("hy-AM")}function renderProducts(){productsGridEl.innerHTML="",products.forEach((t=>{const n=document.createElement("div");n.className="product-item",n.innerHTML=`\n        <div class="product-name">${t.name}</div>\n        <div class="product-price">${formatPrice(t.price)} ֏</div>\n        <div class="product-footer">\n          <span style="font-size:11px;color:var(--text-muted);">ID: ${t.id}</span>\n          <button class="btn" data-product-id="${t.id}">\n            + Add to cart\n          </button>\n        </div>\n      `,productsGridEl.appendChild(n)})),productsGridEl.addEventListener("click",(function(t){const n=t.target.closest("button[data-product-id]");if(!n)return;addToCart(Number(n.dataset.productId))}))}function addToCart(t){const n=products.find((n=>n.id===t));if(!n)return;const e=cart.find((n=>n.id===t));e?e.qty+=1:cart.push({id:n.id,name:n.name,price:n.price,qty:1}),renderCart()}function renderCart(){cartBodyEl.innerHTML="",0===cart.length?cartEmptyEl.style.display="block":cartEmptyEl.style.display="none";let t=0,n=0;cart.forEach((e=>{const d=e.price*e.qty;t+=e.qty,n+=d;const r=document.createElement("tr");r.innerHTML=`\n        <td>${e.name}</td>\n        <td>${formatPrice(e.price)} ֏</td>\n        <td>\n          <div class="qty-controls">\n            <button class="qty-btn" data-action="decrease" data-id="${e.id}">-</button>\n            <span class="qty-value">${e.qty}</span>\n            <button class="qty-btn" data-action="increase" data-id="${e.id}">+</button>\n          </div>\n        </td>\n        <td>${formatPrice(d)} ֏</td>\n        <td>\n          <button class="remove-btn" data-action="remove" data-id="${e.id}">&times;</button>\n        </td>\n      `,cartBodyEl.appendChild(r)})),cartCountEl.textContent=t,summaryQtyEl.textContent=t,summaryTotalEl.textContent=formatPrice(n)+" ֏"}cartBodyEl.addEventListener("click",(function(t){const n=t.target.closest("button");if(!n)return;const e=Number(n.dataset.id),d=n.dataset.action,r=cart.find((t=>t.id===e));if(r){if("increase"===d)r.qty+=1;else if("decrease"===d){if(r.qty-=1,r.qty<=0){const t=cart.findIndex((t=>t.id===e));cart.splice(t,1)}}else if("remove"===d){const t=cart.findIndex((t=>t.id===e));cart.splice(t,1)}renderCart()}})),renderProducts(),renderCart();
+</script>
+
+</body>
+</html>

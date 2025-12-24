@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8">
+    <title>Ապրանքի էջ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+    >
+    <style>
+        :root{
+            --bg-main:#f5f5f7;
+            --bg-card:#ffffff;
+            --border-soft:#e2e2e8;
+            --text-main:#111827;
+            --text-muted:#6b7280;
+            --accent:#0d6efd;
+        }
+        *{
+            box-sizing:border-box;
+            font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+        }
+        body{
+            background:var(--bg-main);
+            color:var(--text-main);
+            min-height:100vh;
+        }
+        .page-shell{
+            max-width:1100px;
+            margin:0 auto;
+            padding:20px 16px 40px;
+        }
+        .card-main{
+            background:var(--bg-card);
+            border-radius:20px;
+            border:1px solid var(--border-soft);
+            padding:20px;
+        }
+        .product-image-wrapper{
+            background:#f9fafb;
+            border-radius:14px;
+            overflow:hidden;
+            border:1px solid #e5e7eb;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            height:360px;
+            margin-bottom:10px;
+        }
+        .product-image-wrapper img{
+            max-height:340px;
+            width:auto;
+            display:block;
+        }
+        .price-row{
+            display:flex;
+            align-items:baseline;
+            gap:8px;
+            margin-top:8px;
+            margin-bottom:8px;
+        }
+        .price-main{
+            font-weight:700;
+            font-size:1.2rem;
+        }
+        .price-old{
+            font-size:.85rem;
+            text-decoration:line-through;
+            color:var(--text-muted);
+        }
+        .discount-badge{
+            font-size:.75rem;
+            padding:2px 8px;
+            border-radius:999px;
+            border:1px solid rgba(16,185,129,.4);
+            color:#047857;
+            background-color:#d1fae5;
+        }
+        .badge-pill{
+            border-radius:999px;
+            font-size:.75rem;
+            padding:4px 10px;
+        }
+        .text-muted-2{
+            color:var(--text-muted);
+            font-size:.85rem;
+        }
+    </style>
+</head>
+<body>
+<div class="page-shell">
+    <header class="d-flex justify-content-between align-items-center mb-3">
+        <div class="d-flex align-items-center gap-2">
+            <a href="index.html" class="btn btn-sm btn-outline-secondary">← Վերադառնալ</a>
+            <span class="text-muted-2">Ապրանքի մանրամասն էջ</span>
+        </div>
+        <a href="cart.html" class="btn btn-sm btn-primary">
+            Զամբյուղ • <span id="cartItemsCount">0</span> հատ
+        </a>
+    </header>
+
+    <div id="productContainer" class="card-main">
+        <!-- Ապրանքի տվյալները կլցվեն JS-ով -->
+    </div>
+</div>
+
+<script src="data.js"></script>
+<script>
+    function updateCartButton() {
+        const cart = loadCart();
+        const count = getCartItemsCount(cart);
+        document.getElementById("cartItemsCount").textContent = count;
+    }
+
+    function renderProduct(product) {
+        const container = document.getElementById("productContainer");
+        if (!product) {
+            container.innerHTML = "<p class='text-danger mb-0'>Ապրանքը չի գտնվել։</p>";
+            return;
+        }
+
+        const brand = getBrand(product.brandId);
+        const cat = getCategory(product.categoryId);
+        const os = getOs(product.opSysId);
+        const r = getRam(product.ramId);
+        const cols = getColors(product.colorIds);
+        const finalPrice = getFinalPrice(product);
+
+        container.innerHTML = `
+      <div class="row g-4">
+        <div class="col-md-5">
+          <div class="product-image-wrapper">
+            <img src="${product.image}" alt="${product.name}">
+          </div>
+        </div>
+        <div class="col-md-7">
+          <h3 class="mb-1">${product.name}</h3>
+          <p class="text-muted-2 mb-2">
+            ${brand ? brand.name : ""}
+            ${cat ? " • " + cat.name : ""}
+          </p>
+
+          <div class="price-row">
+            <div class="price-main">${formatPrice(finalPrice)} ֏</div>
+            ${
+            product.discount
+                ? `<div class="price-old">${formatPrice(product.price)} ֏</div>
+                   <span class="discount-badge">-${product.discount}%</span>`
+                : ""
+        }
+          </div>
+
+          <p class="text-muted-2">
+            Պայմանական նկարագրություն․ բարձր արտադրողականություն, որակյալ էկրան,
+            երկարատև մարտկոց — հարմար թե՛ աշխատանքի, թե՛ խաղերի համար։
+            Կարող ես այստեղ ավելացնել իրական product description դաշտ։
+          </p>
+
+          <div class="mb-2">
+            ${os ? `<span class="badge bg-light text-dark badge-pill me-1">OS: ${os.name}</span>` : ""}
+            ${r ? `<span class="badge bg-light text-dark badge-pill me-1">RAM: ${r.name}</span>` : ""}
+          </div>
+
+          <div class="mb-2">
+            ${
+            cols && cols.length
+                ? `<span class="text-muted-2 d-block mb-1">Մատչելի գույներ</span>` +
+                cols.map(c => `<span class="badge bg-light text-dark badge-pill me-1 mb-1">${c.name}</span>`).join("")
+                : ""
+        }
+          </div>
+
+          <p class="text-muted-2">
+            ${
+            product.stock <= 0
+                ? "Պահեստում չկա (պատվերով)"
+                : product.stock < 5
+                    ? `Մնացել է ընդամենը ${product.stock} հատ։`
+                    : `Պահեստում՝ ${product.stock} հատ։`
+        }
+          </p>
+
+          <div class="d-flex gap-2 mt-3">
+            <button id="addToCartBtn" class="btn btn-primary">
+              Ավելացնել զամբյուղում
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+
+        document.getElementById("addToCartBtn").addEventListener("click", () => {
+            const cart = loadCart();
+            const item = cart.find(i => i.productId === product.id);
+            if (item) {
+                item.qty += 1;
+            } else {
+                cart.push({ productId: product.id, qty: 1 });
+            }
+            saveCart(cart);
+            updateCartButton();
+        });
+    }
+
+    // INIT
+    const params = new URLSearchParams(window.location.search);
+    const id = Number(params.get("id"));
+    const product = products.find(p => p.id === id);
+
+    renderProduct(product);
+    updateCartButton();
+</script>
+</body>
+</html>

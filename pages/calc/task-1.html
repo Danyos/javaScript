@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+  <meta charset="UTF-8">
+  <title>Sales Tax Calculator Pro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg1:#f7d9e9;
+      --bg2:#cfd9ff;
+      --card-bg:rgba(255,255,255,.9);
+      --accent:#6366f1;
+      --accent-soft:rgba(99,102,241,0.12);
+    }
+    *{
+      box-sizing:border-box;
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    }
+    body{
+      min-height:100vh;
+      margin:0;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+      padding:40px 10px;
+      background:radial-gradient(circle at 0 0,var(--bg1),transparent 55%),
+      radial-gradient(circle at 100% 100%,var(--bg2),#f3f4ff 60%);
+    }
+    .app-shell{
+      width:100%;
+      max-width:900px;
+    }
+    .glass-card{
+      background:var(--card-bg);
+      border-radius:20px;
+      box-shadow:0 18px 45px rgba(15,23,42,.25);
+      border:1px solid rgba(148,163,184,.35);
+      backdrop-filter:blur(14px);
+      padding:22px 26px 26px;
+    }
+    .app-title{
+      font-weight:700;
+      font-size:1.8rem;
+      letter-spacing:.03em;
+    }
+    .badge-accent{
+      background:var(--accent-soft);
+      color:var(--accent);
+      border-radius:999px;
+      padding:3px 12px;
+      font-size:.75rem;
+      font-weight:600;
+    }
+    .field-label{
+      font-size:.85rem;
+      font-weight:600;
+      color:#374151;
+    }
+    .input-prefix{
+      background:#f3f4f6;
+      border-right:none;
+    }
+    .input-prefix + .form-control{
+      border-left:none;
+    }
+    .input-prefix,
+    .form-control{
+      height:38px;
+    }
+    .summary-box{
+      background:var(--accent-soft);
+      border-radius:14px;
+      padding:14px 16px;
+      font-size:.9rem;
+    }
+    .summary-label{
+      color:#4b5563;
+    }
+    .summary-value{
+      font-weight:700;
+      color:#111827;
+    }
+    .summary-value.big{
+      font-size:1.3rem;
+    }
+    .btn-main{
+      background:var(--accent);
+      border-color:var(--accent);
+      font-weight:600;
+    }
+    .btn-main:hover{
+      filter:brightness(0.95);
+    }
+    .orders-title{
+      font-size:1.05rem;
+      font-weight:600;
+    }
+    .table-sm td,
+    .table-sm th{
+      padding:.4rem .45rem;
+      vertical-align:middle;
+    }
+    .empty-hint{
+      font-size:.85rem;
+      color:#6b7280;
+    }
+    @media (max-width: 768px){
+      .glass-card{
+        padding:18px 18px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+  <div class="glass-card mb-3">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <div>
+        <h1 class="app-title mb-0">Sales Tax Calculator</h1>
+        <div class="text-muted" style="font-size:.85rem;">Արագ հաշվում, history և CSV ներբեռնում ✨</div>
+      </div>
+      <span class="badge-accent d-none d-md-inline">Demo for students</span>
+    </div>
+
+    <hr class="mb-3">
+
+    <div class="row g-3">
+      <!-- LEFT SIDE: INPUTS -->
+      <div class="col-md-6">
+        <div class="mb-2">
+          <label for="productName" class="field-label mb-1">Product name (ոչ պարտադիր)</label>
+          <input id="productName" class="form-control form-control-sm" placeholder="მაგ․ Laptop, Mouse ...">
+        </div>
+
+        <div class="mb-2">
+          <label class="field-label mb-1">Product price</label>
+          <div class="input-group input-group-sm">
+            <span class="input-group-text input-prefix">$</span>
+            <input id="productPrice" type="number" step="0.01" class="form-control" placeholder="0.00" value="154">
+          </div>
+        </div>
+
+        <div class="mb-2">
+          <label class="field-label mb-1">Quantity</label>
+          <input id="quantity" type="number" min="1" class="form-control form-control-sm" value="3">
+        </div>
+
+        <div class="mb-2">
+          <label class="field-label mb-1">Tax rate (%)</label>
+          <div class="input-group input-group-sm">
+            <input id="taxRate" type="number" class="form-control" value="3" step="0.1">
+            <span class="input-group-text">%</span>
+          </div>
+          <div class="form-text" style="font-size:.75rem;">Օրինակ․ 3, 5, 20 և այլն</div>
+        </div>
+
+        <div class="d-flex gap-2 mt-3">
+          <button id="btnCalculate" class="btn btn-main btn-sm flex-grow-1">
+            Calculate
+          </button>
+          <button id="btnAddToList" class="btn btn-outline-secondary btn-sm flex-grow-1">
+            Add to list
+          </button>
+        </div>
+      </div>
+
+      <!-- RIGHT SIDE: LIVE SUMMARY -->
+      <div class="col-md-6">
+        <div class="summary-box mb-2">
+          <div class="d-flex justify-content-between mb-1">
+            <span class="summary-label">Subtotal</span>
+            <span id="summarySubtotal" class="summary-value">$462.00</span>
+          </div>
+          <div class="d-flex justify-content-between mb-1">
+            <span class="summary-label">Tax (<span id="summaryTaxRate">3</span>%)</span>
+            <span id="summaryTax" class="summary-value">$13.86</span>
+          </div>
+          <hr class="my-2">
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="summary-label">Total</span>
+            <span id="summaryTotal" class="summary-value big">$475.86</span>
+          </div>
+        </div>
+
+        <div class="row g-2">
+          <div class="col-6">
+            <button id="btnClearInputs" class="btn btn-outline-secondary btn-sm w-100">
+              Clear inputs
+            </button>
+          </div>
+          <div class="col-6">
+            <button id="btnResetAll" class="btn btn-outline-danger btn-sm w-100">
+              Clear history
+            </button>
+          </div>
+          <div class="col-12 mt-1">
+            <button id="btnDownloadCSV" class="btn btn-outline-dark btn-sm w-100">
+              Download CSV of list
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ORDERS LIST -->
+  <div class="glass-card">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <span class="orders-title">Orders list</span>
+      <span class="text-muted" style="font-size:.8rem;">Ամեն "Add to list"-ից հետո order-ը կավելանա այստեղ</span>
+    </div>
+
+    <div id="ordersEmpty" class="empty-hint d-none">
+      Պատմություն դեռ չունես 😊 Սկսի հաշվարկել և սեղմի <strong>Add to list</strong>։
+    </div>
+
+    <div class="table-responsive" id="ordersTableWrapper">
+      <table class="table table-sm table-striped align-middle mb-0">
+        <thead class="table-light">
+        <tr>
+          <th>#</th>
+          <th>Product</th>
+          <th>Price</th>
+          <th>Qty</th>
+          <th>Tax %</th>
+          <th>Subtotal</th>
+          <th>Tax</th>
+          <th>Total</th>
+          <th></th>
+        </tr>
+        </thead>
+        <tbody id="ordersBody">
+        <tr>
+          <td>1</td>
+          <td>ghj</td>
+          <td>$154.00</td>
+          <td>3</td>
+          <td>3.0%</td>
+          <td>$462.00</td>
+          <td>$13.86</td>
+          <td><strong>$475.86</strong></td>
+          <td class="text-end">
+            <button class="btn btn-sm btn-link text-danger p-0" data-id="1764992633878">
+              ✕
+            </button>
+          </td>
+        </tr>
+
+        <tr>
+          <td>2</td>
+          <td>ghj</td>
+          <td>$154.00</td>
+          <td>3</td>
+          <td>3.0%</td>
+          <td>$462.00</td>
+          <td>$13.86</td>
+          <td><strong>$475.86</strong></td>
+          <td class="text-end">
+            <button class="btn btn-sm btn-link text-danger p-0" data-id="1764992635690">
+              ✕
+            </button>
+          </td>
+        </tr>
+
+        <tr>
+          <td>3</td>
+          <td>ghj</td>
+          <td>$154.00</td>
+          <td>3</td>
+          <td>3.0%</td>
+          <td>$462.00</td>
+          <td>$13.86</td>
+          <td><strong>$475.86</strong></td>
+          <td class="text-end">
+            <button class="btn btn-sm btn-link text-danger p-0" data-id="1764992635937">
+              ✕
+            </button>
+          </td>
+        </tr>
+
+        <tr>
+          <td>4</td>
+          <td>ghj</td>
+          <td>$154.00</td>
+          <td>3</td>
+          <td>3.0%</td>
+          <td>$462.00</td>
+          <td>$13.86</td>
+          <td><strong>$475.86</strong></td>
+          <td class="text-end">
+            <button class="btn btn-sm btn-link text-danger p-0" data-id="1764992638724">
+              ✕
+            </button>
+          </td>
+        </tr>
+
+        <tr>
+          <td>5</td>
+          <td>ghj</td>
+          <td>$154.00</td>
+          <td>3</td>
+          <td>3.0%</td>
+          <td>$462.00</td>
+          <td>$13.86</td>
+          <td><strong>$475.86</strong></td>
+          <td class="text-end">
+            <button class="btn btn-sm btn-link text-danger p-0" data-id="1764992639112">
+              ✕
+            </button>
+          </td>
+        </tr>
+
+        <tr>
+          <td>6</td>
+          <td>asdfg</td>
+          <td>$65.00</td>
+          <td>2</td>
+          <td>3.0%</td>
+          <td>$130.00</td>
+          <td>$3.90</td>
+          <td><strong>$133.90</strong></td>
+          <td class="text-end">
+            <button class="btn btn-sm btn-link text-danger p-0" data-id="1764992668178">
+              ✕
+            </button>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<script>
+  let orders=[];const productNameInput=document.getElementById("productName"),productPriceInput=document.getElementById("productPrice"),quantityInput=document.getElementById("quantity"),taxRateInput=document.getElementById("taxRate"),summarySubtotal=document.getElementById("summarySubtotal"),summaryTax=document.getElementById("summaryTax"),summaryTotal=document.getElementById("summaryTotal"),summaryTaxRate=document.getElementById("summaryTaxRate"),ordersBody=document.getElementById("ordersBody"),ordersEmpty=document.getElementById("ordersEmpty"),ordersTableWrapper=document.getElementById("ordersTableWrapper");function formatMoney(t){return"$"+t.toFixed(2)}function calculateValues(){const t=parseFloat(productPriceInput.value)||0,e=parseInt(quantityInput.value)||0,a=(parseFloat(taxRateInput.value)||0)/100,r=t*e,n=r*a,o=r+n;return summaryTaxRate.textContent=(parseFloat(taxRateInput.value)||0).toString(),summarySubtotal.textContent=formatMoney(r),summaryTax.textContent=formatMoney(n),summaryTotal.textContent=formatMoney(o),{subtotal:r,tax:n,total:o,taxRate:100*a}}function renderOrders(){if(0===orders.length)return ordersEmpty.classList.remove("d-none"),void ordersTableWrapper.classList.add("d-none");ordersEmpty.classList.add("d-none"),ordersTableWrapper.classList.remove("d-none"),ordersBody.innerHTML=orders.map(((t,e)=>`\n                <tr>\n                    <td>${e+1}</td>\n                    <td>${t.productName||"-"}</td>\n                    <td>${formatMoney(t.price)}</td>\n                    <td>${t.qty}</td>\n                    <td>${t.taxRate.toFixed(1)}%</td>\n                    <td>${formatMoney(t.subtotal)}</td>\n                    <td>${formatMoney(t.tax)}</td>\n                    <td><strong>${formatMoney(t.total)}</strong></td>\n                    <td class="text-end">\n                        <button class="btn btn-sm btn-link text-danger p-0"\n                                data-id="${t.id}">\n                            ✕\n                        </button>\n                    </td>\n                </tr>\n            `)).join("")}function saveToStorage(){localStorage.setItem("salesOrders",JSON.stringify(orders))}function loadFromStorage(){const t=localStorage.getItem("salesOrders");if(t){try{orders=JSON.parse(t)||[]}catch(t){orders=[]}renderOrders()}}function addCurrentOrderToList(){const t=parseFloat(productPriceInput.value)||0,e=parseInt(quantityInput.value)||0;if(t<=0||e<=0)return void alert("Նախ գրիր product price և quantity։");const{subtotal:a,tax:r,total:n,taxRate:o}=calculateValues(),d={id:Date.now(),productName:productNameInput.value.trim(),price:t,qty:e,taxRate:o,subtotal:a,tax:r,total:n};orders.push(d),saveToStorage(),renderOrders()}function downloadCSV(){if(0===orders.length)return void alert("Պատմությունը դատարկ է, ներբեռնելու բան չկա 🙂");const t=[["Index","Product","Price","Quantity","TaxRate(%)","Subtotal","Tax","Total"],...orders.map(((t,e)=>[e+1,`"${(t.productName||"").replace(/"/g,'""')}"`,t.price.toFixed(2),t.qty,t.taxRate.toFixed(1),t.subtotal.toFixed(2),t.tax.toFixed(2),t.total.toFixed(2)]))].map((t=>t.join(","))).join("\n"),e=new Blob([t],{type:"text/csv;charset=utf-8;"}),a=URL.createObjectURL(e),r=document.createElement("a");r.href=a,r.download="sales-orders.csv",document.body.appendChild(r),r.click(),document.body.removeChild(r),URL.revokeObjectURL(a)}document.getElementById("btnCalculate").addEventListener("click",calculateValues),document.getElementById("btnAddToList").addEventListener("click",(()=>{calculateValues(),addCurrentOrderToList()})),document.getElementById("btnClearInputs").addEventListener("click",(()=>{productNameInput.value="",productPriceInput.value="",quantityInput.value=1,calculateValues()})),document.getElementById("btnResetAll").addEventListener("click",(()=>{confirm("Համոզվա՞ծ ես, որ ուզում ես մաքրել ամբողջ history-ն։")&&(orders=[],saveToStorage(),renderOrders())})),document.getElementById("btnDownloadCSV").addEventListener("click",downloadCSV),[productPriceInput,quantityInput,taxRateInput].forEach((t=>{t.addEventListener("input",calculateValues)})),ordersBody.addEventListener("click",(t=>{const e=t.target.closest("button[data-id]");if(!e)return;const a=Number(e.dataset.id);orders=orders.filter((t=>t.id!==a)),saveToStorage(),renderOrders()})),[productPriceInput,quantityInput,taxRateInput,productNameInput].forEach((t=>{t.addEventListener("keydown",(t=>{"Enter"===t.key&&(t.preventDefault(),calculateValues())}))})),calculateValues(),loadFromStorage();
+</script>
+</body>
+</html>

@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="hy">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>People Analytics Dashboard</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        :root{
+            --bg1:#f7f7ff;
+            --bg2:#eef2ff;
+            --card:rgba(255,255,255,.9);
+            --ink:#0f172a;
+            --muted:#64748b;
+            --accent:#6366f1;
+            --accent2:#22c55e;
+            --danger:#ef4444;
+            --shadow: 0 18px 45px rgba(2,6,23,.10);
+            --shadow2: 0 10px 30px rgba(2,6,23,.08);
+            --radius: 18px;
+        }
+
+        body{
+            min-height: 100vh;
+            background: radial-gradient(1200px 600px at 10% 10%, var(--bg2), transparent 60%),
+            radial-gradient(900px 500px at 90% 10%, #fde7f3, transparent 55%),
+            linear-gradient(180deg, var(--bg1), #ffffff 65%);
+            color: var(--ink);
+        }
+
+        .glass{
+            background: var(--card);
+            border: 1px solid rgba(15,23,42,.08);
+            box-shadow: var(--shadow);
+            border-radius: var(--radius);
+            backdrop-filter: blur(10px);
+        }
+
+        .soft{
+            box-shadow: var(--shadow2);
+            border-radius: 16px;
+            border: 1px solid rgba(15,23,42,.06);
+            background: rgba(255,255,255,.95);
+        }
+
+        .brand-badge{
+            display:inline-flex;
+            align-items:center;
+            gap:.5rem;
+            padding:.45rem .75rem;
+            border-radius: 999px;
+            background: rgba(99,102,241,.12);
+            color: #4338ca;
+            font-weight: 600;
+        }
+
+        .kpi{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap: 12px;
+            padding: 14px 16px;
+        }
+        .kpi .label{ color: var(--muted); font-size: .9rem; }
+        .kpi .value{ font-size: 1.35rem; font-weight: 800; letter-spacing: -.02em; }
+        .dot{
+            width: 10px; height: 10px; border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 0 6px rgba(99,102,241,.12);
+        }
+        .dot.green{ background: var(--accent2); box-shadow: 0 0 0 6px rgba(34,197,94,.12); }
+        .dot.red{ background: var(--danger); box-shadow: 0 0 0 6px rgba(239,68,68,.12); }
+
+        .table thead th{
+            color:#334155;
+            font-weight:700;
+            border-bottom: 1px solid rgba(15,23,42,.08);
+        }
+        .table td{
+            vertical-align: middle;
+            color:#0f172a;
+            border-top: 1px solid rgba(15,23,42,.06);
+        }
+        .pill{
+            padding: .25rem .6rem;
+            border-radius: 999px;
+            font-size: .82rem;
+            font-weight: 700;
+            border: 1px solid rgba(15,23,42,.08);
+            background: rgba(2,6,23,.02);
+            color:#334155;
+            display:inline-flex;
+            align-items:center;
+            gap:.35rem;
+        }
+        .pill.alive{ background: rgba(34,197,94,.10); color:#166534; border-color: rgba(34,197,94,.25); }
+        .pill.dead{ background: rgba(239,68,68,.10); color:#991b1b; border-color: rgba(239,68,68,.25); }
+
+        .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+        .small-muted{ color: var(--muted); font-size: .9rem; }
+        .section-title{ font-weight: 900; letter-spacing: -.02em; }
+        .btn-accent{
+            background: var(--accent);
+            border-color: var(--accent);
+            font-weight: 700;
+        }
+        .btn-accent:hover{ filter: brightness(.95); }
+        .form-control, .form-select{
+            border-radius: 14px;
+            border: 1px solid rgba(15,23,42,.10);
+        }
+
+        .sticky-tools{
+            position: sticky;
+            top: 14px;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container py-4">
+    <!-- Header -->
+    <div class="glass p-4 mb-4">
+        <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3">
+            <div>
+                <div class="brand-badge mb-2">
+                    <span class="dot"></span>
+                    People Analytics
+                </div>
+                <h1 class="h3 section-title mb-1">Անձանց տվյալների վերլուծության վահանակ</h1>
+                <div class="small-muted">
+                    Տվյալների հիման վրա հաշվարկում ենք միջին տարիքը, խմբավորումներ, սորտավորում, ծննդյան օրերի հաշվարկներ և այլն։
+                </div>
+            </div>
+            <div class="text-md-end">
+                <div class="small-muted">Այսօրվա օր</div>
+                <div class="fw-bold" id="todayText">—</div>
+            </div>
+        </div>
+
+        <!-- KPIs -->
+        <div class="row g-3 mt-3">
+            <div class="col-12 col-md-3">
+                <div class="soft kpi">
+                    <div>
+                        <div class="label">Մարդկանց քանակ</div>
+                        <div class="value" id="kpiTotal">—</div>
+                    </div>
+                    <span class="dot"></span>
+                </div>
+            </div>
+            <div class="col-12 col-md-3">
+                <div class="soft kpi">
+                    <div>
+                        <div class="label">Մահացածների թիվ</div>
+                        <div class="value" id="kpiDead">—</div>
+                    </div>
+                    <span class="dot red"></span>
+                </div>
+            </div>
+            <div class="col-12 col-md-3">
+                <div class="soft kpi">
+                    <div>
+                        <div class="label">Կենդանիքների թիվ</div>
+                        <div class="value" id="kpiAlive">—</div>
+                    </div>
+                    <span class="dot green"></span>
+                </div>
+            </div>
+            <div class="col-12 col-md-3">
+                <div class="soft kpi">
+                    <div>
+                        <div class="label">Միջին ապրած տարիներ</div>
+                        <div class="value" id="kpiAvgYears">—</div>
+                    </div>
+                    <span class="dot"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Tools -->
+        <div class="col-12 col-lg-4">
+            <div class="glass p-3 sticky-tools">
+                <h2 class="h5 section-title mb-3">Գործիքներ</h2>
+
+                <div class="mb-3">
+                    <label class="form-label small-muted">Որոնում անունով</label>
+                    <input id="searchInput" class="form-control" placeholder="օր․ Jack, Liam..." />
+                </div>
+
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <label class="form-label small-muted">Ամիս (ծնվածները)</label>
+                        <select id="monthSelect" class="form-select">
+                            <option value="">Բոլորը</option>
+                            <option value="1">Հունվար</option>
+                            <option value="2">Փետրվար</option>
+                            <option value="3">Մարտ</option>
+                            <option value="4">Ապրիլ</option>
+                            <option value="5">Մայիս</option>
+                            <option value="6">Հունիս</option>
+                            <option value="7">Հուլիս</option>
+                            <option value="8">Օգոստոս</option>
+                            <option value="9">Սեպտեմբեր</option>
+                            <option value="10">Հոկտեմբեր</option>
+                            <option value="11">Նոյեմբեր</option>
+                            <option value="12">Դեկտեմբեր</option>
+                        </select>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label small-muted">Սորտավորում</label>
+                        <select id="sortSelect" class="form-select">
+                            <option value="age_desc">Տարիքով՝ մեծից փոքր</option>
+                            <option value="age_asc">Տարիքով՝ փոքրից մեծ</option>
+                            <option value="name_asc">Անուն՝ A → Z</option>
+                            <option value="nextbday_asc">Մոտակա ծնունդ՝ շուտից</option>
+                            <option value="died_recent">Մահը՝ վերջերսից (եթե կա)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" role="switch" id="onlyDeadSwitch">
+                    <label class="form-check-label" for="onlyDeadSwitch">Ցույց տալ միայն մահացածներին</label>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button id="btnRecalc" class="btn btn-accent">
+                        Վերահաշվել / Թարմացնել
+                    </button>
+                    <button id="btnReset" class="btn btn-outline-secondary">
+                        Reset ֆիլտրերը
+                    </button>
+                </div>
+
+                <hr class="my-4">
+
+                <div class="small-muted mb-2">Արագ արդյունքներ</div>
+                <div class="soft p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="fw-bold">Ամենաերիտասարդ</div>
+                        <div id="youngestText" class="mono small-muted">—</div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="fw-bold">Ամենատարեց</div>
+                        <div id="oldestText" class="mono small-muted">—</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table + Insights -->
+        <div class="col-12 col-lg-8">
+            <div class="glass p-3">
+                <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-2 mb-3">
+                    <div>
+                        <h2 class="h5 section-title mb-1">Աղյուսակ (մարդիկ)</h2>
+                        <div class="small-muted">Տարիք, ապրած տարիներ, ծնունդի մոտիկ օրեր, մահվանից անցած օրեր…</div>
+                    </div>
+                    <div class="small-muted">
+                        Ցուցադրված՝ <span class="fw-bold" id="shownCount">—</span>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Անուն</th>
+                            <th>Ծնունդ</th>
+                            <th>Կարգավիճակ</th>
+                            <th class="text-end">Տարիք</th>
+                            <th class="text-end">Ապրած տարիներ</th>
+                            <th class="text-end">Մինչև հաջորդ ծնունդ (օր)</th>
+                            <th class="text-end">Մահվանից անցած օրեր</th>
+                        </tr>
+                        </thead>
+                        <tbody id="tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="row g-4 mt-1">
+                <div class="col-12">
+                    <div class="glass p-3">
+                        <h2 class="h5 section-title mb-2">Խմբավորում ըստ ծննդյան տասնամյակների</h2>
+                        <div class="small-muted mb-3">Օր․ 1980s, 1990s ... (քանակներ)</div>
+                        <div id="decadeGroups" class="d-flex flex-wrap gap-2"></div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="glass p-3">
+                        <h2 class="h5 section-title mb-2">Վերլուծություն</h2>
+                        <ul class="small-muted mb-0">
+                            <li><span class="fw-bold">Միջին ապրած տարիներ</span> հաշվվում է՝ (մահացածների համար՝ death - birth, կենդանի համար՝ today - birth)</li>
+                            <li><span class="fw-bold">Time difference (ծնունդ ↔ մահ)</span> ցուցադրվում է “Ապրած տարիներ” դաշտում (մահացածների համար՝ exact մինչև մահ)</li>
+                            <li><span class="fw-bold">Ծնված տվյալ ամսում</span> ֆիլտրով կարող ես արագ գտնել</li>
+                            <li><span class="fw-bold">Days since death</span> միայն մահացածների համար է հաշվվում</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    const personLists = [
+        { id: 1, name: "Arno", birthday: "1987-09-19", die: "2020-04-30" },
+        { id: 2, name: "Robin", birthday: "1963-02-04", die: "2024-09-01" },
+        { id: 3, name: "Jack", birthday: "2001-03-03", die: null },
+        { id: 4, name: "Elizabeth", birthday: "1995-08-23", die: null },
+        { id: 5, name: "Sean", birthday: "1980-09-23", die: "2006-02-16" },
+        { id: 6, name: "Liam", birthday: "1983-07-15", die: null },
+        { id: 7, name: "Sophia", birthday: "1990-05-28", die: "2015-03-10" },
+        { id: 8, name: "Emma", birthday: "2007-11-10", die: null },
+        { id: 9, name: "Oliver", birthday: "1974-01-05", die: "2023-07-20" },
+        { id: 10, name: "Ava", birthday: "1998-06-25", die: null },
+        { id: 11, name: "Mason", birthday: "1985-03-14", die: "2010-12-31" },
+        { id: 12, name: "Isabella", birthday: "1991-10-20", die: null },
+        { id: 13, name: "Jacob", birthday: "1967-02-12", die: "2018-08-07" },
+        { id: 14, name: "Emily", birthday: "2002-04-18", die: null },
+        { id: 15, name: "Lucas", birthday: "1996-08-11", die: null },
+        { id: 16, name: "Mia", birthday: "1979-12-30", die: "2014-05-15" },
+        { id: 17, name: "Noah", birthday: "1989-03-19", die: null },
+        { id: 18, name: "Charlotte", birthday: "1994-07-02", die: null },
+        { id: 19, name: "Elijah", birthday: "2000-09-08", die: null },
+        { id: 20, name: "Amelia", birthday: "1981-06-12", die: "2008-01-22" },
+        { id: 21, name: "James", birthday: "1975-11-30", die: "2016-09-13" },
+        { id: 22, name: "Evelyn", birthday: "1988-10-05", die: null },
+        { id: 23, name: "Logan", birthday: "1993-01-14", die: null },
+        { id: 24, name: "Lily", birthday: "2006-04-27", die: null },
+        { id: 25, name: "Benjamin", birthday: "1976-08-18", die: "2021-11-05" },
+        { id: 26, name: "Ella", birthday: "2003-05-03", die: null },
+        { id: 27, name: "Henry", birthday: "1984-02-17", die: null },
+        { id: 28, name: "Aiden", birthday: "1997-12-08", die: null },
+        { id: 29, name: "Scarlett", birthday: "1978-09-25", die: "2022-10-30" },
+        { id: 30, name: "Victoria", birthday: "1992-11-15", die: null },
+        { id: 31, name: "Matthew", birthday: "1982-01-01", die: "2019-07-12" },
+        { id: 32, name: "Layla", birthday: "2004-06-21", die: null },
+        { id: 33, name: "Harper", birthday: "2008-03-09", die: null },
+        { id: 34, name: "Jack", birthday: "1977-12-22", die: "2020-06-25" },
+        { id: 35, name: "Liam", birthday: "1999-08-01", die: null },
+        { id: 36, name: "Zoe", birthday: "1990-04-04", die: null },
+        { id: 37, name: "Chloe", birthday: "1986-10-11", die: null },
+        { id: 38, name: "Hannah", birthday: "1973-02-27", die: "2017-02-14" },
+        { id: 39, name: "Ryan", birthday: "1980-07-30", die: null },
+        { id: 40, name: "Abigail", birthday: "2005-01-19", die: null },
+    ];
+    const MS_DAY=864e5;function parseDateISO(e){const[t,n,a]=e.split("-").map(Number);return new Date(t,n-1,a,12,0,0)}function formatDate(e){if(!e)return"—";const t=parseDateISO(e);return`${String(t.getDate()).padStart(2,"0")}.${String(t.getMonth()+1).padStart(2,"0")}.${t.getFullYear()}`}function diffDays(e,t){return Math.floor((t-e)/MS_DAY)}function ageInYears(e,t){let n=t.getFullYear()-e.getFullYear();const a=t.getMonth()-e.getMonth();return(a<0||0===a&&t.getDate()<e.getDate())&&n--,n}function livedYearsPrecise(e,t){return(t-e)/MS_DAY/365.2425}function daysUntilNextBirthday(e,t){const n=t.getFullYear(),a=new Date(n,e.getMonth(),e.getDate(),12,0,0);return a<t&&a.setFullYear(n+1),Math.max(0,diffDays(t,a))}function decadeLabel(e){const t=e.getFullYear();return`${10*Math.floor(t/10)}s`}function buildComputedRows(e,t){return e.map((e=>{const n=parseDateISO(e.birthday),a=e.die?parseDateISO(e.die):null,r=!!a,s=r?a:t,l=ageInYears(n,s),d=livedYearsPrecise(n,s),o=daysUntilNextBirthday(n,t),c=r?Math.max(0,diffDays(a,t)):null,i=decadeLabel(n);return{...e,birthDate:n,dieDate:a,isDead:r,age:l,livedYears:d,nextBdayDays:o,daysSinceDeath:c,decade:i}}))}const el=e=>document.getElementById(e);function renderKPIs(e){const t=e.length,n=e.filter((e=>e.isDead)).length,a=t-n,r=e.reduce(((e,t)=>e+t.livedYears),0)/(t||1);el("kpiTotal").textContent=t,el("kpiDead").textContent=n,el("kpiAlive").textContent=a,el("kpiAvgYears").textContent=r.toFixed(1)}function renderYoungOld(e){if(!e.length)return el("youngestText").textContent="—",void(el("oldestText").textContent="—");const t=[...e].sort(((e,t)=>e.age-t.age)),n=t[0],a=t[t.length-1];el("youngestText").textContent=`${n.name} (${n.age})`,el("oldestText").textContent=`${a.name} (${a.age})`}function renderDecades(e){const t=e.reduce(((e,t)=>(e[t.decade]=(e[t.decade]||0)+1,e)),{}),n=Object.entries(t).sort(((e,t)=>parseInt(e[0],10)-parseInt(t[0],10)));el("decadeGroups").innerHTML=n.map((([e,t])=>`<span class="pill"><span class="mono">${e}</span> · ${t}</span>`)).join("")}function statusPill(e){return e?'<span class="pill dead">● Մահացած</span>':'<span class="pill alive">● Կենդանի</span>'}function renderTable(e){el("shownCount").textContent=e.length,el("tbody").innerHTML=e.map(((e,t)=>{const n=e.livedYears.toFixed(1),a=e.nextBdayDays,r=e.isDead?e.daysSinceDeath:"—";return`\n          <tr>\n            <td class="mono text-muted">${t+1}</td>\n            <td class="fw-bold">${e.name}</td>\n            <td class="mono">${formatDate(e.birthday)}</td>\n            <td>${statusPill(e.isDead)}</td>\n            <td class="text-end mono">${e.age}</td>\n            <td class="text-end mono">${n}</td>\n            <td class="text-end mono">${a}</td>\n            <td class="text-end mono">${r}</td>\n          </tr>\n        `})).join("")}function applyFiltersAndSort(e){const t=el("searchInput").value.trim().toLowerCase(),n=el("monthSelect").value?Number(el("monthSelect").value):null,a=el("onlyDeadSwitch").checked,r=el("sortSelect").value;let s=[...e];switch(n&&(s=s.filter((e=>e.birthDate.getMonth()+1===n))),t&&(s=s.filter((e=>e.name.toLowerCase().includes(t)))),a&&(s=s.filter((e=>e.isDead))),r){case"age_asc":s.sort(((e,t)=>e.age-t.age));break;case"age_desc":s.sort(((e,t)=>t.age-e.age));break;case"name_asc":s.sort(((e,t)=>e.name.localeCompare(t.name)));break;case"nextbday_asc":s.sort(((e,t)=>e.nextBdayDays-t.nextBdayDays));break;case"died_recent":s.sort(((e,t)=>{const n=e.dieDate?e.dieDate.getTime():-1/0;return(t.dieDate?t.dieDate.getTime():-1/0)-n}))}return s}function recalc(){const e=new Date;e.setHours(12,0,0,0);const t=String(e.getDate()).padStart(2,"0"),n=String(e.getMonth()+1).padStart(2,"0");el("todayText").textContent=`${t}.${n}.${e.getFullYear()}`;const a=buildComputedRows(personLists,e);renderKPIs(a),renderYoungOld(a),renderDecades(a);renderTable(applyFiltersAndSort(a))}el("btnRecalc").addEventListener("click",recalc),["searchInput","monthSelect","sortSelect","onlyDeadSwitch"].forEach((e=>{el(e).addEventListener("input",recalc),el(e).addEventListener("change",recalc)})),el("btnReset").addEventListener("click",(()=>{el("searchInput").value="",el("monthSelect").value="",el("sortSelect").value="age_desc",el("onlyDeadSwitch").checked=!1,recalc()})),recalc();
+</script>
+</body>
+</html>

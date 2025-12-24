@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Information UI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        *{
+            box-sizing: border-box;
+            font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+        }
+        body{
+            margin:0;
+            min-height:100vh;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            background:#f0f2f5;
+        }
+        .payment-wrap{
+            background:#fff;
+            padding:32px 40px;
+            border-radius:16px;
+            box-shadow:0 18px 40px rgba(15,23,42,.16);
+            max-width:960px;
+            width:100%;
+            display:flex;
+            gap:32px;
+            flex-wrap:wrap;
+        }
+        .payment-title{
+            width:100%;
+            font-size:24px;
+            font-weight:600;
+            text-align:center;
+            margin-bottom:8px;
+        }
+
+        /* Card */
+        .card-preview{
+            flex:0 0 320px;
+            background:linear-gradient(180deg,#d8d8d8,#9a9a9a);
+            border-radius:18px;
+            padding:20px 22px;
+            color:#fff;
+            position:relative;
+            box-shadow:0 12px 30px rgba(0,0,0,.25);
+        }
+        .card-chip{
+            width:54px;
+            height:38px;
+            border-radius:10px;
+            border:2px solid rgba(255,255,255,.8);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            margin-bottom:20px;
+        }
+        .card-chip::before{
+            content:"";
+            width:60%;
+            height:60%;
+            border-radius:8px;
+            border:2px solid rgba(255,255,255,.7);
+        }
+        .card-number-label{
+            font-size:11px;
+            text-transform:uppercase;
+            letter-spacing:.12em;
+            opacity:.9;
+        }
+        .card-number{
+            margin:6px 0 18px;
+            font-size:20px;
+            letter-spacing:.16em;
+            font-weight:500;
+            white-space:nowrap;
+        }
+        .card-bottom{
+            display:flex;
+            justify-content:space-between;
+            align-items:flex-end;
+            font-size:11px;
+            text-transform:uppercase;
+            letter-spacing:.14em;
+        }
+        .card-label{
+            opacity:.85;
+            margin-bottom:4px;
+        }
+        .card-name,
+        .card-exp{
+            font-size:12px;
+            letter-spacing:.18em;
+        }
+
+        /* Form */
+        .payment-form{
+            flex:1 1 320px;
+        }
+        .form-group{
+            margin-bottom:14px;
+        }
+        label{
+            display:block;
+            font-size:13px;
+            margin-bottom:4px;
+            color:#4b5563;
+        }
+        input{
+            width:100%;
+            border-radius:6px;
+            border:1px solid #d1d5db;
+            padding:8px 10px;
+            font-size:14px;
+            outline:none;
+            transition:border-color .18s, box-shadow .18s;
+        }
+        input:focus{
+            border-color:#111827;
+            box-shadow:0 0 0 1px #11182722;
+        }
+        .inline-row{
+            display:flex;
+            gap:10px;
+        }
+        .btn{
+            border-radius:6px;
+            border:1px solid #111827;
+            padding:8px 10px;
+            background:#111827;
+            color:#fff;
+            font-size:12px;
+            text-transform:uppercase;
+            letter-spacing:.12em;
+            cursor:pointer;
+            white-space:nowrap;
+            transition:background .18s, transform .08s;
+        }
+        .btn:active{
+            transform:scale(.97);
+        }
+        .btn-outline{
+            background:#f9fafb;
+            color:#111827;
+        }
+        .btn-outline:hover{
+            background:#e5e7eb;
+        }
+
+        @media (max-width:768px){
+            .payment-wrap{
+                padding:22px 18px 26px;
+            }
+            .payment-title{
+                text-align:left;
+            }
+            .card-preview{
+                margin:0 auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="payment-wrap">
+    <h2 class="payment-title">Payment Information</h2>
+
+    <!-- LEFT: CARD PREVIEW -->
+    <section class="card-preview">
+        <div class="card-chip"></div>
+
+        <div class="card-number-label">card number</div>
+        <div id="cardNumberPreview" class="card-number">0123 4567 8910 1112</div>
+
+        <div class="card-bottom">
+            <div>
+                <div class="card-label">cardholder name</div>
+                <div id="cardNamePreview" class="card-name">CODEHIM</div>
+            </div>
+            <div>
+                <div class="card-label">expiration</div>
+                <div id="cardExpPreview" class="card-exp">01/23</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- RIGHT: FORM -->
+    <section class="payment-form">
+        <div class="form-group">
+            <label for="nameInput">Name</label>
+            <input id="nameInput" type="text" placeholder="John Doe">
+        </div>
+
+        <div class="form-group">
+            <label for="cardNumberInput">Card Number</label>
+            <div class="inline-row">
+                <input id="cardNumberInput" type="text" maxlength="19" placeholder="0000 0000 0000 0000">
+                <button type="button" id="generateBtn" class="btn btn-outline">generate random</button>
+            </div>
+        </div>
+
+        <div class="inline-row">
+            <div class="form-group" style="flex:1;">
+                <label for="expInput">Expiration (mm/yy)</label>
+                <input id="expInput" type="text" maxlength="5" placeholder="01/26">
+            </div>
+            <div class="form-group" style="flex:1;">
+                <label for="cvvInput">Security Code</label>
+                <input id="cvvInput" type="text" maxlength="4" placeholder="123">
+            </div>
+        </div>
+
+        <div class="form-group" style="margin-top:10px;">
+            <button class="btn" type="button">Submit Payment</button>
+        </div>
+    </section>
+</div>
+
+<script>
+    const nameInput=document.getElementById("nameInput"),cardNumberInput=document.getElementById("cardNumberInput"),expInput=document.getElementById("expInput"),cardNamePreview=document.getElementById("cardNamePreview"),cardNumberPreview=document.getElementById("cardNumberPreview"),cardExpPreview=document.getElementById("cardExpPreview"),generateBtn=document.getElementById("generateBtn");function formatCardNumber(e){return e.replace(/\D/g,"").slice(0,16).replace(/(.{4})/g,"$1 ").trim()}nameInput.addEventListener("input",(()=>{const e=nameInput.value.trim();cardNamePreview.textContent=e||"CARDHOLDER NAME"})),cardNumberInput.addEventListener("input",(()=>{const e=formatCardNumber(cardNumberInput.value);cardNumberInput.value=e,cardNumberPreview.textContent=e||"0000 0000 0000 0000"})),expInput.addEventListener("input",(()=>{let e=expInput.value.replace(/[^\d]/g,"").slice(0,4);e.length>=3&&(e=e.slice(0,2)+"/"+e.slice(2)),expInput.value=e,cardExpPreview.textContent=e||"01/23"})),generateBtn.addEventListener("click",(()=>{let e="";for(let t=0;t<16;t++)e+=Math.floor(10*Math.random());const t=formatCardNumber(e);cardNumberInput.value=t,cardNumberPreview.textContent=t}));
+</script>
+
+</body>
+</html>

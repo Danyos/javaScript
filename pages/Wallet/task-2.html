@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8">
+    <title>Դրամապանակ • Քարտապահներ • Mini App v2</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap 5 -->
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+    >
+
+    <style>
+        body {
+            background: radial-gradient(circle at top left, #e0f2fe, #f4f4f5);
+            min-height: 100vh;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+        .app-title {
+            font-weight: 700;
+            letter-spacing: 0.04em;
+        }
+        .card {
+            border: none;
+            border-radius: 14px;
+        }
+        .card.shadow-sm {
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+        }
+        #wallet-balance {
+            font-weight: 700;
+        }
+        .history-wrap {
+            max-height: 320px;
+            overflow-y: auto;
+        }
+        .list-group-item.active-card {
+            background-color: #0d6efd10;
+        }
+    </style>
+</head>
+<body>
+<div class="container py-4">
+    <!-- Header -->
+    <div class="text-center mb-3">
+        <h1 class="app-title mb-1">Դրամապանակ & Քարտապահներ • Mini App v2</h1>
+        <p class="text-muted mb-0 small">
+            Դրամապանակ, քարտապահներ, լիցքավորում, վճարումներ ու պատմություն 💳💸
+        </p>
+    </div>
+
+    <!-- Global selected cardholder -->
+    <div class="alert alert-light border d-flex align-items-center justify-content-between mb-3">
+        <div>
+            <div class="small text-muted text-uppercase">Ընտրված քարտապահ</div>
+            <select id="card-select" class="form-select form-select-sm"></select>
+        </div>
+        <span class="small text-muted">
+            Բոլոր գործողությունները կատարվում են ընտրված քարտապահի հաշվով։
+        </span>
+    </div>
+
+    <div class="row g-3">
+        <!-- Wallet + Transfers -->
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="mb-2">Իմ դրամապանակը</h5>
+                    <div class="display-6 mb-2" id="wallet-balance">0 ֏</div>
+                    <p class="text-muted small">
+                        Սկզբնական դրվում է 100,000 ֏, ուսանողը կարող է փորձարկել փոխանցումներ։
+                    </p>
+                    <hr>
+
+                    <h6 class="small text-uppercase text-muted mb-2">Փոխանցումներ դրամապանակ ↔ քարտապահ</h6>
+
+                    <div class="mb-2">
+                        <label for="amount-input" class="form-label small">Գումար</label>
+                        <input type="number" min="1" id="amount-input" class="form-control"
+                               placeholder="Օր. 10000">
+                    </div>
+
+                    <div class="d-grid gap-2 mb-2">
+                        <button class="btn btn-success" id="btn-send">
+                            💸 Փոխանցել քարտապահին (դրամապանակից)
+                        </button>
+                        <button class="btn btn-outline-primary" id="btn-receive">
+                            💸 Ստանալ քարտապահից (դրամապանակ)
+                        </button>
+                    </div>
+
+                    <small id="message" class="small text-muted"></small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card holders + Top-up + Filter -->
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="mb-0">Քարտապահներ</h5>
+                        <button class="btn btn-sm btn-outline-secondary"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#addCardCollapse">
+                            + Նոր քարտապահ
+                        </button>
+                    </div>
+
+                    <div id="addCardCollapse" class="collapse mb-3">
+                        <label class="form-label small mb-1">Նոր քարտապահի անուն</label>
+                        <div class="input-group input-group-sm">
+                            <input type="text" id="new-card-name" class="form-control"
+                                   placeholder="Օր. Արման">
+                            <button class="btn btn-outline-success" id="btn-add-card">
+                                Ավելացնել
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Top-up section -->
+                    <div class="border rounded-3 p-2 mb-3 bg-light">
+                        <h6 class="small text-uppercase text-muted mb-2">Լիցքավորում (արտաքին աղբյուրից)</h6>
+                        <div class="input-group input-group-sm mb-2">
+                            <input type="number" min="1" id="topup-amount-input"
+                                   class="form-control" placeholder="Գումար քարտապահի հաշվին">
+                            <button class="btn btn-outline-dark" id="btn-topup">
+                                🔋 Լիցքավորել
+                            </button>
+                        </div>
+                        <small class="text-muted small">
+                            Սա նման է այն բանին, որ քարտապահը գումար է գցում իր հաշվին բանկոմատով։
+                        </small>
+                    </div>
+
+                    <!-- Card list -->
+                    <ul class="list-group small flex-grow-1 mb-3" id="card-list">
+                        <!-- Քարտապահները կհայտնվեն այստեղ -->
+                    </ul>
+
+                    <!-- History filter by card -->
+                    <div class="d-flex justify-content-between align-items-center">
+                        <button class="btn btn-sm btn-outline-primary" id="btn-filter-history-card">
+                            🧾 Ցույց տալ միայն այս քարտապահի պատմությունը
+                        </button>
+                        <button class="btn btn-sm btn-link text-decoration-none" id="btn-clear-filter">
+                            Մաքրել ֆիլտրը
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payments + History -->
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="mb-2">Վճարումներ & Պատմություն</h5>
+
+                    <!-- Payments -->
+                    <div class="border rounded-3 p-2 mb-3 bg-light">
+                        <h6 class="small text-uppercase text-muted mb-2">Վճարումներ ծառայություններին (քարտապահի հաշվից)</h6>
+                        <div class="mb-2">
+                            <label class="form-label small" for="service-select">Ծառայություն</label>
+                            <select id="service-select" class="form-select form-select-sm"></select>
+                        </div>
+                        <div class="input-group input-group-sm mb-2">
+                            <input type="number" min="1" id="payment-amount-input"
+                                   class="form-control" placeholder="Վճարման գումար">
+                            <button class="btn btn-outline-danger" id="btn-pay-service">
+                                Վճարել
+                            </button>
+                        </div>
+                        <small class="text-muted small">
+                            Վճարումը կատարվում է <strong>ընրված քարտապահի</strong> հաշվից (ոչ թե դրամապանակից)։
+                        </small>
+                    </div>
+
+                    <!-- History -->
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="small text-muted">Պատմություն</span>
+                        <span class="small" id="history-filter-label"></span>
+                    </div>
+
+                    <div class="history-wrap flex-grow-1 mb-2">
+                        <ul class="list-group list-group-flush small" id="history-list">
+                            <li class="list-group-item text-muted">
+                                Դեռ գործարքներ չկան
+                            </li>
+                        </ul>
+                    </div>
+
+                    <button class="btn btn-sm btn-link mt-1 align-self-start" id="btn-clear-history">
+                        Մաքրել ամբողջ պատմությունը
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    const wallet={balance:1e5};let cards=[{id:1,name:"Արմեն",balance:25e3},{id:2,name:"Անի",balance:15e3},{id:3,name:"Դավիթ",balance:5e3}];const services=[{id:"internet",name:"Ինտերնետ"},{id:"utilities",name:"Կոմունալ վճարներ"},{id:"market",name:"Խանութ"},{id:"mobile",name:"Բջջային կապ"}];let history=[],historyFilterCardId=null;const walletBalanceEl=document.getElementById("wallet-balance"),amountInputEl=document.getElementById("amount-input"),cardSelectEl=document.getElementById("card-select"),cardListEl=document.getElementById("card-list"),historyListEl=document.getElementById("history-list"),historyFilterLabelEl=document.getElementById("history-filter-label"),messageEl=document.getElementById("message"),btnSend=document.getElementById("btn-send"),btnReceive=document.getElementById("btn-receive"),btnAddCard=document.getElementById("btn-add-card"),btnTopup=document.getElementById("btn-topup"),btnClearHistory=document.getElementById("btn-clear-history"),btnFilterHistoryCard=document.getElementById("btn-filter-history-card"),btnClearFilter=document.getElementById("btn-clear-filter"),newCardNameEl=document.getElementById("new-card-name"),topupAmountEl=document.getElementById("topup-amount-input"),serviceSelectEl=document.getElementById("service-select"),paymentAmountEl=document.getElementById("payment-amount-input"),btnPayService=document.getElementById("btn-pay-service");function formatAmount(e){return e.toLocaleString("hy-AM")+" ֏"}function showMessage(e,t="muted"){messageEl.textContent=e,messageEl.className="small text-"+t}function getSelectedCard(){const e=Number(cardSelectEl.value);return cards.find((t=>t.id===e))}function getCardNameById(e){const t=cards.find((t=>t.id===e));return t?t.name:"անհայտ քարտապահ"}function renderWallet(){walletBalanceEl.textContent=formatAmount(wallet.balance)}function renderCards(){cardSelectEl.innerHTML="",cards.forEach((e=>{const t=document.createElement("option");t.value=e.id,t.textContent=`${e.name} (${formatAmount(e.balance)})`,cardSelectEl.appendChild(t)})),!cardSelectEl.value&&cards[0]&&(cardSelectEl.value=String(cards[0].id));const e=Number(cardSelectEl.value);cardListEl.innerHTML="",cards.forEach((t=>{const n=document.createElement("li");n.className="list-group-item d-flex justify-content-between align-items-center",n.dataset.id=t.id,t.id===e&&n.classList.add("active-card"),n.innerHTML=`\n                <span>\n                    ${t.name}\n                    ${t.id===e?'<span class="badge bg-primary ms-2">Ակտիվ</span>':""}\n                </span>\n                <span class="badge bg-dark rounded-pill">${formatAmount(t.balance)}</span>\n            `,cardListEl.appendChild(n)}))}function renderServices(){serviceSelectEl.innerHTML="",services.forEach((e=>{const t=document.createElement("option");t.value=e.id,t.textContent=e.name,serviceSelectEl.appendChild(t)}))}function renderHistory(){historyListEl.innerHTML="";const e=historyFilterCardId?history.filter((e=>e.involvedCardIds.includes(historyFilterCardId))):history;if(0===e.length){const e=document.createElement("li");return e.className="list-group-item text-muted",e.textContent="Դեռ գործարքներ չկան",void historyListEl.appendChild(e)}e.slice().reverse().forEach((e=>{const t=document.createElement("li");t.className="list-group-item",t.innerHTML=`\n                <div class="d-flex justify-content-between">\n                  <div>\n                    <strong>${e.type}</strong> • ${e.from} → ${e.to}\n                  </div>\n                  <span>${formatAmount(e.amount)}</span>\n                </div>\n                <div class="text-muted small">${e.time}</div>\n            `,historyListEl.appendChild(t)}))}function updateHistoryFilterLabel(){if(!historyFilterCardId)return void(historyFilterLabelEl.textContent="");const e=getCardNameById(historyFilterCardId);historyFilterLabelEl.textContent=`Ֆիլտր՝ միայն «${e}» քարտապահի գործարքները`}function addHistory({type:e,from:t,to:n,amount:a,involvedCardIds:r=[]}){history.push({type:e,from:t,to:n,amount:a,time:(new Date).toLocaleString("hy-AM"),involvedCardIds:r}),renderHistory()}cardListEl.addEventListener("click",(e=>{const t=e.target.closest("li[data-id]");if(!t)return;const n=Number(t.dataset.id);cardSelectEl.value=String(n),renderCards(),updateHistoryFilterLabel(),renderHistory(),showMessage(`Ընտրեցիր «${getCardNameById(n)}» քարտապահին։`,"muted")})),cardSelectEl.addEventListener("change",(()=>{renderCards(),updateHistoryFilterLabel(),renderHistory();const e=getSelectedCard();e&&showMessage(`Ընտրված է «${e.name}» քարտապահը։`,"muted")})),btnSend.addEventListener("click",(()=>{const e=Number(amountInputEl.value),t=getSelectedCard();t?!e||e<=0?showMessage("Գումարը պետք է լինի դրական թիվ։","danger"):wallet.balance<e?showMessage("Դրամապանակում բավարար գումար չկա։","danger"):(wallet.balance-=e,t.balance+=e,renderWallet(),renderCards(),addHistory({type:"Փոխանցում (դրամապանակ → քարտապահ)",from:"Դրամապանակ",to:t.name,amount:e,involvedCardIds:[t.id]}),showMessage("Գործարքը հաջողությամբ կատարվեց։","success"),amountInputEl.value=""):showMessage("Խնդրում եմ ընտրել քարտապահի։","danger")})),btnReceive.addEventListener("click",(()=>{const e=Number(amountInputEl.value),t=getSelectedCard();t?!e||e<=0?showMessage("Գումարը պետք է լինի դրական թիվ։","danger"):t.balance<e?showMessage("Քարտապահի հաշվին բավարար գումար չկա։","danger"):(t.balance-=e,wallet.balance+=e,renderWallet(),renderCards(),addHistory({type:"Ստացում (քարտապահ → դրամապանակ)",from:t.name,to:"Դրամապանակ",amount:e,involvedCardIds:[t.id]}),showMessage("Գումարը ստացվեց քարտապահից դրամապանակ։","success"),amountInputEl.value=""):showMessage("Խնդրում եմ ընտրել քարտապահի։","danger")})),btnTopup.addEventListener("click",(()=>{const e=Number(topupAmountEl.value),t=getSelectedCard();t?!e||e<=0?showMessage("Լիցքավորման գումարը պետք է լինի դրական։","danger"):(t.balance+=e,renderCards(),addHistory({type:"Լիցքավորում (արտաքին աղբյուրից)",from:"Արտաքին աղբյուր",to:t.name,amount:e,involvedCardIds:[t.id]}),showMessage(`Քարտապահ «${t.name}»-ի հաշվին լիցքավորեցիր գումար։`,"success"),topupAmountEl.value=""):showMessage("Սկզբում ընտրիր քարտապահ, որին լիցքավորում ես։","danger")})),btnPayService.addEventListener("click",(()=>{const e=getSelectedCard(),t=Number(paymentAmountEl.value),n=serviceSelectEl.value,a=services.find((e=>e.id===n));e?a?!t||t<=0?showMessage("Վճարման գումարը պետք է լինի դրական։","danger"):e.balance<t?showMessage("Քարտապահի հաշվին բավարար գումար չկա վճարելու համար։","danger"):(e.balance-=t,renderCards(),addHistory({type:"Վճարում ծառայությանը",from:e.name,to:a.name,amount:t,involvedCardIds:[e.id]}),showMessage(`Քարտապահ «${e.name}»-ից վճարեցիր «${a.name}» ծառայությանը։`,"success"),paymentAmountEl.value=""):showMessage("Ընտրիր ծառայություն։","danger"):showMessage("Վճարում կատարելու համար ընտրիր քարտապահ։","danger")})),btnClearHistory.addEventListener("click",(()=>{history=[],renderHistory(),showMessage("Պատմությունը մաքրվեց։","muted")})),btnFilterHistoryCard.addEventListener("click",(()=>{const e=getSelectedCard();e?(historyFilterCardId=e.id,updateHistoryFilterLabel(),renderHistory(),showMessage(`Ցույց է տրվում միայն «${e.name}» քարտապահի պատմությունը։`,"muted")):showMessage("Սկզբում ընտրիր քարտապահ, որի պատմությունը ես ուզում։","danger")})),btnClearFilter.addEventListener("click",(()=>{historyFilterCardId=null,updateHistoryFilterLabel(),renderHistory(),showMessage("Ֆիլտրը մաքրվեց, ցուցադրվում է ամբողջ պատմությունը։","muted")})),btnAddCard.addEventListener("click",(()=>{const e=newCardNameEl.value.trim();if(!e)return void showMessage("Նոր քարտապահի անունը դատարկ է։","danger");const t={id:Date.now(),name:e,balance:0};cards.push(t),renderCards(),cardSelectEl.value=String(t.id),renderCards(),showMessage(`Ավելացվեց նոր քարտապահ «${e}»։`,"success"),newCardNameEl.value=""})),renderWallet(),renderCards(),renderServices(),renderHistory(),updateHistoryFilterLabel(),showMessage("Ընտրիր քարտապահ, փորձիր լիցքավորել, կատարել փոխանցումներ ու վճարումներ։");</script>
+</body>
+</html>

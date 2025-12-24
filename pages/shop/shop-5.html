@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cart Dashboard UI</title>
+    <style>
+        :root{
+            --bg:#ffffff;
+            --card:#ffffff;
+            --muted:#6b7280;
+            --text:#0b0b0b;
+            --stroke:#e7e7e7;
+            --soft:#f7f7f7;
+            --shadow:0 12px 28px rgba(0,0,0,.08);
+            --radius:18px;
+            --radius2:14px;
+            --black:#000;
+        }
+        *{box-sizing:border-box}
+        body{
+            margin:0;
+            min-height:100vh;
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+            background:var(--bg);
+            color:var(--text);
+            padding:28px 14px;
+        }
+        .container{max-width:1100px;margin:0 auto;display:grid;gap:14px;}
+        .card{background:var(--card);border:1px solid var(--stroke);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
+        .card-h{padding:16px 18px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--stroke);gap:10px;}
+        .title{display:flex;align-items:center;gap:10px;font-weight:900;letter-spacing:.2px;}
+        .dot{width:10px;height:10px;border-radius:999px;background:var(--black);display:inline-block;}
+        .badges{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+        .badge{font-size:12px;padding:5px 10px;border-radius:999px;border:1px solid var(--stroke);background:var(--soft);color:var(--muted);white-space:nowrap;}
+        .badge.ok{background:#f3fdf3;border-color:#cdeccd;color:#1b6b1b}
+        .badge.warn{background:#fff7ed;border-color:#f5d9b8;color:#8a4b00}
+        .badge.danger{background:#fff1f2;border-color:#f2c2c8;color:#a00010}
+
+        .grid{display:grid;grid-template-columns: 1.35fr .65fr;gap:14px;align-items:start;}
+        @media (max-width: 980px){.grid{grid-template-columns:1fr}}
+
+        .kpi-wrap{padding:14px;display:grid;grid-template-columns: repeat(4, 1fr);gap:10px;}
+        @media (max-width: 980px){.kpi-wrap{grid-template-columns: repeat(2, 1fr);}}
+        .kpi{border:1px solid var(--stroke);border-radius:var(--radius2);background:#fafafa;padding:12px 12px;}
+        .kpi .label{font-size:12px;color:var(--muted);margin-bottom:6px;display:flex;justify-content:space-between;gap:8px;}
+        .kpi .val{font-size:18px;font-weight:900;letter-spacing:.2px;}
+        .kpi .sub{font-size:12px;color:var(--muted);margin-top:6px;}
+
+        .panel{padding:14px;display:grid;gap:12px;}
+        .row{display:grid;grid-template-columns: 1fr 1fr;gap:10px;}
+        @media (max-width: 520px){.row{grid-template-columns:1fr}}
+
+        .field label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;}
+        .field input, .field select{
+            width:100%;height:44px;border-radius:12px;border:1px solid var(--stroke);
+            padding:10px 12px;outline:none;background:#fff;color:var(--text);transition:.15s ease;
+        }
+        .field input:focus, .field select:focus{border-color:var(--black)}
+        .help{font-size:12px;color:var(--muted);line-height:1.35;margin-top:2px;}
+
+        .btn{
+            height:44px;border-radius:12px;border:1px solid var(--black);background:var(--black);color:#fff;
+            font-weight:900;letter-spacing:.2px;padding:0 14px;cursor:pointer;transition:.15s ease;
+            display:inline-flex;align-items:center;justify-content:center;gap:8px;user-select:none;
+        }
+        .btn:hover{background:#fff;color:var(--black)}
+        .btn.ghost{background:#fff;color:var(--black);}
+        .btn.ghost:hover{background:var(--black);color:#fff}
+
+        .add{padding:14px;display:grid;gap:10px;}
+        .add-grid{display:grid;grid-template-columns: 1.4fr .7fr .7fr auto;gap:10px;}
+        @media (max-width: 980px){.add-grid{grid-template-columns: 1fr 1fr}.add-grid .btn{grid-column:1 / -1}}
+
+        .list{padding:14px;}
+        ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+        li.item{
+            border:1px solid var(--stroke);border-radius:var(--radius2);background:#fafafa;padding:12px;
+            display:grid;grid-template-columns: 1.2fr .9fr .6fr;gap:10px;align-items:center;
+        }
+        @media (max-width: 720px){li.item{grid-template-columns: 1fr; gap:10px;}}
+        .item-left .name{font-weight:900;font-size:14px;color:var(--text);display:flex;align-items:center;gap:8px;}
+        .sku{
+            font-size:12px;color:var(--muted);border:1px solid var(--stroke);background:#fff;
+            padding:3px 8px;border-radius:999px;
+        }
+        .item-left .meta{margin-top:6px;display:flex;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--muted);}
+        .pill{border:1px solid var(--stroke);background:#fff;padding:4px 9px;border-radius:999px;}
+
+        .qty{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;}
+        .iconbtn{
+            width:40px;height:40px;border-radius:12px;border:1px solid var(--stroke);background:#fff;
+            cursor:pointer;font-weight:900;transition:.15s ease;
+        }
+        .iconbtn:hover{border-color:var(--black)}
+        .qty input{
+            width:80px;height:40px;border-radius:12px;border:1px solid var(--stroke);
+            text-align:center;font-weight:800;outline:none;
+        }
+        .right{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+        .money{font-weight:1000;font-size:16px;color:var(--text);letter-spacing:.2px;white-space:nowrap;}
+        .remove{
+            width:44px;height:44px;border-radius:14px;border:1px solid var(--stroke);
+            background:#fff;cursor:pointer;font-weight:900;transition:.15s ease;
+        }
+        .remove:hover{border-color:#a00010;color:#a00010}
+        .foot{
+            padding:14px 18px;border-top:1px solid var(--stroke);
+            display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;
+        }
+        .note{font-size:12px;color:var(--muted);}
+        .err{font-size:12px;color:#a00010;margin-top:4px;display:none;}
+        .field.invalid input{border-color:#a00010}
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- HEADER + STATUS -->
+    <div class="card">
+        <div class="card-h">
+            <div class="title"><span class="dot"></span>Cart Dashboard</div>
+            <div class="badges">
+                <span id="badgeBudget" class="badge ok">Budget: OK</span>
+                <span id="badgeShipping" class="badge">Shipping: —</span>
+                <span id="badgeLow" class="badge warn">Low stock: 0</span>
+                <span id="badgeItems" class="badge">Items: 0</span>
+            </div>
+        </div>
+
+        <!-- KPI CARDS -->
+        <div class="kpi-wrap">
+            <div class="kpi">
+                <div class="label"><span>Subtotal</span><span class="badge">Σ price*qty</span></div>
+                <div id="kpiSubtotal" class="val">0 ֏</div>
+                <div class="sub">Before discount/tax</div>
+            </div>
+
+            <div class="kpi">
+                <div class="label"><span>Discount</span><span id="kpiDiscountType" class="badge">—</span></div>
+                <div id="kpiDiscount" class="val">0 ֏</div>
+                <div class="sub">Promo applied</div>
+            </div>
+
+            <div class="kpi">
+                <div class="label"><span>Tax (VAT)</span><span id="kpiVatRate" class="badge">0%</span></div>
+                <div id="kpiTax" class="val">0 ֏</div>
+                <div class="sub">Calculated from subtotal</div>
+            </div>
+
+            <div class="kpi">
+                <div class="label"><span>Grand Total</span><span class="badge">Final</span></div>
+                <div id="kpiGrand" class="val">0 ֏</div>
+                <div class="sub">Incl. shipping</div>
+            </div>
+        </div>
+
+        <div class="foot">
+            <div class="note">All calculations are derived. (React-ում հետո useMemo-ով)</div>
+            <button id="btnCheckout" class="btn ghost">Checkout</button>
+        </div>
+    </div>
+
+    <div class="grid">
+
+        <!-- LEFT: LIST + SEARCH/SORT -->
+        <div class="card">
+            <div class="card-h">
+                <div class="title">Items</div>
+                <div class="badges">
+                    <span class="badge">Merged duplicates: ON</span>
+                    <span class="badge">localStorage: ON</span>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="row">
+                    <div class="field">
+                        <label>Search</label>
+                        <input id="searchInput" type="text" placeholder="search by title..." />
+                    </div>
+                    <div class="field">
+                        <label>Sort</label>
+                        <select id="sortSelect">
+                            <option value="total_desc">Most expensive (total)</option>
+                            <option value="total_asc">Cheapest (total)</option>
+                            <option value="qty_desc">Highest qty</option>
+                            <option value="name_asc">Name A→Z</option>
+                            <option value="newest">Newest</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="list">
+                <ul id="itemsList"></ul>
+            </div>
+        </div>
+
+        <!-- RIGHT: ADD ITEM + PRICING CONTROLS -->
+        <div class="card">
+            <div class="card-h">
+                <div class="title">Controls</div>
+                <div class="badges">
+                    <span class="badge">Discount • Tax • Shipping</span>
+                </div>
+            </div>
+
+            <!-- ADD ITEM -->
+            <div class="add">
+                <div class="title" style="font-size:13px;font-weight:900;">Add item</div>
+
+                <div class="add-grid">
+                    <div class="field" id="fTitle">
+                        <input id="inTitle" type="text" placeholder="title (e.g. mouse)" />
+                        <div class="err">Title min 2 chars</div>
+                    </div>
+                    <div class="field" id="fPrice">
+                        <input id="inPrice" type="text" placeholder="price" />
+                        <div class="err">Price must be a number ≥ 0</div>
+                    </div>
+                    <div class="field" id="fQty">
+                        <input id="inQty" type="text" placeholder="qty" />
+                        <div class="err">Qty must be an integer ≥ 0</div>
+                    </div>
+
+                    <button id="btnAdd" class="btn">Save</button>
+                </div>
+                <div class="help">price/qty → թույլ կտանք միայն թվեր (JS validation)</div>
+            </div>
+
+            <div class="panel" style="border-top:1px solid var(--stroke);">
+                <div class="row">
+                    <div class="field">
+                        <label>Discount type</label>
+                        <select id="discountType">
+                            <option value="percent">Percent (%)</option>
+                            <option value="fixed">Fixed (֏)</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Discount value</label>
+                        <input id="discountValue" type="text" placeholder="e.g. 10 or 15000" />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="field">
+                        <label>VAT (Tax)</label>
+                        <select id="vatRate">
+                            <option value="0">0%</option>
+                            <option value="5">5%</option>
+                            <option value="20" selected>20%</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Budget (optional)</label>
+                        <input id="budgetValue" type="text" placeholder="e.g. 250000" />
+                        <div class="help">Budget badge: OK / Over</div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="field">
+                        <label>Shipping rule</label>
+                        <select id="shippingRule">
+                            <option value="free_over_100k">Free over 100,000 ֏ else 5,000 ֏</option>
+                            <option value="always_free">Always free</option>
+                            <option value="always_5000">Always 5,000 ֏</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Quick actions</label>
+                        <div style="display:flex;gap:10px;flex-wrap:wrap">
+                            <button id="btnClear" class="btn ghost" style="height:44px">Clear cart</button>
+                            <button id="btnSeed" class="btn" style="height:44px">Load demo</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="help">
+                    Մտածել՝ subtotal → discount → taxable → tax → shipping → grandTotal
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    (()=>{const t="mini_cart_v1",e=t=>(Number(t)||0).toLocaleString("en-US")+" ֏",n=()=>Math.random().toString(16).slice(2)+Date.now().toString(16),s=t=>document.querySelector(t),i=s("#itemsList"),a=s("#searchInput"),r=s("#sortSelect"),c=s("#inTitle"),o=s("#inPrice"),l=s("#inQty"),u=s("#btnAdd"),d=s("#fTitle"),g=s("#fPrice"),p=s("#fQty"),m=s("#discountType"),v=s("#discountValue"),b=s("#vatRate"),y=s("#budgetValue"),h=s("#shippingRule"),f=s("#btnClear"),N=s("#btnSeed"),q=s("#btnCheckout"),L=s("#badgeBudget"),k=s("#badgeShipping"),w=s("#badgeLow"),C=s("#badgeItems"),S=s("#kpiSubtotal"),x=s("#kpiDiscount"),E=s("#kpiDiscountType"),R=s("#kpiTax"),T=s("#kpiVatRate"),$=s("#kpiGrand");let A=function(){try{const e=localStorage.getItem(t);if(!e)return null;const n=JSON.parse(e);return n&&Array.isArray(n.items)?(n.settings||={},{items:n.items,settings:{search:n.settings.search??"",sort:n.settings.sort??"total_desc",discountType:n.settings.discountType??"percent",discountValue:n.settings.discountValue??"",vatRate:n.settings.vatRate??"20",budget:n.settings.budget??"",shippingRule:n.settings.shippingRule??"free_over_100k"}}):null}catch(t){return null}}()||{items:[],settings:{search:"",sort:"total_desc",discountType:"percent",discountValue:"",vatRate:"20",budget:"",shippingRule:"free_over_100k"}};const M=[{id:n(),title:"Mouse",price:8e3,qty:3,createdAt:Date.now()-5e4},{id:n(),title:"Keyboard",price:12e3,qty:2,createdAt:Date.now()-4e4},{id:n(),title:"Lamp",price:15e3,qty:0,createdAt:Date.now()-3e4},{id:n(),title:"Mouse",price:8e3,qty:1,createdAt:Date.now()-2e4}];function _(){localStorage.setItem(t,JSON.stringify(A))}const V=t=>{const e=String(t??"").replace(/[^\d.]/g,"");return""===e.trim()?NaN:Number(e)};function D(t,e){t.classList.toggle("invalid",e);const n=t.querySelector(".err");n&&(n.style.display=e?"block":"none")}function I(){const t=function(t){const e=new Map;for(const n of t){const t=(n.title||"").trim().toLowerCase()+"::"+Number(n.price||0);if(e.has(t)){const s=e.get(t);s.qty=(Number(s.qty)||0)+(Number(n.qty)||0),s.createdAt=Math.max(s.createdAt||0,n.createdAt||0),e.set(t,s)}else e.set(t,{...n})}return Array.from(e.values())}(A.items),e=(A.settings.search||"").trim().toLowerCase();let n=t.filter((t=>t.title.toLowerCase().includes(e)));const s=A.settings.sort;return n=n.slice().sort(((t,e)=>{const n=t.price*t.qty||0,i=e.price*e.qty||0;return"total_desc"===s?i-n:"total_asc"===s?n-i:"qty_desc"===s?(e.qty||0)-(t.qty||0):"name_asc"===s?t.title.localeCompare(e.title):"newest"===s?(e.createdAt||0)-(t.createdAt||0):0})),n}function B(t){const e=t.reduce(((t,e)=>t+(Number(e.price)||0)*(Number(e.qty)||0)),0),n=A.settings.discountType,s=V(A.settings.discountValue);let i=0;if(!Number.isNaN(s)&&s>0)if("percent"===n){i=e*(Math.min(100,s)/100)}else i=s;i=Math.min(i,e);const a=Math.max(0,e-i),r=a*(Math.max(0,V(A.settings.vatRate))/100);let c=0;const o=A.settings.shippingRule;c="always_free"===o?0:"always_5000"===o?5e3:a>1e5||0===a?0:5e3;const l=a+r+c,u=t.filter((t=>(t.qty||0)>0&&(t.qty||0)<=3)).length,d=V(A.settings.budget);return{subtotal:e,discount:i,taxable:a,tax:r,shipping:c,grand:l,lowStock:u,overBudget:!Number.isNaN(d)&&d>0&&l>d,budget:d}}function O(){a.value=A.settings.search,r.value=A.settings.sort,m.value=A.settings.discountType,v.value=A.settings.discountValue,b.value=A.settings.vatRate,y.value=A.settings.budget,h.value=A.settings.shippingRule;const t=I(),n=B(t);C.textContent=`Items: ${t.length}`,w.textContent=`Low stock: ${n.lowStock}`,w.className="badge "+(n.lowStock>0?"warn":"ok"),!Number.isNaN(n.budget)&&n.budget>0?(L.textContent=n.overBudget?"Budget: OVER":"Budget: OK",L.className="badge "+(n.overBudget?"danger":"ok")):(L.textContent="Budget: —",L.className="badge");const s=0===n.shipping?"Free":e(n.shipping);if(k.textContent=`Shipping: ${s}`,S.textContent=e(n.subtotal),x.textContent="-"+e(n.discount),E.textContent="percent"===A.settings.discountType?"percent":"fixed",T.textContent=`${A.settings.vatRate}%`,R.textContent="+"+e(n.tax),$.textContent=e(n.grand),i.innerHTML="",0===t.length){const t=document.createElement("li");return t.className="item",t.innerHTML='\n        <div class="item-left">\n          <div class="name">No items <span class="sku">empty</span></div>\n          <div class="meta"><span class="pill">Add something on the right</span></div>\n        </div>\n        <div class="qty"></div>\n        <div class="right"><div class="money">0 ֏</div></div>\n      ',i.appendChild(t),void _()}t.forEach((t=>{const n=document.createElement("li");n.className="item",n.dataset.id=t.id;const s=(Number(t.price)||0)*(Number(t.qty)||0);var a;n.innerHTML=`\n        <div class="item-left">\n          <div class="name">${a=t.title,String(a??"").replace(/[&<>"']/g,(t=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[t])))} <span class="sku">unit: ${e(t.price).replace(" ֏","")} ֏</span></div>\n          <div class="meta">\n            <span class="pill">qty: ${t.qty}</span>\n            <span class="pill">${0===t.qty?"out":t.qty<=3?"low":"ok"}</span>\n          </div>\n        </div>\n\n        <div class="qty">\n          <button class="iconbtn" data-act="dec">−</button>\n          <input class="qtyInput" type="number" min="0" value="${t.qty}" />\n          <button class="iconbtn" data-act="inc">+</button>\n        </div>\n\n        <div class="right">\n          <div class="money">${e(s)}</div>\n          <button class="remove" data-act="rm">×</button>\n        </div>\n      `,i.appendChild(n)})),_()}function H(){const t=(c.value||"").trim(),e=V(o.value),s=(t=>{const e=String(t??"").replace(/[^\d]/g,"");return""===e.trim()?NaN:parseInt(e,10)})(l.value),i=t.length>=2,a=!Number.isNaN(e)&&e>=0,r=!Number.isNaN(s)&&s>=0;D(d,!i),D(g,!a),D(p,!r),i&&a&&r&&(A.items.push({id:n(),title:t,price:Math.round(e),qty:s,createdAt:Date.now()}),c.value="",o.value="",l.value="",O())}function F(t,e){e=Math.max(0,Number(e)||0);const n=t.title.trim().toLowerCase()+"::"+Number(t.price||0),s=A.items.filter((t=>t.title.trim().toLowerCase()+"::"+Number(t.price||0)===n));if(0===s.length)return;const i=s[0].id;A.items=A.items.filter((t=>t.title.trim().toLowerCase()+"::"+Number(t.price||0)!==n||t.id===i)).map((t=>t.id===i?{...t,qty:e}:t)),O()}function G(t){return I().find((e=>e.id===t))}u.addEventListener("click",H),[c,o,l].forEach((t=>{t.addEventListener("keydown",(t=>{"Enter"===t.key&&H()}))})),i.addEventListener("click",(t=>{const e=t.target.closest("button");if(!e)return;const n=t.target.closest("li.item");if(!n)return;const s=G(n.dataset.id);if(!s)return;const i=e.dataset.act;"inc"===i&&F(s,(s.qty||0)+1),"dec"===i&&F(s,(s.qty||0)-1),"rm"===i&&confirm(`Remove "${s.title}" ?`)&&function(t){const e=t.title.trim().toLowerCase()+"::"+Number(t.price||0);A.items=A.items.filter((t=>t.title.trim().toLowerCase()+"::"+Number(t.price||0)!==e)),O()}(s)})),i.addEventListener("change",(t=>{const e=t.target.closest("input.qtyInput");if(!e)return;const n=t.target.closest("li.item");if(!n)return;const s=G(n.dataset.id);s&&F(s,e.value)})),a.addEventListener("input",(()=>{A.settings.search=a.value,O()})),r.addEventListener("change",(()=>{A.settings.sort=r.value,O()})),m.addEventListener("change",(()=>{A.settings.discountType=m.value,O()})),v.addEventListener("input",(()=>{A.settings.discountValue=v.value,O()})),b.addEventListener("change",(()=>{A.settings.vatRate=b.value,O()})),y.addEventListener("input",(()=>{A.settings.budget=y.value,O()})),h.addEventListener("change",(()=>{A.settings.shippingRule=h.value,O()})),f.addEventListener("click",(()=>{confirm("Clear cart?")&&(A.items=[],O())})),N.addEventListener("click",(()=>{A.items=M.map((t=>({...t,id:n()}))),O()})),q.addEventListener("click",(()=>{const t=B(I());alert(`Checkout summary:\nSubtotal: ${e(t.subtotal)}\nDiscount: -${e(t.discount)}\nTax: +${e(t.tax)}\nShipping: ${0===t.shipping?"Free":e(t.shipping)}\nGrand Total: ${e(t.grand)}`)})),O()})();
+</script>
+
+</body>
+</html>

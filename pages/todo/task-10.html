@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Tasks</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: #f4f6fb;
+            font-family: system-ui, sans-serif;
+            padding: 30px;
+        }
+
+        .card {
+            border-radius: 14px;
+            box-shadow: 0 10px 25px rgba(0,0,0,.08);
+        }
+
+        .person {
+            padding: 10px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .person.active {
+            background: #0d6efd;
+            color: #fff;
+        }
+
+        .person:hover {
+            background: #e9ecef;
+        }
+
+        .task {
+            padding: 12px 14px;
+            border-radius: 12px;
+            background: #f8f9fa;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .done {
+            background: #d1e7dd;
+            color: #0f5132;
+            cursor: pointer;
+        }
+
+        .not_done {
+            background: #f8d7da;
+            color: #842029;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="row g-4">
+
+        <!-- PEOPLE -->
+        <div class="col-md-3">
+            <div class="card p-3">
+                <h5>👤 People</h5>
+                <div id="peopleList"></div>
+            </div>
+        </div>
+
+        <!-- TASKS -->
+        <div class="col-md-9">
+            <div class="card p-3">
+                <h5>📝 Tasks for <span id="activePerson"></span></h5>
+
+                <!-- ADD TASK -->
+                <div class="input-group mb-3">
+                    <input id="taskInput" type="text" class="form-control" placeholder="New task...">
+                    <button class="btn btn-primary" id="addTaskBtn">Add</button>
+                </div>
+
+                <div id="tasksList"></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const people = ["Levon", "Karen", "Gagik"];
+
+    const tasks = [
+        { person: "Levon", title: "Finish project report", status: "done" },
+        { person: "Levon", title: "Send email", status: "not_done" },
+        { person: "Karen", title: "Prepare slides", status: "done" },
+        { person: "Gagik", title: "Fix bug", status: "not_done" },
+    ];
+
+    let activePerson = people[0];
+
+    const peopleList = document.getElementById("peopleList");
+    const tasksList = document.getElementById("tasksList");
+    const activePersonEl = document.getElementById("activePerson");
+    const taskInput = document.getElementById("taskInput");
+
+    function renderPeople() {
+        peopleList.innerHTML = "";
+
+        people.forEach(p => {
+            const div = document.createElement("div");
+            div.className = "person mb-2 " + (p === activePerson ? "active" : "");
+            div.textContent = p;
+
+            div.onclick = () => {
+                activePerson = p;
+                renderPeople();
+                renderTasks();
+            };
+
+            peopleList.appendChild(div);
+        });
+    }
+
+    function renderTasks() {
+        tasksList.innerHTML = "";
+        activePersonEl.textContent = activePerson;
+
+        const filtered = tasks.filter(t => t.person === activePerson);
+
+        filtered.forEach(task => {
+            const div = document.createElement("div");
+            div.className = "task";
+
+            const statusClass = task.status === "done" ? "done" : "not_done";
+
+            div.innerHTML = `
+                <span>${task.title}</span>
+                <span class="${statusClass}">
+                    ${task.status}
+                </span>
+            `;
+
+            // toggle status
+            div.querySelector("span:last-child").onclick = () => {
+                task.status = task.status === "done" ? "not_done" : "done";
+                renderTasks();
+            };
+
+            tasksList.appendChild(div);
+        });
+    }
+
+    document.getElementById("addTaskBtn").onclick = () => {
+        const value = taskInput.value.trim();
+        if (!value) return;
+
+        tasks.push({
+            person: activePerson,
+            title: value,
+            status: "not_done"
+        });
+
+        taskInput.value = "";
+        renderTasks();
+    };
+
+    renderPeople();
+    renderTasks();
+</script>
+
+</body>
+</html>

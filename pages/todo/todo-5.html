@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8">
+    <title>Mini Shop — Cart + Wishlist</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        :root {
+            --bg: #020617;
+            --card: #0f172a;
+            --border: #1f2937;
+            --text-main: #e5e7eb;
+            --text-muted: #9ca3af;
+            --accent: #38bdf8;
+            --accent-soft: rgba(56, 189, 248, 0.1);
+            --danger: #f97373;
+            --wish: #fbbf24;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: radial-gradient(circle at top, #1e293b, #020617 55%);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .app {
+            width: 100%;
+            max-width: 1000px;
+            background: rgba(15, 23, 42, 0.96);
+            border-radius: 18px;
+            border: 1px solid var(--border);
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.9);
+            padding: 18px 16px 20px;
+        }
+
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .app-header h1 {
+            font-size: 20px;
+            margin: 0;
+        }
+
+        .app-header p {
+            margin: 4px 0 0;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .badges {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 12px;
+            align-items: flex-end;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: #020617;
+        }
+
+        .badge-pill {
+            padding: 2px 6px;
+            border-radius: 999px;
+            background: var(--accent);
+            color: #020617;
+            font-weight: 600;
+            font-size: 11px;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .badge-pill.wish {
+            background: var(--wish);
+            color: #1f2937;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.4fr);
+            gap: 14px;
+        }
+
+        @media (max-width: 900px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: rgba(15, 23, 42, 0.98);
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            padding: 10px 10px 12px;
+        }
+
+        .card-title {
+            font-size: 14px;
+            margin: 0 0 6px;
+            font-weight: 500;
+        }
+
+        .card-subtitle {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin: 0 0 8px;
+        }
+
+        /* PRODUCTS */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 10px;
+        }
+
+        .product-item {
+            border-radius: 12px;
+            border: 1px solid rgba(31, 41, 55, 0.9);
+            background: #020617;
+            padding: 9px 9px 10px;
+            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            position: relative;
+        }
+
+        .product-category {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .product-name {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .product-price {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .product-footer {
+            margin-top: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn {
+            border-radius: 999px;
+            border: none;
+            padding: 6px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #0ea5e9, #22c55e);
+            color: #020617;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+
+        .btn.secondary {
+            background: #020617;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+        }
+
+        .btn:active {
+            transform: translateY(1px) scale(.99);
+        }
+
+        .btn-icon {
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: #020617;
+            color: var(--text-muted);
+            cursor: pointer;
+            width: 26px;
+            height: 26px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .btn-icon.active {
+            background: var(--accent-soft);
+            color: var(--wish);
+            border-color: var(--wish);
+        }
+
+        /* CART TABLE */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        th, td {
+            padding: 6px 7px;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+        }
+
+        th {
+            font-weight: 500;
+            color: var(--text-muted);
+            font-size: 11px;
+            background: rgba(15, 23, 42, 0.98);
+        }
+
+        tbody tr:nth-child(2n) {
+            background: rgba(15, 23, 42, 0.85);
+        }
+
+        tbody tr:hover {
+            background: rgba(15, 23, 42, 0.95);
+        }
+
+        .cart-empty,
+        .wishlist-empty {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: center;
+            padding: 10px 0 4px;
+        }
+
+        .qty-controls {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .qty-btn {
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: #020617;
+            color: var(--text-main);
+            font-size: 11px;
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .qty-value {
+            min-width: 18px;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .remove-btn {
+            border: none;
+            background: none;
+            color: var(--danger);
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* WISHLIST */
+        .wishlist-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .wish-item {
+            padding: 4px 8px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: #020617;
+            font-size: 11px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .wish-name {
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .badge-small {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .tag-sm {
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            padding: 1px 5px;
+            font-size: 9px;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <header class="app-header">
+        <div>
+            <h1>Mini Shop — Cart + Wishlist</h1>
+            <p>Ապրանքներ + Զամբյուղ + Wishlist (սարքված օրինակ ուսուցման համար)</p>
+        </div>
+
+        <div class="badges">
+            <div class="badge">
+                Cart items:
+                <span id="cart-count" class="badge-pill">4</span>
+            </div>
+
+            <div class="badge">
+                Wishlist:
+                <span id="wish-count" class="badge-pill wish">3</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="layout">
+        <!-- LEFT: PRODUCTS -->
+        <section class="card">
+            <h2 class="card-title">Ապրանքների ցուցակ</h2>
+            <p class="card-subtitle">
+                Սեղմիր <b>Add to cart</b>՝ զամբյուղի մեջ գցելու համար։ Նույն ապրանքը երկրորդ անգամ սեղմելուց quantity-ն ավելանում է։
+                <br>
+                Սեղմիր <b>♥</b>՝ wishlist-ի մեջ պահելու համար։
+            </p>
+
+            <div id="products-grid" class="products-grid"><div class="product-item">
+                <div class="product-category">Books</div>
+                <div class="product-name">JavaScript Book</div>
+                <div class="product-price">12,000 ֏</div>
+                <div class="product-footer">
+                    <button class="btn" data-action="add-cart" data-id="1">
+                        + Add to cart
+                    </button>
+
+                    <button class="btn-icon " data-action="toggle-wish" data-id="1" title="Add to wishlist">
+                        ♥
+                    </button>
+                </div>
+            </div><div class="product-item">
+                <div class="product-category">Courses</div>
+                <div class="product-name">React Course Access</div>
+                <div class="product-price">55,000 ֏</div>
+                <div class="product-footer">
+                    <button class="btn" data-action="add-cart" data-id="2">
+                        + Add to cart
+                    </button>
+
+                    <button class="btn-icon active" data-action="toggle-wish" data-id="2" title="Add to wishlist">
+                        ♥
+                    </button>
+                </div>
+            </div><div class="product-item">
+                <div class="product-category">Accessories</div>
+                <div class="product-name">Wireless Mouse</div>
+                <div class="product-price">9,000 ֏</div>
+                <div class="product-footer">
+                    <button class="btn" data-action="add-cart" data-id="3">
+                        + Add to cart
+                    </button>
+
+                    <button class="btn-icon " data-action="toggle-wish" data-id="3" title="Add to wishlist">
+                        ♥
+                    </button>
+                </div>
+            </div><div class="product-item">
+                <div class="product-category">Accessories</div>
+                <div class="product-name">Mechanical Keyboard</div>
+                <div class="product-price">35,000 ֏</div>
+                <div class="product-footer">
+                    <button class="btn" data-action="add-cart" data-id="4">
+                        + Add to cart
+                    </button>
+
+                    <button class="btn-icon active" data-action="toggle-wish" data-id="4" title="Add to wishlist">
+                        ♥
+                    </button>
+                </div>
+            </div><div class="product-item">
+                <div class="product-category">Merch</div>
+                <div class="product-name">VS Code Stickers Pack</div>
+                <div class="product-price">3,000 ֏</div>
+                <div class="product-footer">
+                    <button class="btn" data-action="add-cart" data-id="5">
+                        + Add to cart
+                    </button>
+
+                    <button class="btn-icon " data-action="toggle-wish" data-id="5" title="Add to wishlist">
+                        ♥
+                    </button>
+                </div>
+            </div><div class="product-item">
+                <div class="product-category">Merch</div>
+                <div class="product-name">Frontend Hoodie</div>
+                <div class="product-price">22,000 ֏</div>
+                <div class="product-footer">
+                    <button class="btn" data-action="add-cart" data-id="6">
+                        + Add to cart
+                    </button>
+
+                    <button class="btn-icon active" data-action="toggle-wish" data-id="6" title="Add to wishlist">
+                        ♥
+                    </button>
+                </div>
+            </div></div>
+        </section>
+
+        <!-- RIGHT: CART + WISHLIST -->
+        <section class="card">
+            <h2 class="card-title">Քո զամբյուղը</h2>
+            <p class="card-subtitle">
+                Ցուցադրում է ընտրված ապրանքները և դրանց քանակները։
+            </p>
+
+            <table>
+                <thead>
+                <tr>
+                    <th>Ապրանք</th>
+                    <th>Գին</th>
+                    <th>Քանակ</th>
+                    <th>Միջագումար</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody id="cart-body"><tr>
+                    <td>
+                        React Course Access
+                        <span class="badge-small">(Courses)</span>
+                    </td>
+                    <td>55,000 ֏</td>
+                    <td>
+                        <div class="qty-controls">
+                            <button class="qty-btn" data-action="dec" data-id="2">-</button>
+                            <span class="qty-value">1</span>
+                            <button class="qty-btn" data-action="inc" data-id="2">+</button>
+                        </div>
+                    </td>
+                    <td>55,000 ֏</td>
+                    <td>
+                        <button class="remove-btn" data-action="remove" data-id="2">×</button>
+                    </td>
+                </tr><tr>
+                    <td>
+                        Mechanical Keyboard
+                        <span class="badge-small">(Accessories)</span>
+                    </td>
+                    <td>35,000 ֏</td>
+                    <td>
+                        <div class="qty-controls">
+                            <button class="qty-btn" data-action="dec" data-id="4">-</button>
+                            <span class="qty-value">2</span>
+                            <button class="qty-btn" data-action="inc" data-id="4">+</button>
+                        </div>
+                    </td>
+                    <td>70,000 ֏</td>
+                    <td>
+                        <button class="remove-btn" data-action="remove" data-id="4">×</button>
+                    </td>
+                </tr><tr>
+                    <td>
+                        Wireless Mouse
+                        <span class="badge-small">(Accessories)</span>
+                    </td>
+                    <td>9,000 ֏</td>
+                    <td>
+                        <div class="qty-controls">
+                            <button class="qty-btn" data-action="dec" data-id="3">-</button>
+                            <span class="qty-value">1</span>
+                            <button class="qty-btn" data-action="inc" data-id="3">+</button>
+                        </div>
+                    </td>
+                    <td>9,000 ֏</td>
+                    <td>
+                        <button class="remove-btn" data-action="remove" data-id="3">×</button>
+                    </td>
+                </tr></tbody>
+            </table>
+
+            <div id="cart-empty" class="cart-empty" style="display: none;">Զամբյուղը դատարկ է 🙂</div>
+
+            <hr style="border-color:rgba(31,41,55,0.7);margin:10px 0;">
+
+            <h3 class="card-title">Wishlist</h3>
+            <p class="card-subtitle">
+                Այստեղ են ապրանքները, որոնք user-ը պահել է “հետո գնելու” համար։
+            </p>
+
+            <div id="wishlist-empty" class="wishlist-empty" style="display: none;">
+                Wishlist-ը դատարկ է 💭
+            </div>
+
+            <div id="wishlist-list" class="wishlist-list"><div class="wish-item">
+                <span class="wish-name">Mechanical Keyboard</span>
+                <span class="tag-sm">Accessories</span>
+                <button class="btn secondary" data-action="wish-to-cart" data-id="4">
+                    To cart
+                </button>
+            </div><div class="wish-item">
+                <span class="wish-name">Frontend Hoodie</span>
+                <span class="tag-sm">Merch</span>
+                <button class="btn secondary" data-action="wish-to-cart" data-id="6">
+                    To cart
+                </button>
+            </div><div class="wish-item">
+                <span class="wish-name">React Course Access</span>
+                <span class="tag-sm">Courses</span>
+                <button class="btn secondary" data-action="wish-to-cart" data-id="2">
+                    To cart
+                </button>
+            </div></div>
+        </section>
+    </div>
+</div>
+
+<script>
+    const products=[{id:1,name:"JavaScript Book",price:12e3,category:"Books"},{id:2,name:"React Course Access",price:55e3,category:"Courses"},{id:3,name:"Wireless Mouse",price:9e3,category:"Accessories"},{id:4,name:"Mechanical Keyboard",price:35e3,category:"Accessories"},{id:5,name:"VS Code Stickers Pack",price:3e3,category:"Merch"},{id:6,name:"Frontend Hoodie",price:22e3,category:"Merch"}];let cart=[],wishlist=[];const productsGridEl=document.getElementById("products-grid"),cartBodyEl=document.getElementById("cart-body"),cartEmptyEl=document.getElementById("cart-empty"),cartCountEl=document.getElementById("cart-count"),wishlistListEl=document.getElementById("wishlist-list"),wishlistEmptyEl=document.getElementById("wishlist-empty"),wishCountEl=document.getElementById("wish-count");function formatPrice(t){return t.toLocaleString("hy-AM")}function isInWishlist(t){return wishlist.includes(t)}function renderProducts(){productsGridEl.innerHTML="",products.forEach((t=>{const n=isInWishlist(t.id),e=document.createElement("div");e.className="product-item",e.innerHTML=`\n        <div class="product-category">${t.category}</div>\n        <div class="product-name">${t.name}</div>\n        <div class="product-price">${formatPrice(t.price)} ֏</div>\n        <div class="product-footer">\n          <button class="btn" data-action="add-cart" data-id="${t.id}">\n            + Add to cart\n          </button>\n\n          <button class="btn-icon ${n?"active":""}"\n                  data-action="toggle-wish"\n                  data-id="${t.id}"\n                  title="Add to wishlist">\n            ♥\n          </button>\n        </div>\n      `,productsGridEl.appendChild(e)}))}function renderCart(){cartBodyEl.innerHTML="",0===cart.length?cartEmptyEl.style.display="block":cartEmptyEl.style.display="none";let t=0;cart.forEach((n=>{const e=n.price*n.qty;t+=n.qty;const i=document.createElement("tr");i.innerHTML=`\n        <td>\n          ${n.name}\n          <span class="badge-small">(${n.category})</span>\n        </td>\n        <td>${formatPrice(n.price)} ֏</td>\n        <td>\n          <div class="qty-controls">\n            <button class="qty-btn" data-action="dec" data-id="${n.id}">-</button>\n            <span class="qty-value">${n.qty}</span>\n            <button class="qty-btn" data-action="inc" data-id="${n.id}">+</button>\n          </div>\n        </td>\n        <td>${formatPrice(e)} ֏</td>\n        <td>\n          <button class="remove-btn" data-action="remove" data-id="${n.id}">&times;</button>\n        </td>\n      `,cartBodyEl.appendChild(i)})),cartCountEl.textContent=t}function renderWishlist(){wishlistListEl.innerHTML="",0===wishlist.length?wishlistEmptyEl.style.display="block":wishlistEmptyEl.style.display="none",wishCountEl.textContent=wishlist.length,wishlist.forEach((t=>{const n=products.find((n=>n.id===t));if(!n)return;const e=document.createElement("div");e.className="wish-item",e.innerHTML=`\n        <span class="wish-name">${n.name}</span>\n        <span class="tag-sm">${n.category}</span>\n        <button class="btn secondary"\n                data-action="wish-to-cart"\n                data-id="${n.id}">\n          To cart\n        </button>\n      `,wishlistListEl.appendChild(e)}))}function addToCart(t){const n=products.find((n=>n.id===t));if(!n)return;const e=cart.find((n=>n.id===t));e?e.qty+=1:cart.push({id:n.id,name:n.name,price:n.price,category:n.category,qty:1}),renderCart()}function changeCartQty(t,n){const e=cart.find((n=>n.id===t));e&&("inc"===n?e.qty+=1:"dec"===n&&(e.qty-=1,e.qty<=0&&(cart=cart.filter((n=>n.id!==t)))),renderCart())}function removeFromCart(t){cart=cart.filter((n=>n.id!==t)),renderCart()}function toggleWishlist(t){isInWishlist(t)?wishlist=wishlist.filter((n=>n!==t)):wishlist.push(t),renderProducts(),renderWishlist()}function moveWishToCart(t){addToCart(t)}function init(){renderProducts(),renderCart(),renderWishlist()}productsGridEl.addEventListener("click",(t=>{const n=t.target.closest("button");if(!n)return;const e=n.dataset.action,i=Number(n.dataset.id);i&&e&&("add-cart"===e?addToCart(i):"toggle-wish"===e&&toggleWishlist(i))})),cartBodyEl.addEventListener("click",(t=>{const n=t.target.closest("button");if(!n)return;const e=n.dataset.action,i=Number(n.dataset.id);i&&e&&("inc"===e||"dec"===e?changeCartQty(i,e):"remove"===e&&removeFromCart(i))})),wishlistListEl.addEventListener("click",(t=>{const n=t.target.closest("button");if(!n)return;const e=n.dataset.action,i=Number(n.dataset.id);i&&e&&"wish-to-cart"===e&&moveWishToCart(i)})),init();
+</script>
+
+</body>
+</html>
