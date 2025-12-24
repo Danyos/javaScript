@@ -1,0 +1,608 @@
+<!doctype html>
+<html lang="hy">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Վճարում</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        :root{
+            --brand:#f07a20;
+            --brand-dark:#d96510;
+            --text:#1d2430;
+            --muted:#6b7280;
+            --card:#ffffff;
+            --stroke:#e8eef6;
+            --shadow:0 12px 30px rgba(16,24,40,.10);
+            --radius:14px;
+            --danger:#ef4444;
+            --ok:#16a34a;
+        }
+        body{ color:var(--text); background:#fff; }
+
+        /* Header */
+        .topbar{ background:var(--brand); color:#fff; font-size:.95rem; }
+        .topbar a{ color:#fff; text-decoration:none; opacity:.95; }
+        .topbar a:hover{ opacity:1; text-decoration:underline; }
+
+        .main-nav{ background:var(--brand); box-shadow:0 6px 20px rgba(0,0,0,.12); }
+        .brand-pill{
+            background:#fff; border-radius:999px; padding:.35rem .8rem;
+            display:inline-flex; align-items:center; gap:.5rem; font-weight:900; color:#111827;
+        }
+        .brand-dot{ width:10px;height:10px;border-radius:50%; background:var(--brand); }
+        .nav-link{ color:#fff !important; opacity:.92; font-weight:600; padding:.65rem .9rem !important; }
+        .nav-link:hover{ opacity:1; }
+        .nav-pills .nav-link.active{
+            background:rgba(255,255,255,.22) !important;
+            border:1px solid rgba(255,255,255,.35);
+        }
+
+        /* Panels */
+        .soft-panel{
+            background:var(--card);
+            border:1px solid var(--stroke);
+            border-radius:var(--radius);
+            box-shadow:var(--shadow);
+        }
+        .panel-title{
+            font-weight:900; font-size:.95rem;
+            padding:.9rem 1rem;
+            border-bottom:1px solid var(--stroke);
+        }
+        .page-title{ font-weight:1000; letter-spacing:.08em; }
+        .page-sub{ color:var(--muted); }
+
+        .btn-brand{
+            background:var(--brand);
+            border-color:var(--brand);
+            color:#fff;
+            font-weight:900;
+            border-radius:12px;
+        }
+        .btn-brand:hover{ background:var(--brand-dark); border-color:var(--brand-dark); color:#fff; }
+
+        .muted{ color:var(--muted); }
+        .money{ font-weight:1000; }
+        .money.danger{ color:var(--danger); }
+        .money.ok{ color:var(--ok); }
+
+        .cart-row{
+            border:1px solid var(--stroke);
+            border-radius:14px;
+            padding:.7rem .75rem;
+        }
+        .cart-row .t{ font-weight:900; margin:0; }
+        .qty-pill{
+            border:1px solid var(--stroke);
+            border-radius:999px;
+            padding:.1rem .55rem;
+            font-weight:900;
+            font-size:.78rem;
+            color:var(--muted);
+        }
+
+        /* Footer */
+        footer{ background:#0b1220; color:#cbd5e1; margin-top:30px; }
+        footer a{ color:#cbd5e1; text-decoration:none; }
+        footer a:hover{ text-decoration:underline; }
+
+        .cart-badge{
+            background:#111827;
+            color:#fff;
+            border-radius:999px;
+            padding:.1rem .5rem;
+            font-weight:900;
+            font-size:.75rem;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- Top bar -->
+<div class="topbar py-1">
+    <div class="container">
+        <div class="d-flex flex-wrap gap-3 justify-content-between align-items-center">
+            <div class="d-flex gap-3 flex-wrap">
+                <span>📞 010-xx-xx-xx</span>
+                <span>🕘 Ամեն օր՝ 10:00 – 23:00</span>
+            </div>
+            <div class="d-flex gap-3">
+                <a href="#">Մուտք</a>
+                <a href="#">Գրանցում</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main nav -->
+<nav class="navbar navbar-expand-lg main-nav py-2">
+    <div class="container">
+        <a class="navbar-brand" href="#">
+            <span class="brand-pill"><span class="brand-dot"></span> FOOD.AM</span>
+        </a>
+
+        <button class="navbar-toggler text-white border-white" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav ms-auto nav-pills align-items-lg-center">
+                <li class="nav-item"><a class="nav-link" href="#">Գլխավոր</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Ռեստորաններ</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Ապրանքներ</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Ակցիաներ</a></li>
+                <li class="nav-item"><a class="nav-link active" href="#">Վճարում</a></li>
+            </ul>
+
+            <div class="d-flex align-items-center gap-2 ms-lg-3 mt-3 mt-lg-0">
+                <a class="btn btn-dark fw-bold d-flex align-items-center gap-2" href="#">
+                    🛒 Զամբյուղ <span id="cartCount" class="cart-badge">0</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Title -->
+<section class="py-4">
+    <div class="container">
+        <div class="soft-panel p-3 p-md-4">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-2">
+                <div>
+                    <h2 class="page-title m-0">ՎՃԱՐՈՒՄ</h2>
+                    <div class="page-sub mt-1">Լրացրու տվյալները և հաստատիր պատվերը</div>
+                </div>
+
+                <div class="d-flex gap-2 flex-wrap">
+                    <span class="badge text-bg-light border">Անվտանգ վճարում</span>
+                    <span class="badge text-bg-light border">Արագ առաքում</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Checkout -->
+<section class="pb-4">
+    <div class="container">
+        <div class="row g-3 g-lg-4 align-items-start">
+
+            <!-- Left: Forms -->
+            <div class="col-12 col-lg-7">
+                <div class="soft-panel mb-3">
+                    <div class="panel-title">Հաճախորդի տվյալներ</div>
+                    <div class="p-3 p-md-4">
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <label class="form-label fw-bold">Անուն Ազգանուն</label>
+                                <input id="fullName" class="form-control" placeholder="օր. Դանիել Համբարձումյան">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label fw-bold">Հեռախոս</label>
+                                <input id="phone" class="form-control" placeholder="օր. +374 XX XX XX XX">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Էլ․ փոստ (ոչ պարտադիր)</label>
+                                <input id="email" type="email" class="form-control" placeholder="օր. name@mail.com">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Նշումներ պատվերի համար (ոչ պարտադիր)</label>
+                                <textarea id="note" class="form-control" rows="3" placeholder="օր. զանգեք նախքան գալը…"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="soft-panel mb-3">
+                    <div class="panel-title">Առաքման հասցե</div>
+                    <div class="p-3 p-md-4">
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <label class="form-label fw-bold">Քաղաք</label>
+                                <select id="city" class="form-select">
+                                    <option value="Երևան">Երևան</option>
+                                    <option value="Գյումրի">Գյումրի</option>
+                                    <option value="Վանաձոր">Վանաձոր</option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label fw-bold">Տարածք / Շրջան</label>
+                                <input id="district" class="form-control" placeholder="օր. Կենտրոն">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Փողոց, տուն, բն․</label>
+                                <input id="address" class="form-control" placeholder="օր. Թումանյան 12, բն․ 18">
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label class="form-label fw-bold">Առաքման ժամանակ</label>
+                                <select id="deliveryTime" class="form-select">
+                                    <option value="asap">Ամենաարագը</option>
+                                    <option value="30">30 րոպե</option>
+                                    <option value="45">45 րոպե</option>
+                                    <option value="60">60 րոպե</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label class="form-label fw-bold">Առաքման վճար (demo)</label>
+                                <select id="deliveryFee" class="form-select">
+                                    <option value="500">500֏</option>
+                                    <option value="700">700֏</option>
+                                    <option value="0">0֏ (Free)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="soft-panel">
+                    <div class="panel-title">Վճարման մեթոդ</div>
+                    <div class="p-3 p-md-4">
+                        <div class="vstack gap-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="pay" id="payCard" value="card" checked>
+                                <label class="form-check-label fw-bold" for="payCard">💳 Քարտով (demo)</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="pay" id="payCash" value="cash">
+                                <label class="form-check-label fw-bold" for="payCash">💵 Կանխիկ</label>
+                            </div>
+                        </div>
+
+                        <div id="cardBox" class="mt-3">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label class="form-label fw-bold">Քարտի համար (demo)</label>
+                                    <input id="cardNumber" class="form-control" placeholder="1234 5678 9012 3456" maxlength="19">
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label fw-bold">Վավերականություն</label>
+                                    <input id="cardExp" class="form-control" placeholder="MM/YY" maxlength="5">
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label fw-bold">CVC</label>
+                                    <input id="cardCvc" class="form-control" placeholder="123" maxlength="3">
+                                </div>
+                            </div>
+                            <div class="muted small mt-2">* Սա demo էջ է․ իրական վճարման համար պետք է ինտեգրում (Idram, ArCa, Stripe և այլն)</div>
+                        </div>
+
+                        <div class="d-grid mt-4">
+                            <button id="placeOrderBtn" class="btn btn-brand btn-lg">
+                                Հաստատել պատվերը
+                            </button>
+                        </div>
+
+                        <div id="msg" class="mt-3"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Summary -->
+            <div class="col-12 col-lg-5">
+                <div class="soft-panel">
+                    <div class="panel-title">Պատվերի ամփոփում</div>
+                    <div class="p-3 p-md-4">
+                        <div id="summaryList" class="vstack gap-2"></div>
+
+                        <hr class="my-3">
+
+                        <div class="d-flex justify-content-between">
+                            <span class="fw-bold">Ենթագումար</span>
+                            <span class="money" id="subTotal">0֏</span>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-2">
+                            <span class="fw-bold">Առաքում</span>
+                            <span class="money" id="feeText">0֏</span>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-2">
+                            <span class="fw-bold">Զեղչ</span>
+                            <span class="money ok" id="discountText">-0֏</span>
+                        </div>
+
+                        <hr class="my-3">
+
+                        <div class="d-flex justify-content-between align-items-end">
+                            <div>
+                                <div class="fw-bold">Ընդհանուր</div>
+                                <div class="muted small">Արժույթ՝ AMD</div>
+                            </div>
+                            <div class="money danger fs-4" id="grandTotal">0֏</div>
+                        </div>
+
+                        <div class="soft-panel p-3 mt-3" style="box-shadow:none;">
+                            <div class="fw-bold mb-2">Պրոմո կոդ</div>
+                            <div class="input-group">
+                                <input id="promoInput" class="form-control" placeholder="օր. SAVE10">
+                                <button id="promoBtn" class="btn btn-outline-secondary fw-bold" type="button">Կիրառել</button>
+                            </div>
+                            <div class="muted small mt-2">
+                                Demo codes: <b>SAVE10</b> (10%), <b>FREEDEL</b> (free delivery)
+                            </div>
+                        </div>
+
+                        <div class="d-grid mt-3">
+                            <a class="btn btn-outline-secondary fw-bold" href="#">← Վերադառնալ ապրանքներ</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="pt-4 pb-3">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-12 col-md-4">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="brand-pill"><span class="brand-dot"></span> FOOD.AM</span>
+                </div>
+                <p class="mb-0" style="opacity:.85">Օնլայն սննդի պատվերներ՝ արագ և հարմար։</p>
+            </div>
+
+            <div class="col-6 col-md-2">
+                <h6 class="text-white fw-bold">Մենյու</h6>
+                <ul class="list-unstyled small">
+                    <li><a href="#">Գլխավոր</a></li>
+                    <li><a href="#">Ռեստորաններ</a></li>
+                    <li><a href="#">Ապրանքներ</a></li>
+                    <li><a href="#">Ակցիաներ</a></li>
+                </ul>
+            </div>
+
+            <div class="col-6 col-md-2">
+                <h6 class="text-white fw-bold">Օգնություն</h6>
+                <ul class="list-unstyled small">
+                    <li><a href="#">Առաքում</a></li>
+                    <li><a href="#">Վճարում</a></li>
+                    <li><a href="#">Կոնտակտ</a></li>
+                </ul>
+            </div>
+
+            <div class="col-12 col-md-4">
+                <h6 class="text-white fw-bold">Կապ</h6>
+                <div class="small" style="opacity:.9">
+                    📍 Երևան<br/>
+                    📞 010-xx-xx-xx<br/>
+                    ✉ info@food.am
+                </div>
+            </div>
+        </div>
+
+        <hr class="border-secondary my-3" />
+        <div class="d-flex justify-content-between flex-wrap gap-2 small" style="opacity:.8">
+            <span>© 2025 FOOD.AM</span>
+            <span>Made with Bootstrap 5</span>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    const LS_KEY = "food_cart_v1";
+
+    const $cartCount = document.getElementById("cartCount");
+    const $summaryList = document.getElementById("summaryList");
+    const $subTotal = document.getElementById("subTotal");
+    const $feeText = document.getElementById("feeText");
+    const $discountText = document.getElementById("discountText");
+    const $grandTotal = document.getElementById("grandTotal");
+
+    const $deliveryFee = document.getElementById("deliveryFee");
+    const $promoInput = document.getElementById("promoInput");
+    const $promoBtn = document.getElementById("promoBtn");
+
+    const $placeOrderBtn = document.getElementById("placeOrderBtn");
+    const $msg = document.getElementById("msg");
+
+    const $payCard = document.getElementById("payCard");
+    const $payCash = document.getElementById("payCash");
+    const $cardBox = document.getElementById("cardBox");
+
+    const $cardNumber = document.getElementById("cardNumber");
+    const $cardExp = document.getElementById("cardExp");
+    const $cardCvc = document.getElementById("cardCvc");
+
+    // promo state
+    let promo = { code: "", percent: 0, freeDelivery: false };
+
+    function readCart(){
+        try{ return JSON.parse(localStorage.getItem(LS_KEY)) || []; }
+        catch{ return []; }
+    }
+    function writeCart(items){
+        localStorage.setItem(LS_KEY, JSON.stringify(items));
+    }
+    function money(n){
+        return (n ?? 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    function renderSummary(){
+        const cart = readCart();
+        const count = cart.reduce((s,i)=> s + i.qty, 0);
+        $cartCount.textContent = count;
+
+        if(cart.length === 0){
+            $summaryList.innerHTML = `
+        <div class="text-center muted py-4">Զամբյուղը դատարկ է</div>
+        <div class="d-grid"><a class="btn btn-brand" href="products.html">Գնալ ապրանքներ</a></div>
+      `;
+            setTotals(0, 0, 0, 0);
+            return;
+        }
+
+        $summaryList.innerHTML = cart.map(i => `
+      <div class="cart-row d-flex justify-content-between align-items-start gap-2">
+        <div>
+          <p class="t">${i.title}</p>
+          <div class="muted small">
+            <span class="qty-pill">քանակ՝ ${i.qty}</span>
+            <span class="ms-2">${money(i.price)}֏</span>
+          </div>
+        </div>
+        <div class="money">${money(i.price * i.qty)}֏</div>
+      </div>
+    `).join("");
+
+        const subtotal = cart.reduce((s,i)=> s + i.qty * i.price, 0);
+
+        const feeRaw = Number($deliveryFee.value || 0);
+        const fee = promo.freeDelivery ? 0 : feeRaw;
+
+        const discount = Math.floor(subtotal * (promo.percent / 100));
+        const total = Math.max(0, subtotal - discount + fee);
+
+        setTotals(subtotal, fee, discount, total);
+    }
+
+    function setTotals(sub, fee, disc, total){
+        $subTotal.textContent = money(sub) + "֏";
+        $feeText.textContent = money(fee) + "֏";
+        $discountText.textContent = "-" + money(disc) + "֏";
+        $grandTotal.textContent = money(total) + "֏";
+    }
+
+    function applyPromo(){
+        const code = ($promoInput.value || "").trim().toUpperCase();
+
+        promo = { code: "", percent: 0, freeDelivery: false };
+
+        if(code === "SAVE10"){
+            promo = { code, percent: 10, freeDelivery: false };
+            showMsg("success", "Պրոմո կոդը կիրառվեց՝ -10%");
+        }else if(code === "FREEDEL"){
+            promo = { code, percent: 0, freeDelivery: true };
+            showMsg("success", "Պրոմո կոդը կիրառվեց՝ առաքումը անվճար");
+        }else if(code){
+            showMsg("danger", "Սխալ պրոմո կոդ");
+        }else{
+            showMsg("secondary", "Պրոմո կոդը հեռացվեց");
+        }
+
+        renderSummary();
+    }
+
+    function showMsg(type, text){
+        $msg.innerHTML = `<div class="alert alert-${type} py-2 mb-0">${text}</div>`;
+    }
+
+    // Card formatting (demo)
+    $cardNumber.addEventListener("input", () => {
+        let v = $cardNumber.value.replace(/\D/g, "").slice(0,16);
+        v = v.replace(/(.{4})/g, "$1 ").trim();
+        $cardNumber.value = v;
+    });
+    $cardExp.addEventListener("input", () => {
+        let v = $cardExp.value.replace(/\D/g, "").slice(0,4);
+        if(v.length >= 3) v = v.slice(0,2) + "/" + v.slice(2);
+        $cardExp.value = v;
+    });
+    $cardCvc.addEventListener("input", () => {
+        $cardCvc.value = $cardCvc.value.replace(/\D/g, "").slice(0,3);
+    });
+
+    function togglePayment(){
+        const isCard = $payCard.checked;
+        $cardBox.style.display = isCard ? "block" : "none";
+    }
+    $payCard.addEventListener("change", togglePayment);
+    $payCash.addEventListener("change", togglePayment);
+
+    // Validation (basic)
+    function validate(){
+        const cart = readCart();
+        if(cart.length === 0){
+            showMsg("danger", "Զամբյուղը դատարկ է");
+            return false;
+        }
+
+        const fullName = document.getElementById("fullName").value.trim();
+        const phone = document.getElementById("phone").value.trim();
+        const address = document.getElementById("address").value.trim();
+
+        if(!fullName || !phone || !address){
+            showMsg("danger", "Լրացրու պարտադիր դաշտերը՝ Անուն, Հեռախոս, Հասցե");
+            return false;
+        }
+
+        if($payCard.checked){
+            const cn = $cardNumber.value.replace(/\s/g, "");
+            if(cn.length < 16 || $cardExp.value.length < 5 || $cardCvc.value.length < 3){
+                showMsg("danger", "Լրացրու քարտի տվյալները ճիշտ ձևով (demo)");
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    function placeOrder(){
+        if(!validate()) return;
+
+        // Create demo order
+        const cart = readCart();
+        const subtotal = cart.reduce((s,i)=> s + i.qty * i.price, 0);
+        const feeRaw = Number($deliveryFee.value || 0);
+        const fee = promo.freeDelivery ? 0 : feeRaw;
+        const discount = Math.floor(subtotal * (promo.percent / 100));
+        const total = Math.max(0, subtotal - discount + fee);
+
+        const order = {
+            id: "ORD-" + Date.now(),
+            createdAt: new Date().toISOString(),
+            customer: {
+                fullName: document.getElementById("fullName").value.trim(),
+                phone: document.getElementById("phone").value.trim(),
+                email: document.getElementById("email").value.trim(),
+                note: document.getElementById("note").value.trim(),
+            },
+            delivery: {
+                city: document.getElementById("city").value,
+                district: document.getElementById("district").value.trim(),
+                address: document.getElementById("address").value.trim(),
+                time: document.getElementById("deliveryTime").value,
+                fee,
+            },
+            payment: {
+                method: document.querySelector('input[name="pay"]:checked').value,
+                promo,
+            },
+            items: cart,
+            totals: { subtotal, discount, fee, total }
+        };
+
+        console.log("ORDER:", order);
+
+        // success: clear cart
+        writeCart([]);
+        renderSummary();
+
+        $placeOrderBtn.disabled = true;
+        showMsg("success", `Պատվերը հաստատվեց ✅ Ձեր կոդը՝ <b>${order.id}</b>`);
+    }
+
+    $deliveryFee.addEventListener("change", renderSummary);
+    $promoBtn.addEventListener("click", applyPromo);
+    $promoInput.addEventListener("keydown", (e)=> { if(e.key === "Enter"){ e.preventDefault(); applyPromo(); } });
+
+    $placeOrderBtn.addEventListener("click", placeOrder);
+
+    // init
+    togglePayment();
+    renderSummary();
+</script>
+
+</body>
+</html>

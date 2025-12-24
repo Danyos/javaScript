@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="hy">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Մոռացել եմ գաղտնաբառը</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root{ --brand:#f07a20; --brand-dark:#d96510; --text:#1d2430; --muted:#6b7280; --stroke:#e8eef6; --shadow:0 12px 30px rgba(16,24,40,.10); --radius:14px; }
+        body{ color:var(--text); background:#fff; }
+        .topbar{ background:var(--brand); color:#fff; font-size:.95rem; }
+        .main-nav{ background:var(--brand); box-shadow:0 6px 20px rgba(0,0,0,.12); }
+        .brand-pill{ background:#fff; border-radius:999px; padding:.35rem .8rem; display:inline-flex; align-items:center; gap:.5rem; font-weight:900; color:#111827; }
+        .brand-dot{ width:10px;height:10px;border-radius:50%; background:var(--brand); }
+        .soft-panel{ background:#fff; border:1px solid var(--stroke); border-radius:var(--radius); box-shadow:var(--shadow); }
+        .panel-title{ font-weight:900; font-size:.95rem; padding:.9rem 1rem; border-bottom:1px solid var(--stroke); }
+        .btn-brand{ background:var(--brand); border-color:var(--brand); color:#fff; font-weight:900; border-radius:12px; }
+        .btn-brand:hover{ background:var(--brand-dark); border-color:var(--brand-dark); color:#fff; }
+        .muted{ color:var(--muted); }
+        footer{ background:#0b1220; color:#cbd5e1; margin-top:30px; }
+    </style>
+</head>
+<body>
+
+<div class="topbar py-1">
+    <div class="container d-flex justify-content-between flex-wrap gap-2">
+        <div class="d-flex gap-3 flex-wrap"><span>📞 010-xx-xx-xx</span><span>🕘 10:00 – 23:00</span></div>
+        <div class="d-flex gap-3">
+            <a class="text-white text-decoration-none" href="login.html">Մուտք</a>
+            <a class="text-white text-decoration-none" href="register.html">Գրանցում</a>
+        </div>
+    </div>
+</div>
+
+<nav class="navbar main-nav py-2">
+    <div class="container">
+        <a class="navbar-brand" href="#"><span class="brand-pill"><span class="brand-dot"></span> FOOD.AM</span></a>
+    </div>
+</nav>
+
+<section class="py-4">
+    <div class="container">
+        <div class="row justify-content-center g-3">
+            <div class="col-12 col-md-9 col-lg-6">
+
+                <!-- Request reset -->
+                <div class="soft-panel mb-3">
+                    <div class="panel-title">Մոռացել եմ գաղտնաբառը</div>
+                    <div class="p-3 p-md-4">
+                        <div id="msg1"></div>
+                        <label class="form-label fw-bold">Մուտքագրիր email-ը</label>
+                        <input id="email" class="form-control mb-3" placeholder="name@mail.com" type="email">
+                        <div class="d-grid gap-2">
+                            <button id="sendBtn" class="btn btn-brand btn-lg">Ուղարկել reset link (demo)</button>
+                            <a class="btn btn-outline-secondary fw-bold" href="login.html">← Վերադառնալ login</a>
+                        </div>
+                        <div class="muted small mt-3">
+                            Demo․ իրականում պետք է email ուղարկվի։ Այստեղ token-ը պահում ենք localStorage-ում։
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reset password -->
+                <div class="soft-panel">
+                    <div class="panel-title">Reset password</div>
+                    <div class="p-3 p-md-4">
+                        <div id="msg2"></div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Token (demo)</label>
+                            <input id="token" class="form-control" placeholder="կստանաս վերևից" />
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <label class="form-label fw-bold">Նոր գաղտնաբառ</label>
+                                <input id="p1" type="password" class="form-control" placeholder="min 6">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label fw-bold">Կրկնել</label>
+                                <input id="p2" type="password" class="form-control" placeholder="repeat">
+                            </div>
+                        </div>
+
+                        <div class="d-grid mt-3">
+                            <button id="resetBtn" class="btn btn-brand btn-lg">Փոխել գաղտնաբառը</button>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer class="pt-4 pb-3">
+    <div class="container">
+        <div class="d-flex justify-content-between flex-wrap gap-2 small" style="opacity:.85">
+            <span>© 2025 FOOD.AM</span>
+            <span>Forgot demo</span>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const USERS_KEY="food_users_v1";
+    const RESET_KEY="food_reset_v1"; // {email, token, expiresAt}
+    const $msg1=document.getElementById("msg1");
+    const $msg2=document.getElementById("msg2");
+
+    function readUsers(){ try{ return JSON.parse(localStorage.getItem(USERS_KEY))||[] }catch{ return [] } }
+    function writeUsers(users){ localStorage.setItem(USERS_KEY, JSON.stringify(users)); }
+    function show(el,type,text){ el.innerHTML=`<div class="alert alert-${type} py-2">${text}</div>`; }
+    function randToken(){ return Math.random().toString(36).slice(2,10).toUpperCase() + "-" + Date.now().toString(36).toUpperCase(); }
+
+    document.getElementById("sendBtn").addEventListener("click", ()=>{
+        const email=(document.getElementById("email").value||"").trim().toLowerCase();
+        if(!email){ show($msg1,"danger","Գրիր email"); return; }
+
+        const users=readUsers();
+        const u=users.find(x=>x.email===email);
+        if(!u){ show($msg1,"danger","Այս email-ով օգտատեր չկա"); return; }
+
+        const token=randToken();
+        const expiresAt=Date.now() + 15*60*1000; // 15 min
+        localStorage.setItem(RESET_KEY, JSON.stringify({ email, token, expiresAt }));
+
+        // demo: show token
+        show($msg1,"success",`Reset token-ը ստեղծվեց ✅ <b>${token}</b> (valid 15 րոպե)`);
+        document.getElementById("token").value = token;
+    });
+
+    document.getElementById("resetBtn").addEventListener("click", ()=>{
+        const token=(document.getElementById("token").value||"").trim();
+        const p1=document.getElementById("p1").value||"";
+        const p2=document.getElementById("p2").value||"";
+
+        if(!token || !p1 || !p2){ show($msg2,"danger","Լրացրու բոլոր դաշտերը"); return; }
+        if(p1.length < 6){ show($msg2,"danger","Գաղտնաբառը պետք է լինի առնվազն 6 նշան"); return; }
+        if(p1 !== p2){ show($msg2,"danger","Գաղտնաբառերը չեն համընկնում"); return; }
+
+        let reset=null;
+        try{ reset=JSON.parse(localStorage.getItem(RESET_KEY)); }catch{}
+        if(!reset){ show($msg2,"danger","Reset request չկա, արա վերևից send"); return; }
+        if(Date.now() > reset.expiresAt){ show($msg2,"danger","Token-ը ժամկետանց է, արա նոր send"); return; }
+        if(reset.token !== token){ show($msg2,"danger","Սխալ token"); return; }
+
+        const users=readUsers();
+        const idx=users.findIndex(u=>u.email===reset.email);
+        if(idx === -1){ show($msg2,"danger","Օգտատերը չի գտնվել"); return; }
+
+        users[idx].password = p1;
+        writeUsers(users);
+        localStorage.removeItem(RESET_KEY);
+
+        show($msg2,"success","Գաղտնաբառը փոխվեց ✅ հիմա կարող ես login անել");
+        setTimeout(()=> location.href="login.html", 900);
+    });
+</script>
+</body>
+</html>
