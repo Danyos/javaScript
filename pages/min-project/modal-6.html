@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Library Borrow Modal Task</title>
+    <style>
+        body{font-family:Arial,sans-serif;background:#f6f7fb;padding:40px}
+        .wrap{max-width:980px;margin:auto}
+        .top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:14px}
+        .title{font-size:22px;font-weight:900}
+        .sub{color:#6b7280;font-size:13px}
+
+        .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+        .card{background:#fff;border-radius:16px;box-shadow:0 10px 28px rgba(0,0,0,.06);padding:16px}
+        .row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+        .name{font-weight:900}
+        .muted{color:#6b7280;font-size:13px;margin-top:6px}
+        .pill{display:inline-block;background:#f3f4f6;border-radius:999px;padding:4px 10px;font-size:12px}
+        .badge{display:inline-block;border-radius:999px;padding:4px 10px;font-size:12px}
+        .ok{background:#ecfdf5}
+        .no{background:#fef2f2}
+        .meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+
+        .btns{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+        button{border:0;border-radius:12px;padding:10px 12px;cursor:pointer;font-size:13px}
+        .b1{background:#2563eb;color:#fff} /* details */
+        .b2{background:#111827;color:#fff} /* close/cancel */
+        .b3{background:#10b981;color:#fff} /* borrow/return */
+
+        /* modal */
+        .backdrop{position:fixed;inset:0;background:rgba(0,0,0,.58);display:none;align-items:center;justify-content:center;padding:18px}
+        .modal{width:min(560px,100%);background:#fff;border-radius:16px;box-shadow:0 18px 60px rgba(0,0,0,.25);overflow:hidden}
+        .mhead{padding:14px 16px;border-bottom:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center}
+        .mtitle{font-weight:900}
+        .x{background:#f3f4f6;border-radius:12px;padding:8px 10px;cursor:pointer;user-select:none}
+        .mbody{padding:16px}
+        .mactions{padding:14px 16px;border-top:1px solid #e5e7eb;display:flex;justify-content:flex-end;gap:10px}
+
+        @media (max-width:900px){ .grid{grid-template-columns:repeat(2,1fr)} }
+        @media (max-width:640px){ body{padding:18px} .grid{grid-template-columns:1fr} }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <div class="top">
+        <div>
+            <div class="title">Library</div>
+            <div class="sub">Task: Details modal + Borrow/Return confirm (array of objects, one modal)</div>
+        </div>
+    </div>
+
+    <div id="cards" class="grid"></div>
+</div>
+
+<!-- One Modal -->
+<div id="backdrop" class="backdrop">
+    <div class="modal">
+        <div class="mhead">
+            <div id="mtitle" class="mtitle">Modal</div>
+            <div id="x" class="x">✕</div>
+        </div>
+        <div id="mbody" class="mbody"></div>
+        <div id="mactions" class="mactions"></div>
+    </div>
+</div>
+
+<script>
+    /* ========= DATA (array of objects) ========= */
+    const books = [
+        { id: 1, title: "Clean Code", author: "Robert C. Martin", year: 2008, status: "AVAILABLE", shelf: "A-3" },
+        { id: 2, title: "You Don't Know JS", author: "Kyle Simpson", year: 2015, status: "BORROWED", shelf: "B-1" },
+        { id: 3, title: "The Pragmatic Programmer", author: "Andrew Hunt", year: 1999, status: "AVAILABLE", shelf: "A-1" },
+        { id: 4, title: "Design Patterns", author: "GoF", year: 1994, status: "AVAILABLE", shelf: "C-2" },
+        { id: 5, title: "Refactoring", author: "Martin Fowler", year: 1999, status: "BORROWED", shelf: "B-2" },
+        { id: 6, title: "Eloquent JavaScript", author: "Marijn Haverbeke", year: 2018, status: "AVAILABLE", shelf: "A-2" },
+    ];
+</script>
+
+<!-- ========== JS SOLUTION (ջնջիր՝ ուսանողին տալուց առաջ) ========== -->
+<script>
+    const cards = document.querySelector("#cards");
+    const backdrop = document.querySelector("#backdrop");
+    const mtitle = document.querySelector("#mtitle");
+    const mbody  = document.querySelector("#mbody");
+    const mactions = document.querySelector("#mactions");
+    const x = document.querySelector("#x");
+
+    let pending = null; // {id, nextStatus}
+
+    function badge(status){
+        return status === "AVAILABLE"
+            ? `<span class="badge ok">AVAILABLE</span>`
+            : `<span class="badge no">BORROWED</span>`;
+    }
+
+    function render(){
+        cards.innerHTML = books.map(b => `
+    <div class="card" data-id="${b.id}">
+      <div class="row">
+        <div>
+          <div class="name">${b.title}</div>
+          <div class="muted">${b.author} • ${b.year}</div>
+        </div>
+        ${badge(b.status)}
+      </div>
+
+      <div class="meta">
+        <span class="pill">Shelf: ${b.shelf}</span>
+        <span class="pill">#${b.id}</span>
+      </div>
+
+      <div class="btns">
+        <button class="b1" data-action="details">Details</button>
+        <button class="b3" data-action="${b.status === "AVAILABLE" ? "borrow" : "return"}">
+          ${b.status === "AVAILABLE" ? "Borrow" : "Return"}
+        </button>
+      </div>
+    </div>
+  `).join("");
+    }
+
+    function openModal({title, bodyHTML, actionsHTML, pendingState=null}){
+        pending = pendingState;
+        mtitle.textContent = title;
+        mbody.innerHTML = bodyHTML;
+        mactions.innerHTML = actionsHTML;
+        backdrop.style.display = "flex";
+    }
+    function closeModal(){
+        backdrop.style.display = "none";
+        pending = null;
+    }
+    function findBook(id){ return books.find(b => b.id === id); }
+
+    render();
+
+    // card click handler (event delegation)
+    cards.addEventListener("click", (e) => {
+        const action = e.target.dataset.action;
+        if(!action) return;
+
+        const card = e.target.closest(".card");
+        if(!card) return;
+
+        const id = Number(card.dataset.id);
+        const b = findBook(id);
+        if(!b) return;
+
+        if(action === "details"){
+            openModal({
+                title: "Book details",
+                bodyHTML: `
+        <div class="name">${b.title}</div>
+        <p class="muted" style="margin:6px 0 0">${b.author} • ${b.year}</p>
+        <hr style="border:none;border-top:1px solid #eef2f7;margin:14px 0">
+        <p><b>Status:</b> ${b.status}</p>
+        <p><b>Shelf:</b> ${b.shelf}</p>
+      `,
+                actionsHTML: `<button class="b2" data-action="close">Close</button>`
+            });
+        }
+
+        if(action === "borrow" && b.status === "AVAILABLE"){
+            openModal({
+                title: "Confirm borrow",
+                bodyHTML: `<p>Borrow <b>${b.title}</b>?</p><p class="muted">Status will become BORROWED.</p>`,
+                actionsHTML: `
+        <button class="b3" data-action="confirm">Borrow</button>
+        <button class="b2" data-action="close">Cancel</button>
+      `,
+                pendingState: { id, nextStatus: "BORROWED" }
+            });
+        }
+
+        if(action === "return" && b.status === "BORROWED"){
+            openModal({
+                title: "Confirm return",
+                bodyHTML: `<p>Return <b>${b.title}</b>?</p><p class="muted">Status will become AVAILABLE.</p>`,
+                actionsHTML: `
+        <button class="b3" data-action="confirm">Return</button>
+        <button class="b2" data-action="close">Cancel</button>
+      `,
+                pendingState: { id, nextStatus: "AVAILABLE" }
+            });
+        }
+    });
+
+    // modal click handler
+    backdrop.addEventListener("click", (e) => {
+        if(e.target === backdrop || e.target === x) return closeModal();
+
+        const action = e.target.dataset.action;
+        if(action === "close") return closeModal();
+
+        if(action === "confirm" && pending){
+            const b = findBook(pending.id);
+            if(b) b.status = pending.nextStatus;
+            render();
+            closeModal();
+        }
+    });
+
+    // ESC close
+    document.addEventListener("keydown", (e)=>{
+        if(e.key === "Escape" && backdrop.style.display === "flex") closeModal();
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Advanced Modal Task</title>
+    <style>
+        body{font-family:Arial,sans-serif;background:#f3f6fb;padding:40px}
+        .wrap{max-width:980px;margin:auto}
+        .top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:14px}
+        .title{font-size:22px;font-weight:800}
+        .sub{color:#6b7280;font-size:13px}
+        .toolbar{display:flex;gap:10px;align-items:center}
+        input,select{padding:10px 12px;border:1px solid #e5e7eb;border-radius:12px;outline:none}
+        input:focus,select:focus{border-color:#93c5fd}
+        .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+        .card{background:#fff;border-radius:16px;box-shadow:0 10px 26px rgba(0,0,0,.06);padding:16px}
+        .name{font-weight:800}
+        .meta{color:#6b7280;font-size:13px;margin-top:6px;display:flex;gap:8px;flex-wrap:wrap}
+        .pill{background:#f3f4f6;border-radius:999px;padding:4px 10px;font-size:12px}
+        .row{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+        .btns{display:flex;gap:8px;margin-top:12px}
+        button{border:0;border-radius:12px;padding:10px 12px;cursor:pointer}
+        .b1{background:#2563eb;color:#fff}
+        .b2{background:#111827;color:#fff}
+        .b3{background:#ef4444;color:#fff}
+        .b4{background:#10b981;color:#fff}
+        .muted{color:#6b7280}
+        .err{color:#ef4444;font-size:12px;margin-top:6px;display:none}
+
+        /* modal */
+        .backdrop{position:fixed;inset:0;background:rgba(0,0,0,.58);display:none;align-items:center;justify-content:center;padding:18px}
+        .modal{width:min(560px,100%);background:#fff;border-radius:18px;box-shadow:0 18px 60px rgba(0,0,0,.25);overflow:hidden}
+        .mhead{padding:14px 16px;border-bottom:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center}
+        .mtitle{font-weight:900}
+        .x{background:#f3f4f6;border-radius:12px;padding:8px 10px;cursor:pointer;user-select:none}
+        .mbody{padding:16px}
+        .mactions{padding:14px 16px;border-top:1px solid #e5e7eb;display:flex;justify-content:flex-end;gap:10px}
+
+        @media (max-width:900px){ .grid{grid-template-columns:repeat(2,1fr)} }
+        @media (max-width:620px){ .grid{grid-template-columns:1fr} .top{flex-direction:column;align-items:stretch} }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <div class="top">
+        <div>
+            <div class="title">Products</div>
+            <div class="sub">Advanced Task: View / Edit / Delete via one Modal Engine + localStorage</div>
+        </div>
+
+        <div class="toolbar">
+            <input id="q" placeholder="Search title..." />
+            <select id="sort">
+                <option value="new">Sort: Newest</option>
+                <option value="price_asc">Price: Low → High</option>
+                <option value="price_desc">Price: High → Low</option>
+            </select>
+            <button id="add" class="b4">+ Add</button>
+        </div>
+    </div>
+
+    <div id="cards" class="grid"></div>
+</div>
+
+<div id="backdrop" class="backdrop">
+    <div class="modal">
+        <div class="mhead">
+            <div id="mtitle" class="mtitle">Modal</div>
+            <div id="x" class="x">✕</div>
+        </div>
+        <div id="mbody" class="mbody"></div>
+        <div id="mactions" class="mactions"></div>
+    </div>
+</div>
+
+<script>
+    /* ========= DATA (array of objects) =========
+       • localStorage key = "modal_task_products"
+       • if storage empty -> use seed data below
+    */
+    const seed = [
+        { id: 1, title: "iPhone 15", price: 1200, brand: "Apple", stock: 6, createdAt: Date.now()-400000 },
+        { id: 2, title: "Samsung S24", price: 1000, brand: "Samsung", stock: 9, createdAt: Date.now()-300000 },
+        { id: 3, title: "Pixel 9", price: 950, brand: "Google", stock: 4, createdAt: Date.now()-200000 },
+        { id: 4, title: "Xiaomi 14", price: 780, brand: "Xiaomi", stock: 12, createdAt: Date.now()-100000 },
+    ];
+</script>
+
+<script>
+    // ================== SOLUTION (հեռացրու՝ ուսանողին տալուց առաջ) ==================
+    const LS_KEY = "modal_task_products";
+
+    const cards = document.querySelector("#cards");
+    const backdrop = document.querySelector("#backdrop");
+    const mtitle = document.querySelector("#mtitle");
+    const mbody = document.querySelector("#mbody");
+    const mactions = document.querySelector("#mactions");
+    const x = document.querySelector("#x");
+
+    const q = document.querySelector("#q");
+    const sort = document.querySelector("#sort");
+    const addBtn = document.querySelector("#add");
+
+    let state = load();
+    let pendingId = null;
+    let modalMode = null; // view | delete | edit | add
+
+    function load(){
+        try{
+            const raw = localStorage.getItem(LS_KEY);
+            if(!raw) return [...seed];
+            const parsed = JSON.parse(raw);
+            return Array.isArray(parsed) ? parsed : [...seed];
+        }catch{
+            return [...seed];
+        }
+    }
+    function save(){
+        localStorage.setItem(LS_KEY, JSON.stringify(state));
+    }
+
+    function getFilteredSorted(){
+        const term = q.value.trim().toLowerCase();
+        let list = state.filter(p => p.title.toLowerCase().includes(term));
+
+        const s = sort.value;
+        if(s === "price_asc") list.sort((a,b)=>a.price-b.price);
+        if(s === "price_desc") list.sort((a,b)=>b.price-a.price);
+        if(s === "new") list.sort((a,b)=>b.createdAt-a.createdAt);
+
+        return list;
+    }
+
+    function render(){
+        const list = getFilteredSorted();
+        cards.innerHTML = list.map(p=>`
+    <div class="card" data-id="${p.id}">
+      <div class="row">
+        <div>
+          <div class="name">${p.title}</div>
+          <div class="meta">
+            <span class="pill">${p.brand}</span>
+            <span class="pill">$${p.price}</span>
+            <span class="pill">Stock: ${p.stock}</span>
+          </div>
+        </div>
+        <div class="muted">#${p.id}</div>
+      </div>
+
+      <div class="btns">
+        <button class="b1" data-action="view">View</button>
+        <button class="b2" data-action="edit">Edit</button>
+        <button class="b3" data-action="delete">Delete</button>
+      </div>
+    </div>
+  `).join("");
+    }
+
+    function openModal({title, bodyHTML, actionsHTML, mode, id=null}){
+        modalMode = mode;
+        pendingId = id;
+        mtitle.textContent = title;
+        mbody.innerHTML = bodyHTML;
+        mactions.innerHTML = actionsHTML;
+        backdrop.style.display = "flex";
+    }
+
+    function closeModal(){
+        backdrop.style.display = "none";
+        modalMode = null;
+        pendingId = null;
+    }
+
+    function productById(id){ return state.find(p=>p.id===id); }
+
+    function validateForm(data){
+        const errors = {};
+        if(!data.title || data.title.trim().length < 3) errors.title = "Title min 3 chars";
+        if(!data.brand || data.brand.trim().length < 2) errors.brand = "Brand min 2 chars";
+        if(!(Number(data.price) > 0)) errors.price = "Price must be > 0";
+        if(!(Number.isInteger(Number(data.stock)) && Number(data.stock) >= 0)) errors.stock = "Stock must be >= 0 integer";
+        return errors;
+    }
+
+    function formHTML(p){
+        const title = p?.title ?? "";
+        const brand = p?.brand ?? "";
+        const price = p?.price ?? "";
+        const stock = p?.stock ?? "";
+        return `
+    <label class="muted">Title</label>
+    <input id="f_title" value="${title}" style="width:100%;margin:6px 0 0" />
+    <div id="e_title" class="err"></div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">
+      <div>
+        <label class="muted">Brand</label>
+        <input id="f_brand" value="${brand}" style="width:100%;margin-top:6px" />
+        <div id="e_brand" class="err"></div>
+      </div>
+      <div>
+        <label class="muted">Price</label>
+        <input id="f_price" type="number" value="${price}" style="width:100%;margin-top:6px" />
+        <div id="e_price" class="err"></div>
+      </div>
+    </div>
+
+    <div style="margin-top:12px">
+      <label class="muted">Stock</label>
+      <input id="f_stock" type="number" value="${stock}" style="width:100%;margin-top:6px" />
+      <div id="e_stock" class="err"></div>
+    </div>
+  `;
+    }
+
+    function showErrors(errors){
+        const map = ["title","brand","price","stock"];
+        map.forEach(k=>{
+            const el = document.querySelector("#e_"+k);
+            if(!el) return;
+            if(errors[k]){
+                el.textContent = errors[k];
+                el.style.display = "block";
+            }else{
+                el.textContent = "";
+                el.style.display = "none";
+            }
+        });
+    }
+
+    function readForm(){
+        return {
+            title: document.querySelector("#f_title").value,
+            brand: document.querySelector("#f_brand").value,
+            price: Number(document.querySelector("#f_price").value),
+            stock: Number(document.querySelector("#f_stock").value),
+        };
+    }
+
+    // init
+    render();
+
+    q.addEventListener("input", render);
+    sort.addEventListener("change", render);
+
+    addBtn.addEventListener("click", ()=>{
+        openModal({
+            title:"Add product",
+            mode:"add",
+            bodyHTML: formHTML(null),
+            actionsHTML: `
+      <button class="b4" data-action="save">Save</button>
+      <button class="b2" data-action="close">Cancel</button>
+    `
+        });
+    });
+
+    cards.addEventListener("click", (e)=>{
+        const action = e.target.dataset.action;
+        if(!action) return;
+
+        const card = e.target.closest(".card");
+        if(!card) return;
+
+        const id = Number(card.dataset.id);
+        const p = productById(id);
+        if(!p) return;
+
+        if(action==="view"){
+            openModal({
+                title:"Details",
+                mode:"view",
+                id,
+                bodyHTML: `
+        <div class="name">${p.title}</div>
+        <p class="meta"><b>Brand:</b> ${p.brand}</p>
+        <p class="meta"><b>Price:</b> $${p.price}</p>
+        <p class="meta"><b>Stock:</b> ${p.stock}</p>
+      `,
+                actionsHTML:`<button class="b2" data-action="close">Close</button>`
+            });
+        }
+
+        if(action==="delete"){
+            openModal({
+                title:"Confirm delete",
+                mode:"delete",
+                id,
+                bodyHTML:`<p>Delete <b>${p.title}</b>?</p><p class="muted">This will also update localStorage.</p>`,
+                actionsHTML:`
+        <button class="b3" data-action="confirm-delete">Delete</button>
+        <button class="b2" data-action="close">Cancel</button>
+      `
+            });
+        }
+
+        if(action==="edit"){
+            openModal({
+                title:"Edit product",
+                mode:"edit",
+                id,
+                bodyHTML: formHTML(p),
+                actionsHTML:`
+        <button class="b4" data-action="save">Save</button>
+        <button class="b2" data-action="close">Cancel</button>
+      `
+            });
+        }
+    });
+
+    // modal interactions
+    backdrop.addEventListener("click", (e)=>{
+        if(e.target === backdrop || e.target === x) return closeModal();
+
+        const action = e.target.dataset.action;
+        if(!action) return;
+
+        if(action==="close") return closeModal();
+
+        if(action==="confirm-delete" && modalMode==="delete" && pendingId!=null){
+            state = state.filter(p=>p.id!==pendingId);
+            save();
+            render();
+            closeModal();
+        }
+
+        if(action==="save" && (modalMode==="add" || modalMode==="edit")){
+            const data = readForm();
+            const errors = validateForm(data);
+            showErrors(errors);
+            if(Object.keys(errors).length) return;
+
+            if(modalMode==="add"){
+                const nextId = state.length ? Math.max(...state.map(x=>x.id))+1 : 1;
+                state.unshift({ id: nextId, ...data, createdAt: Date.now() });
+            }
+            if(modalMode==="edit" && pendingId!=null){
+                state = state.map(p => p.id===pendingId ? { ...p, ...data } : p);
+            }
+
+            save();
+            render();
+            closeModal();
+        }
+    });
+
+    // ESC close
+    document.addEventListener("keydown", (e)=>{
+        if(e.key === "Escape" && backdrop.style.display === "flex"){
+            closeModal();
+        }
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Modal Task A/B</title>
+    <style>
+        body{font-family:Arial,sans-serif;background:#f4f6f9;padding:40px}
+        .wrap{max-width:900px;margin:auto}
+        .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+        .title{font-size:20px;font-weight:700}
+        .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+        .card{background:#fff;border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,.06);padding:16px}
+        .row{display:flex;justify-content:space-between;gap:10px;align-items:center}
+        .name{font-weight:700}
+        .meta{color:#6b7280;font-size:13px;margin-top:4px}
+        .btns{display:flex;gap:8px}
+        button{border:0;border-radius:10px;padding:8px 12px;cursor:pointer}
+        .btn-view{background:#2563eb;color:#fff}
+        .btn-del{background:#ef4444;color:#fff}
+        .btn-ghost{background:#111827;color:#fff}
+        .muted{color:#6b7280;font-size:13px}
+
+        .backdrop{
+            position:fixed;inset:0;background:rgba(0,0,0,.55);
+            display:none;align-items:center;justify-content:center;padding:18px
+        }
+        .modal{
+            width:min(520px,100%);background:#fff;border-radius:14px;
+            box-shadow:0 18px 60px rgba(0,0,0,.25);overflow:hidden
+        }
+        .modal-head{padding:14px 16px;border-bottom:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center}
+        .modal-title{font-weight:800}
+        .modal-body{padding:16px}
+        .modal-actions{padding:14px 16px;border-top:1px solid #e5e7eb;display:flex;justify-content:flex-end;gap:10px}
+        .x{background:#f3f4f6;border-radius:10px;padding:8px 10px;cursor:pointer}
+        .pill{display:inline-block;background:#f3f4f6;border-radius:999px;padding:4px 10px;font-size:12px}
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <div class="top">
+        <div class="title">Products</div>
+        <div class="muted">Task: View / Delete via Modal (data from array)</div>
+    </div>
+
+    <div id="cards" class="grid">
+        <div class="card" data-id="1">
+            <div class="row">
+                <div>
+                    <div class="name">iPhone 15</div>
+                    <div class="meta">Apple • <span class="pill">$1200</span> • Stock: 6</div>
+                </div>
+                <div class="btns">
+                    <button class="btn-view" data-action="view">View</button>
+                    <button class="btn-del" data-action="delete">Delete</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" data-id="2">
+            <div class="row">
+                <div>
+                    <div class="name">Samsung S24</div>
+                    <div class="meta">Samsung • <span class="pill">$1000</span> • Stock: 9</div>
+                </div>
+                <div class="btns">
+                    <button class="btn-view" data-action="view">View</button>
+                    <button class="btn-del" data-action="delete">Delete</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" data-id="3">
+            <div class="row">
+                <div>
+                    <div class="name">Pixel 9</div>
+                    <div class="meta">Google • <span class="pill">$950</span> • Stock: 4</div>
+                </div>
+                <div class="btns">
+                    <button class="btn-view" data-action="view">View</button>
+                    <button class="btn-del" data-action="delete">Delete</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" data-id="4">
+            <div class="row">
+                <div>
+                    <div class="name">Xiaomi 14</div>
+                    <div class="meta">Xiaomi • <span class="pill">$780</span> • Stock: 12</div>
+                </div>
+                <div class="btns">
+                    <button class="btn-view" data-action="view">View</button>
+                    <button class="btn-del" data-action="delete">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="backdrop" class="backdrop">
+    <div class="modal">
+        <div class="modal-head">
+            <div id="modalTitle" class="modal-title">Modal</div>
+            <div id="modalClose" class="x">✕</div>
+        </div>
+        <div id="modalBody" class="modal-body"></div>
+        <div id="modalActions" class="modal-actions"></div>
+    </div>
+</div>
+
+<script>
+
+    const products = [
+        { id: 1, title: "iPhone 15", price: 1200, brand: "Apple", stock: 6 },
+        { id: 2, title: "Samsung S24", price: 1000, brand: "Samsung", stock: 9 },
+        { id: 3, title: "Pixel 9", price: 950, brand: "Google", stock: 4 },
+        { id: 4, title: "Xiaomi 14", price: 780, brand: "Xiaomi", stock: 12 },
+    ];
+    const cards=document.querySelector("#cards"),backdrop=document.querySelector("#backdrop"),modalTitle=document.querySelector("#modalTitle"),modalBody=document.querySelector("#modalBody"),modalActions=document.querySelector("#modalActions"),modalClose=document.querySelector("#modalClose");let pendingDeleteId=null;function render(){cards.innerHTML=products.map((e=>`\n    <div class="card" data-id="${e.id}">\n      <div class="row">\n        <div>\n          <div class="name">${e.title}</div>\n          <div class="meta">${e.brand} • <span class="pill">$${e.price}</span> • Stock: ${e.stock}</div>\n        </div>\n        <div class="btns">\n          <button class="btn-view" data-action="view">View</button>\n          <button class="btn-del" data-action="delete">Delete</button>\n        </div>\n      </div>\n    </div>\n  `)).join("")}function openModal({title:e,bodyHTML:t,actionsHTML:n}){modalTitle.textContent=e,modalBody.innerHTML=t,modalActions.innerHTML=n,backdrop.style.display="flex"}function closeModal(){backdrop.style.display="none",pendingDeleteId=null}render(),cards.addEventListener("click",(e=>{const t=e.target.dataset.action;if(!t)return;const n=e.target.closest(".card"),d=Number(n.dataset.id),o=products.find((e=>e.id===d));o&&("view"===t&&openModal({title:"Product details",bodyHTML:`\n        <div class="name">${o.title}</div>\n        <p class="meta">Brand: <b>${o.brand}</b></p>\n        <p class="meta">Price: <b>$${o.price}</b></p>\n        <p class="meta">Stock: <b>${o.stock}</b></p>\n      `,actionsHTML:'<button class="btn-ghost" data-action="close">Close</button>'}),"delete"===t&&(pendingDeleteId=d,openModal({title:"Confirm delete",bodyHTML:`<p>Delete <b>${o.title}</b>?</p>`,actionsHTML:'\n        <button class="btn-del" data-action="confirm-delete">Confirm</button>\n        <button class="btn-ghost" data-action="close">Cancel</button>\n      '})))})),backdrop.addEventListener("click",(e=>{e.target!==backdrop&&e.target!==modalClose||closeModal();const t=e.target.dataset.action;if("close"===t&&closeModal(),"confirm-delete"===t&&null!=pendingDeleteId){const e=products.findIndex((e=>e.id===pendingDeleteId));-1!==e&&products.splice(e,1),render(),closeModal()}}));
+</script>
+</body>
+</html>

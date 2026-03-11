@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Requests + Modal Task</title>
+    <style>
+        body{font-family:Arial,sans-serif;background:#f6f7fb;padding:40px}
+        .wrap{max-width:980px;margin:auto}
+        .top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:14px}
+        .title{font-size:22px;font-weight:900}
+        .sub{color:#6b7280;font-size:13px}
+
+        .panel{background:#fff;border-radius:16px;box-shadow:0 10px 28px rgba(0,0,0,.06);overflow:hidden}
+        .head{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #e5e7eb}
+        .search{display:flex;gap:10px;align-items:center}
+        input{padding:10px 12px;border:1px solid #e5e7eb;border-radius:12px;outline:none;min-width:260px}
+        input:focus{border-color:#93c5fd}
+        .count{color:#6b7280;font-size:13px}
+
+        table{width:100%;border-collapse:collapse}
+        th,td{padding:12px 16px;border-bottom:1px solid #eef2f7;text-align:left;font-size:14px}
+        th{font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;background:#fbfcff}
+        .name{font-weight:800}
+        .muted{color:#6b7280;font-size:13px}
+        .badge{display:inline-block;border-radius:999px;padding:4px 10px;font-size:12px;background:#f3f4f6}
+        .b-pending{background:#fff7ed}
+        .b-approved{background:#ecfdf5}
+        .b-rejected{background:#fef2f2}
+
+        .btns{display:flex;gap:8px;flex-wrap:wrap}
+        button{border:0;border-radius:12px;padding:8px 10px;cursor:pointer;font-size:13px}
+        .btn-view{background:#2563eb;color:#fff}
+        .btn-ok{background:#10b981;color:#fff}
+        .btn-no{background:#ef4444;color:#fff}
+        .btn-dark{background:#111827;color:#fff}
+
+        /* modal */
+        .backdrop{position:fixed;inset:0;background:rgba(0,0,0,.58);display:none;align-items:center;justify-content:center;padding:18px}
+        .modal{width:min(560px,100%);background:#fff;border-radius:16px;box-shadow:0 18px 60px rgba(0,0,0,.25);overflow:hidden}
+        .mhead{padding:14px 16px;border-bottom:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center}
+        .mtitle{font-weight:900}
+        .x{background:#f3f4f6;border-radius:12px;padding:8px 10px;cursor:pointer;user-select:none}
+        .mbody{padding:16px}
+        .mactions{padding:14px 16px;border-top:1px solid #e5e7eb;display:flex;justify-content:flex-end;gap:10px}
+
+        @media (max-width:760px){
+            body{padding:18px}
+            input{min-width:160px;width:100%}
+            .head{flex-direction:column;align-items:stretch}
+            .search{justify-content:space-between}
+            th:nth-child(3), td:nth-child(3){display:none} /* hide phone on small */
+        }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <div class="top">
+        <div>
+            <div class="title">Incoming Requests</div>
+            <div class="sub">Easy Modal Task: View message + Approve/Reject confirm (array of objects)</div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="head">
+            <div class="search">
+                <input id="q" placeholder="Search by name...">
+            </div>
+            <div id="count" class="count">4 shown / 4 total</div>
+        </div>
+
+        <div style="overflow:auto">
+            <table>
+                <thead>
+                <tr>
+                    <th>Client</th>
+                    <th>Status</th>
+                    <th>Phone</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody id="rows">
+                <tr data-id="101">
+                    <td>
+                        <div class="name">Arman</div>
+                        <div class="muted">#101</div>
+                    </td>
+                    <td><span class="badge b-pending">PENDING</span></td>
+                    <td class="muted">+374 99 111111</td>
+                    <td>
+                        <div class="btns">
+                            <button class="btn-view" data-action="view">View</button>
+                            <button class="btn-ok" data-action="approve">Approve</button>
+                            <button class="btn-no" data-action="reject">Reject</button>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr data-id="102">
+                    <td>
+                        <div class="name">Mariam</div>
+                        <div class="muted">#102</div>
+                    </td>
+                    <td><span class="badge b-pending">PENDING</span></td>
+                    <td class="muted">+374 91 222222</td>
+                    <td>
+                        <div class="btns">
+                            <button class="btn-view" data-action="view">View</button>
+                            <button class="btn-ok" data-action="approve">Approve</button>
+                            <button class="btn-no" data-action="reject">Reject</button>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr data-id="103">
+                    <td>
+                        <div class="name">Suren</div>
+                        <div class="muted">#103</div>
+                    </td>
+                    <td><span class="badge b-approved">APPROVED</span></td>
+                    <td class="muted">+374 77 333333</td>
+                    <td>
+                        <div class="btns">
+                            <button class="btn-view" data-action="view">View</button>
+                            <button class="btn-ok" data-action="approve" disabled="" style="opacity:.5;cursor:not-allowed">Approve</button>
+                            <button class="btn-no" data-action="reject" disabled="" style="opacity:.5;cursor:not-allowed">Reject</button>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr data-id="104">
+                    <td>
+                        <div class="name">Nare</div>
+                        <div class="muted">#104</div>
+                    </td>
+                    <td><span class="badge b-rejected">REJECTED</span></td>
+                    <td class="muted">+374 55 444444</td>
+                    <td>
+                        <div class="btns">
+                            <button class="btn-view" data-action="view">View</button>
+                            <button class="btn-ok" data-action="approve" disabled="" style="opacity:.5;cursor:not-allowed">Approve</button>
+                            <button class="btn-no" data-action="reject" disabled="" style="opacity:.5;cursor:not-allowed">Reject</button>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<!-- One Modal -->
+<div id="backdrop" class="backdrop" >
+    <div class="modal">
+        <div class="mhead">
+            <div id="mtitle" class="mtitle">Request message</div>
+            <div id="x" class="x">✕</div>
+        </div>
+        <div id="mbody" class="mbody">
+            <div class="name">Mariam</div>
+            <p class="muted" style="margin:6px 0 0">+374 91 222222 • <b>PENDING</b></p>
+            <hr style="border:none;border-top:1px solid #eef2f7;margin:14px 0">
+            <div>Can you call me after 18:00? I’m interested.</div>
+        </div>
+        <div id="mactions" class="mactions"><button class="btn-dark" data-action="close">Close</button></div>
+    </div>
+</div>
+<script>
+    /* ========= DATA (array of objects) ========= */
+    const requests = [
+        { id: 101, name: "Arman", phone: "+374 99 111111", status: "PENDING", message: "Hello, I want details about the course schedule." },
+        { id: 102, name: "Mariam", phone: "+374 91 222222", status: "PENDING", message: "Can you call me after 18:00? I’m interested." },
+        { id: 103, name: "Suren", phone: "+374 77 333333", status: "APPROVED", message: "I already sent CV, waiting for confirmation." },
+        { id: 104, name: "Nare", phone: "+374 55 444444", status: "REJECTED", message: "Wrong number, sorry." }
+    ];
+</script>
+
+<!-- ========== JS SOLUTION (ջնջիր՝ ուսանողին տալուց առաջ) ========== -->
+<script>
+    const rows=document.querySelector("#rows"),q=document.querySelector("#q"),count=document.querySelector("#count"),backdrop=document.querySelector("#backdrop"),mtitle=document.querySelector("#mtitle"),mbody=document.querySelector("#mbody"),mactions=document.querySelector("#mactions"),x=document.querySelector("#x");let pendingAction=null;function badgeClass(t){return"APPROVED"===t?"badge b-approved":"REJECTED"===t?"badge b-rejected":"badge b-pending"}function render(){const t=q.value.trim().toLowerCase(),e=requests.filter((e=>e.name.toLowerCase().includes(t)));count.textContent=`${e.length} shown / ${requests.length} total`,rows.innerHTML=e.map((t=>`\n    <tr data-id="${t.id}">\n      <td>\n        <div class="name">${t.name}</div>\n        <div class="muted">#${t.id}</div>\n      </td>\n      <td><span class="${badgeClass(t.status)}">${t.status}</span></td>\n      <td class="muted">${t.phone}</td>\n      <td>\n        <div class="btns">\n          <button class="btn-view" data-action="view">View</button>\n          <button class="btn-ok" data-action="approve" ${"PENDING"!==t.status?"disabled style='opacity:.5;cursor:not-allowed'":""}>Approve</button>\n          <button class="btn-no" data-action="reject" ${"PENDING"!==t.status?"disabled style='opacity:.5;cursor:not-allowed'":""}>Reject</button>\n        </div>\n      </td>\n    </tr>\n  `)).join("")}function openModal({title:t,bodyHTML:e,actionsHTML:n}){mtitle.textContent=t,mbody.innerHTML=e,mactions.innerHTML=n,backdrop.style.display="flex"}function closeModal(){backdrop.style.display="none",pendingAction=null}function findById(t){return requests.find((e=>e.id===t))}render(),q.addEventListener("input",render),rows.addEventListener("click",(t=>{const e=t.target.dataset.action;if(!e)return;const n=t.target.closest("tr");if(!n)return;const o=Number(n.dataset.id),a=findById(o);a&&("view"===e&&openModal({title:"Request message",bodyHTML:`\n        <div class="name">${a.name}</div>\n        <p class="muted" style="margin:6px 0 0">${a.phone} • <b>${a.status}</b></p>\n        <hr style="border:none;border-top:1px solid #eef2f7;margin:14px 0">\n        <div>${a.message}</div>\n      `,actionsHTML:'<button class="btn-dark" data-action="close">Close</button>'}),"approve"===e&&"PENDING"===a.status&&(pendingAction={type:"APPROVED",id:o},openModal({title:"Confirm approve",bodyHTML:`<p>Approve request from <b>${a.name}</b>?</p>`,actionsHTML:'\n        <button class="btn-ok" data-action="confirm">Approve</button>\n        <button class="btn-dark" data-action="close">Cancel</button>\n      '})),"reject"===e&&"PENDING"===a.status&&(pendingAction={type:"REJECTED",id:o},openModal({title:"Confirm reject",bodyHTML:`<p>Reject request from <b>${a.name}</b>?</p>`,actionsHTML:'\n        <button class="btn-no" data-action="confirm">Reject</button>\n        <button class="btn-dark" data-action="close">Cancel</button>\n      '})))})),backdrop.addEventListener("click",(t=>{if(t.target===backdrop||t.target===x)return closeModal();const e=t.target.dataset.action;if("close"===e)return closeModal();if("confirm"===e&&pendingAction){const t=findById(pendingAction.id);t&&(t.status=pendingAction.type),render(),closeModal()}})),document.addEventListener("keydown",(t=>{"Escape"===t.key&&"flex"===backdrop.style.display&&closeModal()}));
+</script>
+</body>
+</html>

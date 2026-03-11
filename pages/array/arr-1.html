@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>JavaScript Tasks — Checklist</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+
+  <style>
+    :root{
+      --card: rgba(15, 23, 42, 0.82);
+      --card2: rgba(2, 6, 23, 0.55);
+      --border: rgba(148, 163, 184, 0.18);
+      --text: rgba(226, 232, 240, 0.92);
+      --muted: rgba(226, 232, 240, 0.65);
+      --shadow: 0 18px 45px rgba(0,0,0,.35);
+    }
+
+    body{
+      min-height: 100vh;
+      color: var(--text);
+      background:
+              radial-gradient(900px 500px at 10% 10%, rgba(56, 189, 248, .22), transparent 60%),
+              radial-gradient(850px 520px at 90% 20%, rgba(167, 139, 250, .18), transparent 55%),
+              radial-gradient(900px 700px at 40% 110%, rgba(34, 197, 94, .12), transparent 55%),
+              linear-gradient(180deg, #020617 0%, #0b1224 50%, #020617 100%);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+
+    .app-wrap{ padding: 36px 12px 60px; }
+    .glass{
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .glass-soft{
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .brand-badge{
+      display:inline-flex;
+      gap:10px;
+      align-items:center;
+      padding:10px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(2,6,23,.35);
+    }
+    .dot{
+      width:10px;height:10px;border-radius:50%;
+      background: radial-gradient(circle at 30% 30%, #38bdf8, #a78bfa);
+      box-shadow: 0 0 18px rgba(56,189,248,.35);
+    }
+    .muted{ color: var(--muted); }
+
+    .task-card{
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: rgba(2, 6, 23, 0.35);
+      overflow: hidden;
+      transition: transform .15s ease, border-color .15s ease;
+    }
+    .task-card:hover{
+      transform: translateY(-2px);
+      border-color: rgba(148,163,184,.28);
+    }
+
+    .task-head{
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(148,163,184,.12);
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+    }
+    .task-title{
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: .2px;
+      margin: 0;
+      display:flex; align-items:center; gap:10px;
+    }
+    .task-body{ padding: 14px 16px 16px; }
+    code{
+      color: #93c5fd;
+      background: rgba(59,130,246,.12);
+      padding: 2px 6px;
+      border-radius: 8px;
+    }
+    .task-body ul{ margin-bottom:0; }
+    .task-body li{ color: rgba(226,232,240,.85); }
+
+    .done .task-title,
+    .done .task-body{
+      opacity: .55;
+    }
+    .done .task-title{
+      text-decoration: line-through;
+    }
+
+    .form-check-input{
+      border-color: rgba(148,163,184,.35);
+      background-color: rgba(2,6,23,.35);
+    }
+    .form-check-input:checked{
+      border-color: rgba(34,197,94,.65);
+      background-color: rgba(34,197,94,.85);
+    }
+
+    .chip{
+      font-size: .78rem;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,.18);
+      background: rgba(2,6,23,.35);
+      color: rgba(226,232,240,.8);
+      white-space: nowrap;
+    }
+
+    .progress{
+      height: 10px;
+      background: rgba(148,163,184,.14);
+      border-radius: 999px;
+      overflow:hidden;
+    }
+
+    .btn-ghost{
+      border: 1px solid rgba(148,163,184,.22);
+      color: rgba(226,232,240,.9);
+      background: rgba(2,6,23,.25);
+    }
+    .btn-ghost:hover{
+      background: rgba(2,6,23,.45);
+      border-color: rgba(148,163,184,.35);
+      color: rgba(226,232,240,1);
+    }
+
+    .search{
+      background: rgba(2,6,23,.25);
+      border: 1px solid rgba(148,163,184,.22);
+      color: rgba(226,232,240,.92);
+      border-radius: 14px;
+      padding: 12px 14px;
+    }
+    .search:focus{
+      outline: none;
+      border-color: rgba(56,189,248,.55);
+      box-shadow: 0 0 0 .2rem rgba(56,189,248,.15);
+    }
+  </style>
+</head>
+
+<body>
+<div class="app-wrap">
+  <div class="container">
+    <div class="glass p-4 p-md-5">
+      <!-- Header -->
+      <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3">
+        <div>
+          <div class="brand-badge mb-3">
+            <span class="dot"></span>
+            <span class="fw-semibold">JS Tasks Checklist</span>
+            <span class="chip">localStorage ✅</span>
+          </div>
+          <h1 class="h3 mb-2">JavaScript Tasks</h1>
+          <div class="muted">Checkbox-ը նշիր՝ task-ը պահվում է localStorage-ում և refresh-ից հետո էլ մնում է։</div>
+        </div>
+
+        <div class="w-100 w-md-auto d-flex flex-column gap-2" style="min-width: 280px;">
+          <input id="searchInput" class="search w-100" type="text" placeholder="Search (օր․ numbers, string, array, object)…">
+          <div class="d-flex gap-2">
+            <button id="markAllBtn" class="btn btn-ghost w-100">Mark all</button>
+            <button id="resetBtn" class="btn btn-outline-danger w-100">Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress -->
+      <div class="glass-soft mt-4 p-3">
+        <div class="d-flex align-items-center justify-content-between gap-3 mb-2">
+          <div class="fw-semibold">Progress</div>
+          <div class="chip"><span id="doneCount">0</span>/<span id="totalCount">0</span> done</div>
+        </div>
+        <div class="progress">
+          <div id="progressBar" class="progress-bar" role="progressbar" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <!-- Tasks -->
+      <div id="tasksWrap" class="row g-3 mt-3"></div>
+
+      <div id="emptyState" class="text-center muted mt-4 d-none">
+        Ոչինչ չի գտնվել 😕 Փորձիր ուրիշ որոնում։
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+
+  const TASKS=[{id:1,title:"Mixed array: numbers only, sum, square",given:'[1, "ergfe3tr", \'true\', true, false, -78, 58, 4, 54, 5, "5652", "barev"]',steps:["Ստանալ զանգված, որը պարունակում է միայն թվերը։","Հաշվել զանգվածի թվերի գումարը։","Ստացված թվերի արժեքները փոխարկել դրանց քառակուսիներով։"]},{id:2,title:"Array: < 100, unique, split even/odd",given:"[45, 7, 8, 9, 4, 2, 8, 56, 5, 4, 2, 57, 55, 7, 7]",steps:["Ստանալ զանգված, որը պարունակում է 100-ից փոքր թվերը։","Ջնջել զանգվածից կրկնվող արժեքները։","Ստացված զանգվածից առանձին հավաքել զույգ և կենտ թվերը երկու առանձին զանգվածների մեջ։"]},{id:3,title:"String: words count, uppercase, remove spaces",given:'"barev dzez inchpes eq"',steps:["Հաշվել տողի բառերի քանակը։","Փոխարկել տողը մեծատառերով։","Հեռացնել տողի բոլոր բացատները։"]},{id:4,title:"Array: product, evens, includes 5",given:"[2, 5, 8, 3, 9]",steps:["Հաշվել զանգվածի բոլոր տարրերի արտադրյալը։","Տպել զանգվածի բոլոր զույգ թվերը։","Պարզել զանգվածում կա՞ 5 թիվը, թե՞ ոչ։"]},{id:5,title:"Object: keys, values, add country",given:'{name: "Aram", age: 25, city: "Yerevan"}',steps:["Տպել օբյեկտի բոլոր բանալիները։","Տպել օբյեկտի բոլոր արժեքները։",'Ավելացնել նոր հատկություն՝ country: "Armenia"']},{id:6,title:"Array: sort asc, max, remove last",given:"[3, 6, 1, 4, 9]",steps:["Դասավորել զանգվածը աճման կարգով։","Պարզել զանգվածի ամենամեծ թիվը։","Հեռացնել զանգվածի վերջին տարրը։"]},{id:7,title:"String: length, capitalize first, reverse",given:'"javascript is fun"',steps:["Հաշվել տողի երկարությունը։","Փոխել տողի առաջին տառը մեծատառ։","Տողը շրջել հակառակ կողմով։"]},{id:8,title:"1..10: even count, odd sum, divide by 2",given:"[1,2,3,4,5,6,7,8,9,10]",steps:["Հաշվել զույգ թվերի քանակը։","Հաշվել կենտ թվերի գումարը։","Բաժանել բոլոր տարրերը 2-ի։"]},{id:9,title:"Words: first letters, includes banana, replace cherry",given:'["apple","banana","cherry","date"]',steps:["Տպել ամեն մի բառի առաջին տառը։",'Պարզել զանգվածում կա՞ "banana" բառը, թե՞ ոչ։','Փոխարինել "cherry" բառը "kiwi"-ով։']},{id:10,title:"String: split to array, trim first/last char, o->0",given:'"I love programming"',steps:["Փոխարկել տողը զանգվածի։","Հեռացնել տողի առաջին և վերջին տառը։",'Փոխել բոլոր "o"-ները "0"-ներով։']},{id:11,title:"Squares: roots, average, >10 only",given:"[1, 4, 9, 16, 25]",steps:["Գտնել զանգվածի բոլոր տարրերի քառակուսիների արմատները։","Հաշվել զանգվածի տարրերի միջինը։","Տպել միայն տարրեր, որոնք մեծ են 10-ից։"]},{id:12,title:"Car object: year=2021, delete model, add color",given:'{brand: "Toyota", model: "Corolla", year: 2020}',steps:["Փոխել օբյեկտի year հատկությունը 2021։","Հեռացնել օբյեկտից model հատկությունը։",'Ավելացնել նոր հատկություն՝ color: "red"']},{id:13,title:"Booleans: count true, print trues, remove 2nd",given:"[true, false, true, false, true]",steps:["Հաշվել true արժեքների քանակը։","Տպել զանգվածի բոլոր արժեքները, որոնք համընկնում են true-ի հետ։","Հեռացնել զանգվածի երկրորդ տարրը։"]},{id:14,title:"hello world: uppercase all, first word uppercase, second lowercase",given:'"hello world"',steps:["Փոխարկել բոլոր տառերը մեծատառերի։","Տողի առաջին բառը դարձնել մեծատառերով։","Տողի երկրորդ բառը դարձնել փոքրատառերով։"]},{id:15,title:"Array ops: push 30, shift, sum",given:"[5, 10, 15, 20, 25]",steps:["Ավելացնել զանգվածի վերջում թիվ 30։","Հեռացնել զանգվածի առաջին տարրը։","Գտնել զանգվածի բոլոր տարրերի գումարը։"]}],LS_KEY="js_tasks_done_v1";function loadDoneMap(){try{const e=localStorage.getItem(LS_KEY);return e?JSON.parse(e):{}}catch(e){return{}}}function saveDoneMap(e){localStorage.setItem(LS_KEY,JSON.stringify(e))}const tasksWrap=document.getElementById("tasksWrap"),emptyState=document.getElementById("emptyState"),doneCountEl=document.getElementById("doneCount"),totalCountEl=document.getElementById("totalCount"),progressBar=document.getElementById("progressBar"),searchInput=document.getElementById("searchInput"),resetBtn=document.getElementById("resetBtn"),markAllBtn=document.getElementById("markAllBtn");let doneMap=loadDoneMap(),filterText="";function taskMatches(e,t){if(!t)return!0;return(e.title+" "+e.given+" "+e.steps.join(" ")).toLowerCase().includes(t.toLowerCase())}function render(){tasksWrap.innerHTML="";const e=TASKS.filter((e=>taskMatches(e,filterText)));emptyState.classList.toggle("d-none",0!==e.length),e.forEach((e=>{const t=document.createElement("div");t.className="col-12 col-lg-6";const n=!!doneMap[e.id];t.innerHTML=`\n          <div class="task-card ${n?"done":""}" data-task-id="${e.id}">\n            <div class="task-head">\n              <div class="task-title">\n                <span class="chip">#${e.id}</span>\n                <span>${escapeHtml(e.title)}</span>\n              </div>\n\n              <div class="form-check form-switch m-0">\n                <input class="form-check-input js-done" type="checkbox" role="switch" id="done-${e.id}" ${n?"checked":""}>\n                <label class="form-check-label muted" for="done-${e.id}">Done</label>\n              </div>\n            </div>\n\n            <div class="task-body">\n              <div class="muted mb-2">Տրված է</div>\n              <div class="mb-3"><code>${escapeHtml(e.given)}</code></div>\n              <div class="muted mb-2">Անելիքներ</div>\n              <ul class="mb-0">\n                ${e.steps.map((e=>`<li>${escapeHtml(e)}</li>`)).join("")}\n              </ul>\n            </div>\n          </div>\n        `,tasksWrap.appendChild(t)})),updateProgress(),attachHandlers()}function attachHandlers(){document.querySelectorAll(".js-done").forEach((e=>{e.onchange=e=>{const t=e.target.closest(".task-card"),n=Number(t.dataset.taskId);doneMap[n]=e.target.checked,saveDoneMap(doneMap),t.classList.toggle("done",e.target.checked),updateProgress()}}))}function updateProgress(){const e=TASKS.length,t=TASKS.reduce(((e,t)=>e+(doneMap[t.id]?1:0)),0);totalCountEl.textContent=e,doneCountEl.textContent=t;const n=e?Math.round(t/e*100):0;progressBar.style.width=n+"%",progressBar.setAttribute("aria-valuenow",String(n)),progressBar.textContent=n>=18?n+"%":""}function escapeHtml(e){return String(e).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;")}searchInput.addEventListener("input",(e=>{filterText=e.target.value.trim(),render()})),resetBtn.addEventListener("click",(()=>{localStorage.removeItem(LS_KEY),doneMap={},render()})),markAllBtn.addEventListener("click",(()=>{const e=TASKS.every((e=>doneMap[e.id]));TASKS.forEach((t=>doneMap[t.id]=!e)),saveDoneMap(doneMap),render()})),render();
+</script>
+</body>
+</html>

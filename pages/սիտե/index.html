@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="hy">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>ONEX · Bootstrap Mock</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+    <!-- Custom -->
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar py-2">
+    <div class="container d-flex align-items-center justify-content-between gap-3 flex-wrap">
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+        <span class="badge rounded-pill top-pill">
+          <i class="bi bi-box-seam me-1"></i> Delivery
+        </span>
+            <span class="text-white-50 small">Աշխատանքային ժամեր · 10:00–19:00</span>
+        </div>
+
+        <div class="d-flex align-items-center gap-2 small">
+            <a class="toplink" href="#">Մուտք</a>
+            <span class="topsep"></span>
+            <a class="toplink" href="#">ՀՏՀ</a>
+            <span class="topsep"></span>
+            <a class="toplink" href="#">Հայ</a>
+        </div>
+    </div>
+</div>
+
+<!-- HEADER -->
+<nav class="navbar navbar-expand-lg sticky-top headerNav">
+    <div class="container">
+        <a class="navbar-brand fw-black d-flex align-items-center gap-1" href="#">
+            <span class="brandA">ON</span><span class="brandB">EX</span>
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div id="mainNav" class="collapse navbar-collapse">
+            <ul class="navbar-nav mx-auto navPill mt-3 mt-lg-0">
+                <li class="nav-item"><a class="nav-link" href="#">Ծառայություններ</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Սակագներ</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Smart</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Հետևել</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Կոնտակտ</a></li>
+            </ul>
+
+            <div class="d-flex gap-2 ms-lg-3">
+                <a class="btn btn-outline-light btnSoft d-none d-lg-inline-flex" href="#">
+                    <i class="bi bi-geo-alt me-2"></i>Հետևել
+                </a>
+                <a class="btn btnOnex" href="#">
+                    Ստեղծել առաքում
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="py-3">
+    <div class="container">
+        <div class="heroCard position-relative overflow-hidden">
+            <div class="heroBg"></div>
+
+            <div class="heroOverlay p-4 p-md-5">
+                <div class="d-inline-flex align-items-center gap-2 badge heroBadge mb-3">
+                    🇺🇸 <span class="fw-semibold">ԱՄՆ</span>
+                </div>
+
+                <h1 class="heroTitle mb-3">
+                    ԳՐԱՆՑՎԻՐ ՀԻՄԱ <br>
+                    <span class="heroAccent">ՍՏԱՑԻՐ ԱՌԱՔՈՒՄ</span>
+                </h1>
+
+                <div class="d-flex align-items-end gap-3 mb-2 flex-wrap">
+                    <div class="heroPriceNow">3900֏</div>
+                    <div class="heroPriceOld">5900֏</div>
+                </div>
+
+                <div class="text-white-50 small">2026 մարտ · ակցիա</div>
+            </div>
+
+            <div class="heroDots position-absolute start-50 translate-middle-x">
+                <span class="dot active"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- TRACKING -->
+<section class="py-4 py-md-5">
+    <div class="container">
+        <div class="text-center mb-4">
+            <div class="stars">****</div>
+            <h2 class="h3 fw-black mb-2">Հետևել առաքմանը</h2>
+            <p class="text-muted mb-0">Մուտքագրիր tracking համարը՝ կարգավիճակը տեսնելու համար</p>
+        </div>
+
+        <div class="trackWrap mx-auto">
+            <div class="input-group input-group-lg trackGroup">
+                <span class="input-group-text trackIcon"><i class="bi bi-search"></i></span>
+                <input class="form-control trackInput" placeholder="Օր․ ONX-123456789">
+                <button class="btn btnOnex px-4">Փնտրել</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- PINCODE -->
+<section class="pb-4 pb-md-5">
+    <div class="container">
+        <div class="card cardX border-0">
+            <div class="row g-0 align-items-stretch">
+                <div class="col-lg-7">
+                    <div class="p-4 p-md-5">
+                        <h3 class="fw-black mb-2">PINCODE-ով առաքում</h3>
+                        <p class="text-muted mb-4">
+                            Ապահով տարբերակ՝ ստացողի PIN-ով հաստատում։ Հարմար է արժեքավոր բեռների համար։
+                        </p>
+                        <a class="btn btnOnex" href="#">Մանրամասներ</a>
+                    </div>
+                </div>
+                <div class="col-lg-5 pinArt d-flex align-items-center justify-content-center">
+                    <div class="pinBlob position-relative">
+                        <div class="pinCircle"></div>
+                        <div class="pinEmoji">📦 🔒 📍</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SERVICES -->
+<section class="py-4 py-md-5">
+    <div class="container">
+        <div class="text-center mb-4">
+            <div class="stars">****</div>
+            <h2 class="h3 fw-black mb-2">Առաքման ծառայություններ մեր <span class="text-onex">ONEX</span>-ում</h2>
+            <p class="text-muted mb-0">Ընտրիր ուղղությունը՝ տեսնելու համար պայմանները</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <article class="svcCard h-100">
+                    <div class="svcThumb thumb1">
+                        <span class="svcTag">Նոր</span>
+                    </div>
+                    <div class="p-3 p-md-4">
+                        <h5 class="fw-black mb-1">ԱՄՆ-ից Հայաստան</h5>
+                        <div class="text-muted small mb-3">Օդային առաքում · արագ</div>
+                        <a class="svcLink" href="#">Մանրամասներ <i class="bi bi-arrow-right"></i></a>
+                    </div>
+                </article>
+            </div>
+
+            <div class="col-md-4">
+                <article class="svcCard h-100">
+                    <div class="svcThumb thumb2">
+                        <span class="svcTag">-10%</span>
+                    </div>
+                    <div class="p-3 p-md-4">
+                        <h5 class="fw-black mb-1">Լեհաստանից Հայաստան</h5>
+                        <div class="text-muted small mb-3">Եվրոպա · օպտիմալ գին</div>
+                        <a class="svcLink" href="#">Մանրամասներ <i class="bi bi-arrow-right"></i></a>
+                    </div>
+                </article>
+            </div>
+
+            <div class="col-md-4">
+                <article class="svcCard h-100">
+                    <div class="svcThumb thumb3">
+                        <span class="svcTag">TOP</span>
+                    </div>
+                    <div class="p-3 p-md-4">
+                        <h5 class="fw-black mb-1">Գերմանիայից Հայաստան</h5>
+                        <div class="text-muted small mb-3">Արագ մշակման կենտրոն</div>
+                        <a class="svcLink" href="#">Մանրամասներ <i class="bi bi-arrow-right"></i></a>
+                    </div>
+                </article>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <a class="btn btn-outline-secondary btnSoft2" href="#">Տեսնել բոլորը</a>
+        </div>
+    </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="py-4 py-md-5 sectionSoft">
+    <div class="container">
+        <div class="text-center mb-4">
+            <div class="stars">****</div>
+            <h2 class="h3 fw-black mb-2">Ինչպես է աշխատում</h2>
+            <p class="text-muted mb-0">4 պարզ քայլ՝ մինչև ստանալը</p>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-sm-6 col-lg-3">
+                <div class="stepCard h-100">
+                    <div class="stepNum">1</div>
+                    <h6 class="fw-black mt-2 mb-1">Գրանցվում ես</h6>
+                    <p class="text-muted small mb-0">Ստանում ես քո հասցեն/ID-ն</p>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="stepCard h-100">
+                    <div class="stepNum">2</div>
+                    <h6 class="fw-black mt-2 mb-1">Գնում ես online</h6>
+                    <p class="text-muted small mb-0">Amazon / eBay / և այլն</p>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="stepCard h-100">
+                    <div class="stepNum">3</div>
+                    <h6 class="fw-black mt-2 mb-1">Փաթեթը գալիս է պահեստ</h6>
+                    <p class="text-muted small mb-0">Մենք գրանցում ենք համակարգում</p>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="stepCard h-100">
+                    <div class="stepNum">4</div>
+                    <h6 class="fw-black mt-2 mb-1">Դու ստանում ես</h6>
+                    <p class="text-muted small mb-0">Առաքում տուն կամ կետ</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- TABLE -->
+<section class="py-4 py-md-5">
+    <div class="container">
+        <div class="text-center mb-4">
+            <div class="stars">****</div>
+            <h2 class="h3 fw-black mb-2">Գներ՝ ըստ ուղղությունների</h2>
+            <p class="text-muted mb-0">Օրինակային սակագներ՝ քաշ/ծավալ կախված</p>
+        </div>
+
+        <div class="tableCard">
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead>
+                    <tr>
+                        <th>Երկիր</th>
+                        <th>Առաքում</th>
+                        <th>Ժամկետ</th>
+                        <th class="text-end">Գին (սկսած)</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>🇺🇸 ԱՄՆ</td>
+                        <td>Օդային</td>
+                        <td>7–12 օր</td>
+                        <td class="text-end priceCell">3900֏</td>
+                    </tr>
+                    <tr>
+                        <td>🇩🇪 Գերմանիա</td>
+                        <td>Օդային</td>
+                        <td>6–10 օր</td>
+                        <td class="text-end priceCell">4200֏</td>
+                    </tr>
+                    <tr>
+                        <td>🇵🇱 Լեհաստան</td>
+                        <td>Օդային</td>
+                        <td>8–14 օր</td>
+                        <td class="text-end priceCell">4000֏</td>
+                    </tr>
+                    <tr>
+                        <td>🇨🇳 Չինաստան</td>
+                        <td>Օդային</td>
+                        <td>10–18 օր</td>
+                        <td class="text-end priceCell">3500֏</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- SMART NOTIFICATIONS -->
+<section class="pb-4 pb-md-5">
+    <div class="container">
+        <div class="card cardX border-0">
+            <div class="row g-0 align-items-stretch">
+                <div class="col-lg-5 smartArt d-flex align-items-center justify-content-center">
+                    <div class="smartPhone"></div>
+                </div>
+                <div class="col-lg-7">
+                    <div class="p-4 p-md-5">
+                        <h3 class="fw-black mb-3"><span class="text-onex">SMART</span> Ծանուցումներ</h3>
+                        <ul class="list-unstyled d-grid gap-2 mb-4">
+                            <li><i class="bi bi-check-circle-fill text-success me-2"></i> Tracking թարմացումներ</li>
+                            <li><i class="bi bi-check-circle-fill text-success me-2"></i> Վճարումների հիշեցումներ</li>
+                            <li><i class="bi bi-check-circle-fill text-success me-2"></i> Առաքման փուլերի հաղորդագրություններ</li>
+                            <li><i class="bi bi-check-circle-fill text-success me-2"></i> Աջակցություն</li>
+                        </ul>
+                        <a class="btn btnOnex" href="#">Միացնել</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- WALL + LOCKER -->
+<section class="py-4 py-md-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="card cardX border-0 h-100">
+                    <div class="p-4 p-md-5 position-relative">
+                        <h3 class="fw-black mb-2">ONEX <span class="text-onex">SMART WALL</span></h3>
+                        <p class="text-muted mb-4">Հարմար ստացման կետ՝ արագ և հերթ չսպասելով։</p>
+                        <a class="btn btn-outline-secondary btnSoft2" href="#">Կարդալ ավելին</a>
+                        <div class="miniArt miniBox"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card cardX border-0 h-100">
+                    <div class="p-4 p-md-5 position-relative">
+                        <h3 class="fw-black mb-2">ONEX <span class="text-onex">SMART LOCKER</span></h3>
+                        <p class="text-muted mb-4">Լոքեր համակարգ՝ 24/7 ստացում PIN-ով։</p>
+                        <a class="btn btn-outline-secondary btnSoft2" href="#">Կարդալ ավելին</a>
+                        <div class="miniArt miniLocker"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- PARTNERS -->
+<section class="py-4 py-md-5 sectionSoft">
+    <div class="container">
+        <div class="text-center mb-4">
+            <div class="stars">****</div>
+            <h2 class="h4 fw-black mb-0">Աշխատում ենք սիրված հարթակների հետ</h2>
+        </div>
+
+        <div class="row g-3 justify-content-center">
+            <div class="col-6 col-md-4 col-lg-2"><div class="logoBox">amazon</div></div>
+            <div class="col-6 col-md-4 col-lg-2"><div class="logoBox">ebay</div></div>
+            <div class="col-6 col-md-4 col-lg-2"><div class="logoBox">H&M</div></div>
+            <div class="col-6 col-md-4 col-lg-2"><div class="logoBox">GAP</div></div>
+            <div class="col-6 col-md-4 col-lg-2"><div class="logoBox">ZARA</div></div>
+            <div class="col-6 col-md-4 col-lg-2"><div class="logoBox">Nike</div></div>
+        </div>
+
+        <div class="text-center mt-4">
+            <a class="btn btnOnex" href="#">Սկսել</a>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer mt-4">
+    <div class="container py-5">
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="d-inline-flex align-items-center fw-black fs-4">
+                    <span class="brandA text-white">ON</span><span class="brandB">EX</span>
+                </div>
+                <p class="text-white-50 mt-2 mb-0">Առաքումներ · Tracking · Smart լուծումներ</p>
+            </div>
+
+            <div class="col-6 col-lg-2">
+                <h6 class="text-white fw-black">Բաժիններ</h6>
+                <a class="fLink" href="#">Ծառայություններ</a>
+                <a class="fLink" href="#">Սակագներ</a>
+                <a class="fLink" href="#">ՀՏՀ</a>
+            </div>
+
+            <div class="col-6 col-lg-3">
+                <h6 class="text-white fw-black">Կոնտակտ</h6>
+                <a class="fLink" href="#">+374 xx xx xx xx</a>
+                <a class="fLink" href="#">support@onex.am</a>
+                <a class="fLink" href="#">Երևան</a>
+            </div>
+
+            <div class="col-lg-3">
+                <h6 class="text-white fw-black">Սոցիալ</h6>
+                <div class="d-flex gap-2">
+                    <a class="sIcon" href="#" aria-label="fb"><i class="bi bi-facebook"></i></a>
+                    <a class="sIcon" href="#" aria-label="ig"><i class="bi bi-instagram"></i></a>
+                    <a class="sIcon" href="#" aria-label="tg"><i class="bi bi-telegram"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 border-top border-white-10 pt-3 mt-4">
+            <span class="text-white-50 small">© 2026 ONEX · Demo layout</span>
+            <span class="text-white-50 small">Privacy · Terms</span>
+        </div>
+    </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

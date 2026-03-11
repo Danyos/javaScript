@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8" />
+    <title>Mini Shop — Cart + Wishlist + Stock + Filter + Promo + Orders</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <style>
+        :root {
+            --bg: #020617;
+            --card: #0f172a;
+            --border: #1f2937;
+            --text-main: #e5e7eb;
+            --text-muted: #9ca3af;
+            --accent: #38bdf8;
+            --accent-soft: rgba(56, 189, 248, 0.1);
+            --danger: #f97373;
+            --wish: #fbbf24;
+            --disabled: #6b7280;
+            --success: #4ade80;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: radial-gradient(circle at top, #1e293b, #020617 55%);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .app {
+            width: 100%;
+            max-width: 1100px;
+            background: rgba(15, 23, 42, 0.96);
+            border-radius: 18px;
+            border: 1px solid var(--border);
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.9);
+            padding: 18px 16px 20px;
+        }
+
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .app-header h1 {
+            font-size: 20px;
+            margin: 0;
+        }
+
+        .app-header p {
+            margin: 4px 0 0;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .badges {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 12px;
+            align-items: flex-end;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: #020617;
+        }
+
+        .badge-pill {
+            padding: 2px 6px;
+            border-radius: 999px;
+            background: var(--accent);
+            color: #020617;
+            font-weight: 600;
+            font-size: 11px;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .badge-pill.wish {
+            background: var(--wish);
+            color: #1f2937;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.4fr);
+            gap: 14px;
+        }
+
+        @media (max-width: 900px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: rgba(15, 23, 42, 0.98);
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            padding: 10px 10px 12px;
+        }
+
+        .card-title {
+            font-size: 14px;
+            margin: 0 0 6px;
+            font-weight: 500;
+        }
+
+        .card-subtitle {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin: 0 0 8px;
+        }
+
+        /* FILTER BAR */
+        .controls-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+
+        .checkbox-wrap {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .checkbox-wrap input {
+            width: 14px;
+            height: 14px;
+        }
+
+        .select-sm {
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: #020617;
+            color: var(--text-main);
+            padding: 4px 10px;
+            font-size: 12px;
+        }
+
+        .btn-xs {
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: #020617;
+            color: var(--text-main);
+            padding: 5px 10px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .btn-xs:hover {
+            background: #111827;
+        }
+
+        /* PRODUCTS */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 10px;
+        }
+
+        .product-item {
+            border-radius: 12px;
+            border: 1px solid rgba(31, 41, 55, 0.9);
+            background: #020617;
+            padding: 9px 9px 10px;
+            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            position: relative;
+        }
+
+        .product-category {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .product-name {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .product-price {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .product-stock {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .product-stock.out {
+            color: var(--danger);
+            font-weight: 500;
+        }
+
+        .product-footer {
+            margin-top: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn {
+            border-radius: 999px;
+            border: none;
+            padding: 6px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #0ea5e9, #22c55e);
+            color: #020617;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+
+        .btn.secondary {
+            background: #020617;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+        }
+
+        .btn.buy {
+            width: 100%;
+            margin-top: 10px;
+            justify-content: center;
+        }
+
+        .btn:active {
+            transform: translateY(1px) scale(.99);
+        }
+
+        .btn:disabled {
+            cursor: not-allowed;
+            background: #111827;
+            color: var(--disabled);
+            border: 1px solid #374151;
+        }
+
+        .btn-icon {
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: #020617;
+            color: var(--text-muted);
+            cursor: pointer;
+            width: 26px;
+            height: 26px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .btn-icon.active {
+            background: var(--accent-soft);
+            color: var(--wish);
+            border-color: var(--wish);
+        }
+
+        /* CART TABLE */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        th, td {
+            padding: 6px 7px;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            font-weight: 500;
+            color: var(--text-muted);
+            font-size: 11px;
+            background: rgba(15, 23, 42, 0.98);
+        }
+
+        tbody tr:nth-child(2n) {
+            background: rgba(15, 23, 42, 0.85);
+        }
+
+        tbody tr:hover {
+            background: rgba(15, 23, 42, 0.95);
+        }
+
+        .cart-empty,
+        .wishlist-empty,
+        .orders-empty {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: center;
+            padding: 10px 0 4px;
+        }
+
+        .qty-controls {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .qty-btn {
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: #020617;
+            color: var(--text-main);
+            font-size: 11px;
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .qty-value {
+            min-width: 18px;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .remove-btn {
+            border: none;
+            background: none;
+            color: var(--danger);
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* WISHLIST */
+        .wishlist-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .wish-item {
+            padding: 4px 8px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: #020617;
+            font-size: 11px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .wish-name {
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .badge-small {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .tag-sm {
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            padding: 1px 5px;
+            font-size: 9px;
+            color: var(--text-muted);
+        }
+
+        /* CART SUMMARY + PROMO */
+        .cart-summary-box {
+            margin-top: 8px;
+            padding-top: 6px;
+            border-top: 1px dashed var(--border);
+            font-size: 12px;
+        }
+
+        .cart-summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2px;
+        }
+
+        .cart-summary-label {
+            color: var(--text-muted);
+        }
+
+        .cart-summary-value {
+            font-weight: 500;
+        }
+
+        .cart-summary-final {
+            margin-top: 4px;
+            font-weight: 600;
+        }
+
+        .cart-summary-final span {
+            color: var(--accent);
+        }
+
+        .promo-row {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .promo-row input {
+            flex: 1;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: #020617;
+            color: var(--text-main);
+            padding: 6px 10px;
+            font-size: 12px;
+        }
+
+        .promo-msg {
+            margin-top: 4px;
+            font-size: 11px;
+        }
+
+        .promo-msg.error { color: var(--danger); }
+        .promo-msg.success { color: var(--success); }
+
+        /* Orders History */
+        .orders-box {
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px dashed var(--border);
+        }
+
+        .order-row {
+            cursor: pointer;
+        }
+
+        .order-row.active {
+            outline: 1px solid rgba(56, 189, 248, 0.35);
+            box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.06) inset;
+        }
+
+        .details {
+            margin-top: 8px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: #020617;
+            padding: 10px;
+            display: none;
+        }
+
+        .details-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .details-title {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .details-meta {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .close-details {
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: #0b1220;
+            color: var(--text-main);
+            padding: 5px 10px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 10px;
+            font-size: 12px;
+        }
+
+        .details-card {
+            border: 1px solid rgba(31, 41, 55, 0.9);
+            background: rgba(15, 23, 42, 0.85);
+            border-radius: 12px;
+            padding: 8px;
+        }
+
+        .details-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 2px;
+        }
+
+        .details-value {
+            font-weight: 600;
+        }
+
+        .muted { color: var(--text-muted); }
+    </style>
+</head>
+
+<body>
+<div class="app">
+    <header class="app-header">
+        <div>
+            <h1>Mini Shop — Cart + Wishlist + Stock</h1>
+            <p>Checkout + Orders history (սեղմիր գնումի վրա՝ տեսնելու ինչ է գնել)</p>
+        </div>
+
+        <div class="badges">
+            <div class="badge">
+                Cart items:
+                <span id="cart-count" class="badge-pill">0</span>
+            </div>
+
+            <div class="badge">
+                Wishlist:
+                <span id="wish-count" class="badge-pill wish">0</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="layout">
+        <!-- LEFT: PRODUCTS -->
+        <section class="card">
+            <h2 class="card-title">Ապրանքների ցուցակ</h2>
+            <p class="card-subtitle">
+                Checkbox՝ միայն մնացած ապրանքները, filter կոճակ՝ կատեգորիա, և stock սահմանափակում։
+            </p>
+
+            <!-- FILTER CONTROLS -->
+            <div class="controls-row">
+                <label class="checkbox-wrap">
+                    <input type="checkbox" id="in-stock-only">
+                    <span>Միայն stock ունեցողները</span>
+                </label>
+
+                <select id="category-filter" class="select-sm">
+                    <option value="all">Բոլոր կատեգորիաները</option>
+                    <option value="Books">Books</option>
+                    <option value="Courses">Courses</option>
+                    <option value="Accessories">Accessories</option>
+                    <option value="Merch">Merch</option>
+                </select>
+
+                <button id="apply-filter-btn" class="btn-xs">Ֆիլտր</button>
+                <button id="reset-filter-btn" class="btn-xs">Մաքրել</button>
+            </div>
+
+            <div id="products-grid" class="products-grid"></div>
+        </section>
+
+        <!-- RIGHT: CART + WISHLIST + ORDERS -->
+        <section class="card">
+            <h2 class="card-title">Քո զամբյուղը</h2>
+            <p class="card-subtitle">
+                Քանակներ + stock սահմանափակում + promocode զեղչ (PROMO10 կամ PROMO20)։
+            </p>
+
+            <table>
+                <thead>
+                <tr>
+                    <th>Ապրանք</th>
+                    <th>Գին</th>
+                    <th>Քանակ</th>
+                    <th>Միջագումար</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody id="cart-body"></tbody>
+            </table>
+
+            <div id="cart-empty" class="cart-empty">Զամբյուղը դատարկ է 🙂</div>
+
+            <!-- CART SUMMARY + PROMO -->
+            <div class="cart-summary-box" id="cart-summary-box" style="display:none;">
+                <div class="cart-summary-row">
+                    <span class="cart-summary-label">Ընդհանուր գումար (առանց զեղչի)</span>
+                    <span class="cart-summary-value" id="cart-subtotal">0 ֏</span>
+                </div>
+                <div class="cart-summary-row">
+                    <span class="cart-summary-label">Զեղչ (promocode)</span>
+                    <span class="cart-summary-value" id="cart-discount">0 ֏</span>
+                </div>
+                <div class="cart-summary-final">
+                    Վճարելիք գումար՝ <span id="cart-total-final">0 ֏</span>
+                </div>
+
+                <form id="promo-form" class="promo-row">
+                    <input type="text" id="promo-input" placeholder="Մուտքագրիր promocode (օր․ PROMO10 կամ PROMO20)">
+                    <button type="submit" class="btn secondary">Apply</button>
+                </form>
+                <div id="promo-msg" class="promo-msg"></div>
+
+                <button id="buy-btn" class="btn buy" type="button">Գնել հիմա</button>
+            </div>
+
+            <!-- ORDERS HISTORY -->
+            <div class="orders-box">
+                <h3 class="card-title">Գնումների պատմություն</h3>
+                <p class="card-subtitle">1 տող = 1 գնում։ Սեղմիր տողի վրա՝ բացելու մանրամասները։</p>
+
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Ամսաթիվ</th>
+                        <th>Քանակ</th>
+                        <th>Promocode</th>
+                        <th>Total</th>
+                    </tr>
+                    </thead>
+                    <tbody id="orders-body"></tbody>
+                </table>
+
+                <div id="orders-empty" class="orders-empty">Դեռ գնումներ չկան 🙂</div>
+
+                <div id="order-details" class="details">
+                    <div class="details-head">
+                        <div>
+                            <div class="details-title" id="details-title">Գնում #</div>
+                            <div class="details-meta" id="details-meta">—</div>
+                        </div>
+                        <button class="close-details" id="close-details" type="button">Փակել</button>
+                    </div>
+
+                    <div class="details-grid">
+                        <div class="details-card">
+                            <div class="details-label">Subtotal</div>
+                            <div class="details-value" id="details-subtotal">0 ֏</div>
+                        </div>
+                        <div class="details-card">
+                            <div class="details-label">Discount</div>
+                            <div class="details-value" id="details-discount">0 ֏</div>
+                        </div>
+                        <div class="details-card">
+                            <div class="details-label">Total</div>
+                            <div class="details-value" id="details-total">0 ֏</div>
+                        </div>
+                        <div class="details-card">
+                            <div class="details-label">Items count</div>
+                            <div class="details-value" id="details-qty">0</div>
+                        </div>
+                    </div>
+
+                    <div class="muted" style="font-size:11px;margin-bottom:6px;">Գնված ապրանքների ցանկ</div>
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Ապրանք</th>
+                            <th>Գին</th>
+                            <th>Քանակ</th>
+                            <th>Միջագումար</th>
+                        </tr>
+                        </thead>
+                        <tbody id="details-items"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <hr style="border-color:rgba(31,41,55,0.7);margin:10px 0;">
+
+            <h3 class="card-title">Wishlist</h3>
+            <p class="card-subtitle">Այստեղ են ապրանքները, որոնք user-ը պահել է “հետո գնելու” համար։</p>
+
+            <div id="wishlist-empty" class="wishlist-empty">Wishlist-ը դատարկ է 💭</div>
+            <div id="wishlist-list" class="wishlist-list"></div>
+        </section>
+    </div>
+</div>
+
+<script>
+    // --- Products "database" + STOCK ---
+    const products = [
+        { id: 1, name: "JavaScript Book",        price: 12000, category: "Books",       stock: 5 },
+        { id: 2, name: "React Course Access",    price: 55000, category: "Courses",     stock: 2 },
+        { id: 3, name: "Wireless Mouse",         price: 9000,  category: "Accessories", stock: 4 },
+        { id: 4, name: "Mechanical Keyboard",    price: 35000, category: "Accessories", stock: 3 },
+        { id: 5, name: "VS Code Stickers Pack",  price: 3000,  category: "Merch",       stock: 10 },
+        { id: 6, name: "Frontend Hoodie",        price: 22000, category: "Merch",       stock: 1 }
+    ];
+
+    const promoCodes = {
+        "PROMO10": 10,
+        "PROMO20": 20,
+    };
+
+    // --- State ---
+    let cart = [];
+    let wishlist = [];
+    let orders = []; // ✅ NEW: orders history (1 row = 1 order)
+    let filterState = { inStockOnly: false, category: "all" };
+    let activePromo = { code: null, percent: 0 };
+
+    // --- Elements ---
+    const productsGridEl = document.getElementById("products-grid");
+
+    const cartBodyEl = document.getElementById("cart-body");
+    const cartEmptyEl = document.getElementById("cart-empty");
+    const cartCountEl = document.getElementById("cart-count");
+
+    const wishlistListEl = document.getElementById("wishlist-list");
+    const wishlistEmptyEl = document.getElementById("wishlist-empty");
+    const wishCountEl = document.getElementById("wish-count");
+
+    const inStockOnlyEl = document.getElementById("in-stock-only");
+    const categoryFilterEl = document.getElementById("category-filter");
+    const applyFilterBtnEl = document.getElementById("apply-filter-btn");
+    const resetFilterBtnEl = document.getElementById("reset-filter-btn");
+
+    const cartSummaryBoxEl = document.getElementById("cart-summary-box");
+    const cartSubtotalEl = document.getElementById("cart-subtotal");
+    const cartDiscountEl = document.getElementById("cart-discount");
+    const cartTotalFinalEl = document.getElementById("cart-total-final");
+
+    const promoFormEl = document.getElementById("promo-form");
+    const promoInputEl = document.getElementById("promo-input");
+    const promoMsgEl = document.getElementById("promo-msg");
+
+    const buyBtnEl = document.getElementById("buy-btn");
+
+    // Orders elements
+    const ordersBodyEl = document.getElementById("orders-body");
+    const ordersEmptyEl = document.getElementById("orders-empty");
+    const orderDetailsEl = document.getElementById("order-details");
+    const closeDetailsEl = document.getElementById("close-details");
+
+    const detailsTitleEl = document.getElementById("details-title");
+    const detailsMetaEl = document.getElementById("details-meta");
+    const detailsSubtotalEl = document.getElementById("details-subtotal");
+    const detailsDiscountEl = document.getElementById("details-discount");
+    const detailsTotalEl = document.getElementById("details-total");
+    const detailsQtyEl = document.getElementById("details-qty");
+    const detailsItemsEl = document.getElementById("details-items");
+
+    let selectedOrderId = null;
+
+    // --- Helpers ---
+    function formatPrice(v) { return v.toLocaleString("hy-AM"); }
+
+    function fmtDate(ts) {
+        return new Date(ts).toLocaleString("hy-AM", {
+            year: "numeric", month: "2-digit", day: "2-digit",
+            hour: "2-digit", minute: "2-digit"
+        });
+    }
+
+    function isInWishlist(id) { return wishlist.includes(id); }
+
+    function getCartQty(id) {
+        const item = cart.find(i => i.id === id);
+        return item ? item.qty : 0;
+    }
+
+    function getAvailableStock(id) {
+        const p = products.find(p => p.id === id);
+        if (!p) return 0;
+        const inCart = getCartQty(id);
+        return p.stock - inCart;
+    }
+
+    function getCartTotals() {
+        let totalQty = 0;
+        let subtotal = 0;
+        cart.forEach(item => {
+            totalQty += item.qty;
+            subtotal += item.price * item.qty;
+        });
+        return { totalQty, subtotal };
+    }
+
+    function calcTotalsFromSubtotal(subtotal, promoPercent) {
+        const discount = (promoPercent > 0 && subtotal > 0)
+            ? Math.round(subtotal * promoPercent / 100)
+            : 0;
+        const total = Math.max(subtotal - discount, 0);
+        return { discount, total };
+    }
+
+    // --- Render Products ---
+    function getFilteredProducts() {
+        return products.filter(p => {
+            if (filterState.category !== "all" && p.category !== filterState.category) return false;
+            if (filterState.inStockOnly && getAvailableStock(p.id) <= 0) return false;
+            return true;
+        });
+    }
+
+    function renderProducts() {
+        productsGridEl.innerHTML = "";
+        getFilteredProducts().forEach(p => {
+            const wishActive = isInWishlist(p.id);
+            const available = getAvailableStock(p.id);
+            const out = available <= 0;
+
+            const div = document.createElement("div");
+            div.className = "product-item";
+            div.innerHTML = `
+        <div class="product-category">${p.category}</div>
+        <div class="product-name">${p.name}</div>
+        <div class="product-price">${formatPrice(p.price)} ֏</div>
+        <div class="product-stock ${out ? "out" : ""}">
+          ${out ? "Ավարտված է" : "Մնացել է՝ " + available + " հատ (ընդամենը " + p.stock + ")"}
+        </div>
+        <div class="product-footer">
+          <button class="btn" data-action="add-cart" data-id="${p.id}" ${out ? "disabled" : ""}>
+            ${out ? "Ավարտված" : "+ Add to cart"}
+          </button>
+
+          <button class="btn-icon ${wishActive ? "active" : ""}" data-action="toggle-wish" data-id="${p.id}" title="Add to wishlist">
+            ♥
+          </button>
+        </div>
+      `;
+            productsGridEl.appendChild(div);
+        });
+    }
+
+    // --- Render Cart ---
+    function renderCart() {
+        cartBodyEl.innerHTML = "";
+
+        if (cart.length === 0) {
+            cartEmptyEl.style.display = "block";
+            cartSummaryBoxEl.style.display = "none";
+        } else {
+            cartEmptyEl.style.display = "none";
+            cartSummaryBoxEl.style.display = "block";
+        }
+
+        let totalQty = 0;
+
+        cart.forEach(item => {
+            const rowSum = item.price * item.qty;
+            totalQty += item.qty;
+
+            const p = products.find(p => p.id === item.id);
+            const totalStock = p ? p.stock : item.qty;
+
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+        <td>
+          ${item.name}
+          <span class="badge-small">(${item.category})</span>
+          <br>
+          <span class="badge-small">stock: ${totalStock} • cart: ${item.qty}</span>
+        </td>
+        <td>${formatPrice(item.price)} ֏</td>
+        <td>
+          <div class="qty-controls">
+            <button class="qty-btn" data-action="dec" data-id="${item.id}">-</button>
+            <span class="qty-value">${item.qty}</span>
+            <button class="qty-btn" data-action="inc" data-id="${item.id}">+</button>
+          </div>
+        </td>
+        <td>${formatPrice(rowSum)} ֏</td>
+        <td>
+          <button class="remove-btn" data-action="remove" data-id="${item.id}">&times;</button>
+        </td>
+      `;
+            cartBodyEl.appendChild(tr);
+        });
+
+        cartCountEl.textContent = totalQty;
+        renderCartSummary();
+    }
+
+    function renderCartSummary() {
+        const { subtotal } = getCartTotals();
+        const { discount, total } = calcTotalsFromSubtotal(subtotal, activePromo.percent);
+
+        cartSubtotalEl.textContent = formatPrice(subtotal) + " ֏";
+        cartDiscountEl.textContent = "-" + formatPrice(discount) + " ֏";
+        cartTotalFinalEl.textContent = formatPrice(total) + " ֏";
+    }
+
+    // --- Render Wishlist ---
+    function renderWishlist() {
+        wishlistListEl.innerHTML = "";
+
+        if (wishlist.length === 0) wishlistEmptyEl.style.display = "block";
+        else wishlistEmptyEl.style.display = "none";
+
+        wishCountEl.textContent = wishlist.length;
+
+        wishlist.forEach(id => {
+            const p = products.find(p => p.id === id);
+            if (!p) return;
+
+            const out = getAvailableStock(p.id) <= 0;
+
+            const div = document.createElement("div");
+            div.className = "wish-item";
+            div.innerHTML = `
+        <span class="wish-name">${p.name}</span>
+        <span class="tag-sm">${p.category}</span>
+        <button class="btn secondary" data-action="wish-to-cart" data-id="${p.id}" ${out ? "disabled" : ""}>
+          ${out ? "Ավարտված" : "To cart"}
+        </button>
+      `;
+            wishlistListEl.appendChild(div);
+        });
+    }
+
+    // --- Orders History Render ---
+    function renderOrders() {
+        ordersBodyEl.innerHTML = "";
+
+        if (orders.length === 0) {
+            ordersEmptyEl.style.display = "block";
+            orderDetailsEl.style.display = "none";
+            selectedOrderId = null;
+            return;
+        }
+        ordersEmptyEl.style.display = "none";
+
+        orders.forEach(order => {
+            const tr = document.createElement("tr");
+            tr.className = "order-row" + (order.id === selectedOrderId ? " active" : "");
+            tr.dataset.orderId = order.id;
+
+            const promoText = order.promoCode ? `${order.promoCode} (-${order.promoPercent}%)` : "—";
+
+            tr.innerHTML = `
+        <td>${fmtDate(order.createdAt)}</td>
+        <td>${order.totalQty}</td>
+        <td>${promoText}</td>
+        <td><strong>${formatPrice(order.total)} ֏</strong></td>
+      `;
+
+            ordersBodyEl.appendChild(tr);
+        });
+    }
+
+    function openOrderDetails(orderId) {
+        const order = orders.find(o => o.id === orderId);
+        if (!order) return;
+
+        selectedOrderId = orderId;
+        renderOrders();
+
+        orderDetailsEl.style.display = "block";
+
+        detailsTitleEl.textContent = `Գնում #${order.id}`;
+        detailsMetaEl.textContent = `Ամսաթիվ՝ ${fmtDate(order.createdAt)} • Քանակ՝ ${order.totalQty} • Promocode՝ ${order.promoCode || "—"}`;
+
+        detailsSubtotalEl.textContent = formatPrice(order.subtotal) + " ֏";
+        detailsDiscountEl.textContent = "-" + formatPrice(order.discount) + " ֏";
+        detailsTotalEl.textContent = formatPrice(order.total) + " ֏";
+        detailsQtyEl.textContent = order.totalQty;
+
+        // items table
+        detailsItemsEl.innerHTML = "";
+        order.items.forEach(it => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+        <td>${it.name} <span class="badge-small">(${it.category})</span></td>
+        <td>${formatPrice(it.price)} ֏</td>
+        <td>${it.qty}</td>
+        <td>${formatPrice(it.price * it.qty)} ֏</td>
+      `;
+            detailsItemsEl.appendChild(tr);
+        });
+
+        orderDetailsEl.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function closeOrderDetails() {
+        orderDetailsEl.style.display = "none";
+        selectedOrderId = null;
+        renderOrders();
+    }
+
+    // --- Actions ---
+    function addToCart(id) {
+        const p = products.find(p => p.id === id);
+        if (!p) return;
+
+        if (getAvailableStock(id) <= 0) {
+            alert("Պահեստում այլևս ապրանք չի մնացել (stock ավարտված է)");
+            return;
+        }
+
+        const existing = cart.find(i => i.id === id);
+        if (existing) existing.qty += 1;
+        else cart.push({ id: p.id, name: p.name, price: p.price, category: p.category, qty: 1 });
+
+        renderCart();
+        renderProducts();
+        renderWishlist();
+    }
+
+    function changeCartQty(id, action) {
+        const item = cart.find(i => i.id === id);
+        if (!item) return;
+
+        if (action === "inc") {
+            if (getAvailableStock(id) <= 0) {
+                alert("Ավելին չես կարող ավելացնել, stock–ը ավարտվել է");
+                return;
+            }
+            item.qty += 1;
+        } else if (action === "dec") {
+            item.qty -= 1;
+            if (item.qty <= 0) cart = cart.filter(i => i.id !== id);
+        }
+
+        renderCart();
+        renderProducts();
+        renderWishlist();
+    }
+
+    function removeFromCart(id) {
+        cart = cart.filter(i => i.id !== id);
+        renderCart();
+        renderProducts();
+        renderWishlist();
+    }
+
+    function toggleWishlist(id) {
+        if (isInWishlist(id)) wishlist = wishlist.filter(x => x !== id);
+        else wishlist.push(id);
+
+        renderProducts();
+        renderWishlist();
+    }
+
+    function moveWishToCart(id) {
+        addToCart(id);
+    }
+
+    function applyFiltersFromControls() {
+        filterState.inStockOnly = inStockOnlyEl.checked;
+        filterState.category = categoryFilterEl.value;
+        renderProducts();
+    }
+
+    function resetFilters() {
+        filterState.inStockOnly = false;
+        filterState.category = "all";
+        inStockOnlyEl.checked = false;
+        categoryFilterEl.value = "all";
+        renderProducts();
+    }
+
+    function handlePromoSubmit(e) {
+        e.preventDefault();
+
+        const code = promoInputEl.value.trim().toUpperCase();
+        promoMsgEl.textContent = "";
+        promoMsgEl.className = "promo-msg";
+
+        const { subtotal } = getCartTotals();
+
+        if (subtotal <= 0) {
+            promoMsgEl.textContent = "Զամբյուղը դատարկ է։";
+            promoMsgEl.classList.add("error");
+            activePromo = { code: null, percent: 0 };
+            renderCartSummary();
+            return;
+        }
+
+        if (code && promoCodes[code]) {
+            activePromo = { code, percent: promoCodes[code] };
+            promoMsgEl.textContent = `Կիրառված է ${activePromo.percent}% զեղչ (${activePromo.code}).`;
+            promoMsgEl.classList.add("success");
+            renderCartSummary();
+            return;
+        }
+
+        promoMsgEl.textContent = "Սխալ կամ չգրանցված promocode։ Օրինակ՝ PROMO10 կամ PROMO20";
+        promoMsgEl.classList.add("error");
+        activePromo = { code: null, percent: 0 };
+        renderCartSummary();
+    }
+
+    // ✅ Checkout -> create 1 order (history row)
+    function checkout() {
+        if (cart.length === 0) {
+            alert("Զամբյուղը դատարկ է 🙂");
+            return;
+        }
+
+        const { subtotal, totalQty } = getCartTotals();
+        const { discount, total } = calcTotalsFromSubtotal(subtotal, activePromo.percent);
+
+        const order = {
+            id: Date.now(),
+            createdAt: Date.now(),
+            items: cart.map(i => ({ ...i })), // snapshot
+            subtotal,
+            discount,
+            total,
+            totalQty,
+            promoCode: activePromo.code,
+            promoPercent: activePromo.percent
+        };
+
+        // newest first
+        orders.unshift(order);
+
+        // reset cart & promo
+        cart = [];
+        activePromo = { code: null, percent: 0 };
+        promoInputEl.value = "";
+        promoMsgEl.textContent = "";
+        promoMsgEl.className = "promo-msg";
+
+        alert(`Գնումը հաջողվեց ✅ Վճարեցիր՝ ${formatPrice(total)} ֏`);
+
+        renderCart();
+        renderProducts();
+        renderWishlist();
+        renderOrders();
+
+        // auto open newest order
+        openOrderDetails(order.id);
+    }
+
+    // --- Init ---
+    function init() {
+        renderProducts();
+        renderCart();
+        renderWishlist();
+        renderOrders();
+    }
+
+    // --- Events ---
+    productsGridEl.addEventListener("click", (e) => {
+        const btn = e.target.closest("button");
+        if (!btn) return;
+
+        const action = btn.dataset.action;
+        const id = Number(btn.dataset.id);
+        if (!id || !action) return;
+
+        if (action === "add-cart") addToCart(id);
+        else if (action === "toggle-wish") toggleWishlist(id);
+    });
+
+    cartBodyEl.addEventListener("click", (e) => {
+        const btn = e.target.closest("button");
+        if (!btn) return;
+
+        const action = btn.dataset.action;
+        const id = Number(btn.dataset.id);
+        if (!id || !action) return;
+
+        if (action === "inc" || action === "dec") changeCartQty(id, action);
+        else if (action === "remove") removeFromCart(id);
+    });
+
+    wishlistListEl.addEventListener("click", (e) => {
+        const btn = e.target.closest("button");
+        if (!btn) return;
+
+        const action = btn.dataset.action;
+        const id = Number(btn.dataset.id);
+        if (!id || !action) return;
+
+        if (action === "wish-to-cart") moveWishToCart(id);
+    });
+
+    inStockOnlyEl.addEventListener("change", applyFiltersFromControls);
+    applyFilterBtnEl.addEventListener("click", applyFiltersFromControls);
+    resetFilterBtnEl.addEventListener("click", resetFilters);
+    promoFormEl.addEventListener("submit", handlePromoSubmit);
+    buyBtnEl.addEventListener("click", checkout);
+
+    // orders click -> open details
+    ordersBodyEl.addEventListener("click", (e) => {
+        const row = e.target.closest("tr");
+        if (!row) return;
+        const orderId = Number(row.dataset.orderId);
+        if (!orderId) return;
+        openOrderDetails(orderId);
+    });
+
+    closeDetailsEl.addEventListener("click", closeOrderDetails);
+
+    init();
+</script>
+</body>
+</html>

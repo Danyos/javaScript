@@ -1,0 +1,1618 @@
+<!doctype html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Products Dashboard – DummyJSON</title>
+
+    <style>
+        :root {
+            --bg: #0b1220;
+            --panel: #0f1a2f;
+            --card: #101f3a;
+            --muted: #91a4c6;
+            --text: #e8f0ff;
+            --line: rgba(255, 255, 255, .08);
+            --accent: #7c5cff;
+            --green: #22c55e;
+            --warn: #f59e0b;
+            --danger: #ef4444;
+            --radius: 16px;
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, Segoe UI, Roboto;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .app {
+            max-width: 1240px;
+            margin: 20px auto;
+            padding: 14px;
+            display: grid;
+            grid-template-columns:420px 1fr;
+            gap: 14px;
+        }
+
+        /* LEFT */
+        .details {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            height: calc(100vh - 40px);
+            position: sticky;
+            top: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .details-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--line);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .details-main {
+            padding: 16px;
+            overflow: auto;
+            flex: 1;
+        }
+
+        .details-product {
+            display: grid;
+            grid-template-columns:140px 1fr;
+            gap: 14px;
+        }
+
+        .details-product-img {
+            width: 140px;
+            height: 140px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, .04);
+            border: 1px solid var(--line);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .details-product-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .price-main {
+            font-size: 22px;
+            font-weight: 800
+        }
+
+        .price-old {
+            text-decoration: line-through;
+            color: var(--muted);
+            margin-left: 6px
+        }
+
+        .discount-pill {
+            background: rgba(34, 197, 94, .2);
+            color: #22c55e;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            margin-left: 6px;
+        }
+
+        .meta-pill {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 999px;
+            border: 1px solid var(--line);
+            font-size: 12px;
+            margin-right: 6px;
+        }
+
+        /* RIGHT */
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            gap: 14px;
+            margin-bottom: 10px;
+        }
+
+        .input, .select {
+            background: var(--card);
+            border: 1px solid var(--line);
+            color: var(--text);
+            padding: 10px 12px;
+            border-radius: 12px;
+        }
+
+        .categories {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .category-chip {
+            padding: 6px 12px;
+            border-radius: 999px;
+            border: 1px solid var(--line);
+            background: var(--card);
+            cursor: pointer;
+            font-size: 12px;
+            color: white;
+        }
+
+        .category-chip.active {
+            background: var(--accent);
+            border-color: transparent;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns:repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+        }
+
+        .product-card {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-3px)
+        }
+
+        .product-card.active {
+            outline: 2px solid var(--accent)
+        }
+
+        .product-thumb img {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 14px 14px 0 0;
+        }
+
+        .product-info {
+            padding: 10px
+        }
+
+        .product-title {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px
+        }
+
+        .product-meta-line {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--muted);
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app">
+    <!-- LEFT -->
+    <aside class="details">
+        <div class="details-header">
+            <strong>Product details</strong>
+            <span style="font-size:12px;color:var(--muted)">dummyjson.com</span>
+        </div>
+
+        <div class="details-main">
+            <div class="details-product">
+                <div class="details-product-img" id="detailsImg"><img
+                        src="https://cdn.dummyjson.com/product-images/beauty/eyeshadow-palette-with-mirror/thumbnail.webp">
+                </div>
+                <div>
+                    <h2 id="detailsTitle">Eyeshadow Palette with Mirror</h2>
+                    <div id="detailsBrand">Glamour Beauty</div>
+                    <div id="detailsPriceLine" style="display: block; margin: 8px 0px;">
+                        <span class="price-main" id="detailsPrice">$19.99</span>
+                        <span class="price-old" id="detailsOld">$24</span>
+                        <span class="discount-pill" id="detailsDiscount">-18.19%</span>
+                    </div>
+                    <div>
+                        <span class="meta-pill">⭐ <b id="detailsRating">2.86</b></span>
+                        <span class="meta-pill">📦 <b id="detailsStock">34</b></span>
+                        <span class="meta-pill">ID <b id="detailsId">2</b></span>
+                    </div>
+                </div>
+            </div>
+
+            <p id="detailsDesc" style="color:var(--muted);margin-top:14px">The Eyeshadow Palette with Mirror offers a
+                versatile range of eyeshadow shades for creating stunning eye looks. With a built-in mirror, it's
+                convenient for on-the-go makeup application.</p>
+        </div>
+    </aside>
+
+    <!-- RIGHT -->
+    <section>
+        <div class="topbar">
+            <h2>Products overview</h2>
+            <div>
+                <input id="searchInput" class="input" placeholder="Search…">
+                <select id="sortSelect" class="select">
+                    <option value="default">Default</option>
+                    <option value="price-asc">Price ↑</option>
+                    <option value="price-desc">Price ↓</option>
+                    <option value="rating-desc">Rating ↑</option>
+                    <option value="rating-asc">Rating ↓</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="categories" id="categories">
+            <button class="category-chip active" data-cat="all">
+                all
+            </button>
+
+            <button class="category-chip " data-cat="beauty">
+                beauty
+            </button>
+
+            <button class="category-chip " data-cat="fragrances">
+                fragrances
+            </button>
+
+            <button class="category-chip " data-cat="furniture">
+                furniture
+            </button>
+
+            <button class="category-chip " data-cat="groceries">
+                groceries
+            </button>
+
+            <button class="category-chip " data-cat="home-decoration">
+                home-decoration
+            </button>
+
+            <button class="category-chip " data-cat="kitchen-accessories">
+                kitchen-accessories
+            </button>
+
+            <button class="category-chip " data-cat="laptops">
+                laptops
+            </button>
+
+            <button class="category-chip " data-cat="mens-shirts">
+                mens-shirts
+            </button>
+
+            <button class="category-chip " data-cat="mens-shoes">
+                mens-shoes
+            </button>
+
+            <button class="category-chip " data-cat="mens-watches">
+                mens-watches
+            </button>
+
+            <button class="category-chip " data-cat="mobile-accessories">
+                mobile-accessories
+            </button>
+        </div>
+        <div class="products-grid" id="grid">
+            <article class="product-card" data-id="1">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/beauty/essence-mascara-lash-princess/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Essence Mascara Lash Princess</div>
+                    <div class="product-meta-line">
+                        <span>$9.99</span>
+                        <span>⭐ 2.56</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card active" data-id="2">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/beauty/eyeshadow-palette-with-mirror/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Eyeshadow Palette with Mirror</div>
+                    <div class="product-meta-line">
+                        <span>$19.99</span>
+                        <span>⭐ 2.86</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="3">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/beauty/powder-canister/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Powder Canister</div>
+                    <div class="product-meta-line">
+                        <span>$14.99</span>
+                        <span>⭐ 4.64</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="4">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/beauty/red-lipstick/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Red Lipstick</div>
+                    <div class="product-meta-line">
+                        <span>$12.99</span>
+                        <span>⭐ 4.36</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="5">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/beauty/red-nail-polish/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Red Nail Polish</div>
+                    <div class="product-meta-line">
+                        <span>$8.99</span>
+                        <span>⭐ 4.32</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="6">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/fragrances/calvin-klein-ck-one/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Calvin Klein CK One</div>
+                    <div class="product-meta-line">
+                        <span>$49.99</span>
+                        <span>⭐ 4.37</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="7">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/fragrances/chanel-coco-noir-eau-de/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Chanel Coco Noir Eau De</div>
+                    <div class="product-meta-line">
+                        <span>$129.99</span>
+                        <span>⭐ 4.26</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="8">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/fragrances/dior-j'adore/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Dior J'adore</div>
+                    <div class="product-meta-line">
+                        <span>$89.99</span>
+                        <span>⭐ 3.8</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="9">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/fragrances/dolce-shine-eau-de/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Dolce Shine Eau de</div>
+                    <div class="product-meta-line">
+                        <span>$69.99</span>
+                        <span>⭐ 3.96</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="10">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/fragrances/gucci-bloom-eau-de/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Gucci Bloom Eau de</div>
+                    <div class="product-meta-line">
+                        <span>$79.99</span>
+                        <span>⭐ 2.74</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="11">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/furniture/annibale-colombo-bed/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Annibale Colombo Bed</div>
+                    <div class="product-meta-line">
+                        <span>$1899.99</span>
+                        <span>⭐ 4.77</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="12">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/furniture/annibale-colombo-sofa/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Annibale Colombo Sofa</div>
+                    <div class="product-meta-line">
+                        <span>$2499.99</span>
+                        <span>⭐ 3.92</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="13">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/furniture/bedside-table-african-cherry/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Bedside Table African Cherry</div>
+                    <div class="product-meta-line">
+                        <span>$299.99</span>
+                        <span>⭐ 2.87</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="14">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/furniture/knoll-saarinen-executive-conference-chair/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Knoll Saarinen Executive Conference Chair</div>
+                    <div class="product-meta-line">
+                        <span>$499.99</span>
+                        <span>⭐ 4.88</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="15">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/furniture/wooden-bathroom-sink-with-mirror/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Wooden Bathroom Sink With Mirror</div>
+                    <div class="product-meta-line">
+                        <span>$799.99</span>
+                        <span>⭐ 3.59</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="16">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/groceries/apple/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Apple</div>
+                    <div class="product-meta-line">
+                        <span>$1.99</span>
+                        <span>⭐ 4.19</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="17">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/groceries/beef-steak/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Beef Steak</div>
+                    <div class="product-meta-line">
+                        <span>$12.99</span>
+                        <span>⭐ 4.47</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="18">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/groceries/cat-food/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Cat Food</div>
+                    <div class="product-meta-line">
+                        <span>$8.99</span>
+                        <span>⭐ 3.13</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="19">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/groceries/chicken-meat/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Chicken Meat</div>
+                    <div class="product-meta-line">
+                        <span>$9.99</span>
+                        <span>⭐ 3.19</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="20">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/groceries/cooking-oil/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Cooking Oil</div>
+                    <div class="product-meta-line">
+                        <span>$4.99</span>
+                        <span>⭐ 4.8</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="21">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/groceries/cucumber/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Cucumber</div>
+                    <div class="product-meta-line">
+                        <span>$1.49</span>
+                        <span>⭐ 4.07</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="22">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/groceries/dog-food/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Dog Food</div>
+                    <div class="product-meta-line">
+                        <span>$10.99</span>
+                        <span>⭐ 4.55</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="23">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/groceries/eggs/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Eggs</div>
+                    <div class="product-meta-line">
+                        <span>$2.99</span>
+                        <span>⭐ 2.53</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="24">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/groceries/fish-steak/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Fish Steak</div>
+                    <div class="product-meta-line">
+                        <span>$14.99</span>
+                        <span>⭐ 3.78</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="25">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/groceries/green-bell-pepper/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Green Bell Pepper</div>
+                    <div class="product-meta-line">
+                        <span>$1.29</span>
+                        <span>⭐ 3.25</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="26">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/groceries/green-chili-pepper/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Green Chili Pepper</div>
+                    <div class="product-meta-line">
+                        <span>$0.99</span>
+                        <span>⭐ 3.66</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="27">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/groceries/honey-jar/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Honey Jar</div>
+                    <div class="product-meta-line">
+                        <span>$6.99</span>
+                        <span>⭐ 3.97</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="28">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/groceries/ice-cream/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Ice Cream</div>
+                    <div class="product-meta-line">
+                        <span>$5.49</span>
+                        <span>⭐ 3.39</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="29">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/groceries/juice/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Juice</div>
+                    <div class="product-meta-line">
+                        <span>$3.99</span>
+                        <span>⭐ 3.94</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="30">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/groceries/kiwi/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Kiwi</div>
+                    <div class="product-meta-line">
+                        <span>$2.49</span>
+                        <span>⭐ 4.93</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="31">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/groceries/lemon/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Lemon</div>
+                    <div class="product-meta-line">
+                        <span>$0.79</span>
+                        <span>⭐ 3.53</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="32">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/groceries/milk/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Milk</div>
+                    <div class="product-meta-line">
+                        <span>$3.49</span>
+                        <span>⭐ 2.61</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="33">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/groceries/mulberry/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Mulberry</div>
+                    <div class="product-meta-line">
+                        <span>$4.99</span>
+                        <span>⭐ 4.95</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="34">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/groceries/nescafe-coffee/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Nescafe Coffee</div>
+                    <div class="product-meta-line">
+                        <span>$7.99</span>
+                        <span>⭐ 4.82</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="35">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/groceries/potatoes/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Potatoes</div>
+                    <div class="product-meta-line">
+                        <span>$2.29</span>
+                        <span>⭐ 4.81</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="36">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/groceries/protein-powder/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Protein Powder</div>
+                    <div class="product-meta-line">
+                        <span>$19.99</span>
+                        <span>⭐ 4.18</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="37">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/groceries/red-onions/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Red Onions</div>
+                    <div class="product-meta-line">
+                        <span>$1.99</span>
+                        <span>⭐ 4.2</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="38">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/groceries/rice/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Rice</div>
+                    <div class="product-meta-line">
+                        <span>$5.99</span>
+                        <span>⭐ 3.18</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="39">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/groceries/soft-drinks/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Soft Drinks</div>
+                    <div class="product-meta-line">
+                        <span>$1.99</span>
+                        <span>⭐ 4.75</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="40">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/groceries/strawberry/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Strawberry</div>
+                    <div class="product-meta-line">
+                        <span>$3.99</span>
+                        <span>⭐ 3.08</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="41">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/groceries/tissue-paper-box/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Tissue Paper Box</div>
+                    <div class="product-meta-line">
+                        <span>$2.49</span>
+                        <span>⭐ 2.69</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="42">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/groceries/water/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Water</div>
+                    <div class="product-meta-line">
+                        <span>$0.99</span>
+                        <span>⭐ 4.96</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="43">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/home-decoration/decoration-swing/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Decoration Swing</div>
+                    <div class="product-meta-line">
+                        <span>$59.99</span>
+                        <span>⭐ 3.16</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="44">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/home-decoration/family-tree-photo-frame/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Family Tree Photo Frame</div>
+                    <div class="product-meta-line">
+                        <span>$29.99</span>
+                        <span>⭐ 4.53</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="45">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/home-decoration/house-showpiece-plant/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">House Showpiece Plant</div>
+                    <div class="product-meta-line">
+                        <span>$39.99</span>
+                        <span>⭐ 4.67</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="46">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/home-decoration/plant-pot/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Plant Pot</div>
+                    <div class="product-meta-line">
+                        <span>$14.99</span>
+                        <span>⭐ 3.01</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="47">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/home-decoration/table-lamp/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Table Lamp</div>
+                    <div class="product-meta-line">
+                        <span>$49.99</span>
+                        <span>⭐ 3.55</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="48">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/kitchen-accessories/bamboo-spatula/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Bamboo Spatula</div>
+                    <div class="product-meta-line">
+                        <span>$7.99</span>
+                        <span>⭐ 3.27</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="49">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/kitchen-accessories/black-aluminium-cup/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Black Aluminium Cup</div>
+                    <div class="product-meta-line">
+                        <span>$5.99</span>
+                        <span>⭐ 4.46</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="50">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/kitchen-accessories/black-whisk/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Black Whisk</div>
+                    <div class="product-meta-line">
+                        <span>$9.99</span>
+                        <span>⭐ 3.9</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="51">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/kitchen-accessories/boxed-blender/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Boxed Blender</div>
+                    <div class="product-meta-line">
+                        <span>$39.99</span>
+                        <span>⭐ 4.56</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="52">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/kitchen-accessories/carbon-steel-wok/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Carbon Steel Wok</div>
+                    <div class="product-meta-line">
+                        <span>$29.99</span>
+                        <span>⭐ 4.05</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="53">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/kitchen-accessories/chopping-board/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Chopping Board</div>
+                    <div class="product-meta-line">
+                        <span>$12.99</span>
+                        <span>⭐ 3.7</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="54">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/kitchen-accessories/citrus-squeezer-yellow/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Citrus Squeezer Yellow</div>
+                    <div class="product-meta-line">
+                        <span>$8.99</span>
+                        <span>⭐ 4.63</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="55">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/kitchen-accessories/egg-slicer/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Egg Slicer</div>
+                    <div class="product-meta-line">
+                        <span>$6.99</span>
+                        <span>⭐ 3.09</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="56">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/kitchen-accessories/electric-stove/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Electric Stove</div>
+                    <div class="product-meta-line">
+                        <span>$49.99</span>
+                        <span>⭐ 4.11</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="57">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/kitchen-accessories/fine-mesh-strainer/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Fine Mesh Strainer</div>
+                    <div class="product-meta-line">
+                        <span>$9.99</span>
+                        <span>⭐ 3.04</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="58">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/kitchen-accessories/fork/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Fork</div>
+                    <div class="product-meta-line">
+                        <span>$3.99</span>
+                        <span>⭐ 3.11</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="59">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/kitchen-accessories/glass/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Glass</div>
+                    <div class="product-meta-line">
+                        <span>$4.99</span>
+                        <span>⭐ 4.02</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="60">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/kitchen-accessories/grater-black/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Grater Black</div>
+                    <div class="product-meta-line">
+                        <span>$10.99</span>
+                        <span>⭐ 3.21</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="61">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/kitchen-accessories/hand-blender/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Hand Blender</div>
+                    <div class="product-meta-line">
+                        <span>$34.99</span>
+                        <span>⭐ 3.86</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="62">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/kitchen-accessories/ice-cube-tray/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Ice Cube Tray</div>
+                    <div class="product-meta-line">
+                        <span>$5.99</span>
+                        <span>⭐ 4.71</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="63">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/kitchen-accessories/kitchen-sieve/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Kitchen Sieve</div>
+                    <div class="product-meta-line">
+                        <span>$7.99</span>
+                        <span>⭐ 3.09</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="64">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/kitchen-accessories/knife/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Knife</div>
+                    <div class="product-meta-line">
+                        <span>$14.99</span>
+                        <span>⭐ 3.26</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="65">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/kitchen-accessories/lunch-box/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Lunch Box</div>
+                    <div class="product-meta-line">
+                        <span>$12.99</span>
+                        <span>⭐ 4.93</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="66">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/kitchen-accessories/microwave-oven/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Microwave Oven</div>
+                    <div class="product-meta-line">
+                        <span>$89.99</span>
+                        <span>⭐ 4.82</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="67">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/kitchen-accessories/mug-tree-stand/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Mug Tree Stand</div>
+                    <div class="product-meta-line">
+                        <span>$15.99</span>
+                        <span>⭐ 2.64</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="68">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/kitchen-accessories/pan/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Pan</div>
+                    <div class="product-meta-line">
+                        <span>$24.99</span>
+                        <span>⭐ 2.79</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="69">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/kitchen-accessories/plate/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Plate</div>
+                    <div class="product-meta-line">
+                        <span>$3.99</span>
+                        <span>⭐ 3.65</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="70">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/kitchen-accessories/red-tongs/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Red Tongs</div>
+                    <div class="product-meta-line">
+                        <span>$6.99</span>
+                        <span>⭐ 4.42</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="71">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/kitchen-accessories/silver-pot-with-glass-cap/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Silver Pot With Glass Cap</div>
+                    <div class="product-meta-line">
+                        <span>$39.99</span>
+                        <span>⭐ 3.22</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="72">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/kitchen-accessories/slotted-turner/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Slotted Turner</div>
+                    <div class="product-meta-line">
+                        <span>$8.99</span>
+                        <span>⭐ 3.4</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="73">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/kitchen-accessories/spice-rack/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Spice Rack</div>
+                    <div class="product-meta-line">
+                        <span>$19.99</span>
+                        <span>⭐ 4.87</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="74">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/kitchen-accessories/spoon/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Spoon</div>
+                    <div class="product-meta-line">
+                        <span>$4.99</span>
+                        <span>⭐ 4.03</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="75">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/kitchen-accessories/tray/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Tray</div>
+                    <div class="product-meta-line">
+                        <span>$16.99</span>
+                        <span>⭐ 4.62</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="76">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/kitchen-accessories/wooden-rolling-pin/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Wooden Rolling Pin</div>
+                    <div class="product-meta-line">
+                        <span>$11.99</span>
+                        <span>⭐ 2.92</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="77">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/kitchen-accessories/yellow-peeler/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Yellow Peeler</div>
+                    <div class="product-meta-line">
+                        <span>$5.99</span>
+                        <span>⭐ 4.24</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="78">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/laptops/apple-macbook-pro-14-inch-space-grey/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Apple MacBook Pro 14 Inch Space Grey</div>
+                    <div class="product-meta-line">
+                        <span>$1999.99</span>
+                        <span>⭐ 3.65</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="79">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/laptops/asus-zenbook-pro-dual-screen-laptop/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Asus Zenbook Pro Dual Screen Laptop</div>
+                    <div class="product-meta-line">
+                        <span>$1799.99</span>
+                        <span>⭐ 3.95</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="80">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/laptops/huawei-matebook-x-pro/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Huawei Matebook X Pro</div>
+                    <div class="product-meta-line">
+                        <span>$1399.99</span>
+                        <span>⭐ 4.98</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="81">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/laptops/lenovo-yoga-920/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Lenovo Yoga 920</div>
+                    <div class="product-meta-line">
+                        <span>$1099.99</span>
+                        <span>⭐ 2.86</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="82">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/laptops/new-dell-xps-13-9300-laptop/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">New DELL XPS 13 9300 Laptop</div>
+                    <div class="product-meta-line">
+                        <span>$1499.99</span>
+                        <span>⭐ 2.67</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="83">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/mens-shirts/blue-&amp;-black-check-shirt/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Blue &amp; Black Check Shirt</div>
+                    <div class="product-meta-line">
+                        <span>$29.99</span>
+                        <span>⭐ 3.64</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="84">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/mens-shirts/gigabyte-aorus-men-tshirt/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Gigabyte Aorus Men Tshirt</div>
+                    <div class="product-meta-line">
+                        <span>$24.99</span>
+                        <span>⭐ 3.18</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="85">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/mens-shirts/man-plaid-shirt/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Man Plaid Shirt</div>
+                    <div class="product-meta-line">
+                        <span>$34.99</span>
+                        <span>⭐ 3.46</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="86">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/mens-shirts/man-short-sleeve-shirt/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Man Short Sleeve Shirt</div>
+                    <div class="product-meta-line">
+                        <span>$19.99</span>
+                        <span>⭐ 2.9</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="87">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/mens-shirts/men-check-shirt/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Men Check Shirt</div>
+                    <div class="product-meta-line">
+                        <span>$27.99</span>
+                        <span>⭐ 2.72</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="88">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/mens-shoes/nike-air-jordan-1-red-and-black/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Nike Air Jordan 1 Red And Black</div>
+                    <div class="product-meta-line">
+                        <span>$149.99</span>
+                        <span>⭐ 4.77</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="89">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/mens-shoes/nike-baseball-cleats/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Nike Baseball Cleats</div>
+                    <div class="product-meta-line">
+                        <span>$79.99</span>
+                        <span>⭐ 3.88</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="90">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/mens-shoes/puma-future-rider-trainers/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Puma Future Rider Trainers</div>
+                    <div class="product-meta-line">
+                        <span>$89.99</span>
+                        <span>⭐ 4.9</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="91">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/mens-shoes/sports-sneakers-off-white-&amp;-red/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Sports Sneakers Off White &amp; Red</div>
+                    <div class="product-meta-line">
+                        <span>$119.99</span>
+                        <span>⭐ 4.77</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="92">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/mens-shoes/sports-sneakers-off-white-red/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Sports Sneakers Off White Red</div>
+                    <div class="product-meta-line">
+                        <span>$109.99</span>
+                        <span>⭐ 4.69</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="93">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/mens-watches/brown-leather-belt-watch/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Brown Leather Belt Watch</div>
+                    <div class="product-meta-line">
+                        <span>$89.99</span>
+                        <span>⭐ 4.19</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="94">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/mens-watches/longines-master-collection/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Longines Master Collection</div>
+                    <div class="product-meta-line">
+                        <span>$1499.99</span>
+                        <span>⭐ 3.87</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="95">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/mens-watches/rolex-cellini-date-black-dial/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Rolex Cellini Date Black Dial</div>
+                    <div class="product-meta-line">
+                        <span>$8999.99</span>
+                        <span>⭐ 4.97</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="96">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/mens-watches/rolex-cellini-moonphase/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Rolex Cellini Moonphase</div>
+                    <div class="product-meta-line">
+                        <span>$12999.99</span>
+                        <span>⭐ 2.58</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="97">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/mens-watches/rolex-datejust/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Rolex Datejust</div>
+                    <div class="product-meta-line">
+                        <span>$10999.99</span>
+                        <span>⭐ 3.66</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="98">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/mens-watches/rolex-submariner-watch/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Rolex Submariner Watch</div>
+                    <div class="product-meta-line">
+                        <span>$13999.99</span>
+                        <span>⭐ 2.69</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="99">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/mobile-accessories/amazon-echo-plus/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Amazon Echo Plus</div>
+                    <div class="product-meta-line">
+                        <span>$99.99</span>
+                        <span>⭐ 4.99</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="product-card" data-id="100">
+                <div class="product-thumb">
+                    <img src="https://cdn.dummyjson.com/product-images/mobile-accessories/apple-airpods/thumbnail.webp">
+                </div>
+                <div class="product-info">
+                    <div class="product-title">Apple Airpods</div>
+                    <div class="product-meta-line">
+                        <span>$129.99</span>
+                        <span>⭐ 4.15</span>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </section>
+</div>
+<script>
+    const grid=document.getElementById("grid"),categoriesEl=document.getElementById("categories"),searchInput=document.getElementById("searchInput"),sortSelect=document.getElementById("sortSelect");let products=[],filtered=[],activeCategory="all";function renderCategories(){const t=["all",...new Set(products.map((t=>t.category)))];categoriesEl.innerHTML=t.map((t=>`\n    <button class="category-chip ${"all"===t?"active":""}" data-cat="${t}">\n      ${t}\n    </button>\n  `)).join(""),categoriesEl.onclick=t=>{t.target.dataset.cat&&(activeCategory=t.target.dataset.cat,[...categoriesEl.children].forEach((t=>t.classList.remove("active"))),t.target.classList.add("active"),applyFilters())}}function applyFilters(){filtered=products.filter((t=>{const e=searchInput.value.toLowerCase(),r=t.title.toLowerCase().includes(e)||t.description.toLowerCase().includes(e),i="all"===activeCategory||t.category===activeCategory;return r&&i})),sortProducts(),renderProducts()}function sortProducts(){const t=sortSelect.value;"price-asc"===t&&filtered.sort(((t,e)=>t.price-e.price)),"price-desc"===t&&filtered.sort(((t,e)=>e.price-t.price)),"rating-asc"===t&&filtered.sort(((t,e)=>t.rating-e.rating)),"rating-desc"===t&&filtered.sort(((t,e)=>e.rating-t.rating))}function renderProducts(){grid.innerHTML=filtered.map((t=>`\n    <article class="product-card" data-id="${t.id}">\n      <div class="product-thumb">\n        <img src="${t.thumbnail}">\n      </div>\n      <div class="product-info">\n        <div class="product-title">${t.title}</div>\n        <div class="product-meta-line">\n          <span>$${t.price}</span>\n          <span>⭐ ${t.rating}</span>\n        </div>\n      </div>\n    </article>\n  `)).join(""),document.querySelectorAll(".product-card").forEach((t=>{t.onclick=()=>{document.querySelectorAll(".product-card").forEach((t=>t.classList.remove("active"))),t.classList.add("active"),showDetails(t.dataset.id)}}))}function showDetails(t){const e=products.find((e=>e.id==t));detailsImg.innerHTML=`<img src="${e.thumbnail}">`,detailsTitle.textContent=e.title,detailsBrand.textContent=e.brand||"",detailsPrice.textContent=`$${e.price}`,detailsOld.textContent=`$${Math.round(e.price/(1-e.discountPercentage/100))}`,detailsDiscount.textContent=`-${e.discountPercentage}%`,detailsPriceLine.style.display="block",detailsRating.textContent=e.rating,detailsStock.textContent=e.stock,detailsId.textContent=e.id,detailsDesc.textContent=e.description}fetch("https://dummyjson.com/products?limit=100").then((t=>t.json())).then((t=>{products=t.products,filtered=products,renderCategories(),renderProducts()})),searchInput.oninput=applyFilters,sortSelect.onchange=applyFilters;
+</script>
+
+</body>
+</html>

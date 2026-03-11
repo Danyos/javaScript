@@ -1,0 +1,919 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Store UI · Orders + Invoice</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel:#0f1b2d;
+      --panel2:#12243c;
+      --card:rgba(255,255,255,.06);
+      --border:rgba(255,255,255,.10);
+      --text:#eaf2ff;
+      --muted:rgba(234,242,255,.70);
+      --shadow:0 22px 70px rgba(0,0,0,.45);
+      --r:18px;
+
+      --green:#22c55e;
+      --green2:#16a34a;
+      --red:#ef4444;
+      --yellow:#f59e0b;
+      --blue:#60a5fa;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans";
+      background:
+              radial-gradient(1200px 800px at 15% 10%, #153d63 0%, transparent 55%),
+              radial-gradient(900px 700px at 85% 30%, #174b3a 0%, transparent 55%),
+              var(--bg);
+      color:var(--text);
+    }
+
+    .container{width:min(1180px, calc(100% - 32px)); margin:0 auto;}
+    .topbar{
+      position:sticky; top:0; z-index:10;
+      border-bottom:1px solid var(--border);
+      background: rgba(11,18,32,.65);
+      backdrop-filter: blur(14px);
+    }
+    .topbar__row{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 0;
+      gap:16px;
+    }
+
+    .brand{display:flex; align-items:center; gap:12px;}
+    .brand__logo{
+      width:42px;height:42px;border-radius:14px;
+      background: rgba(255,255,255,.06);
+      border:1px solid var(--border);
+      display:grid;place-items:center;
+      box-shadow: 0 10px 24px rgba(0,0,0,.18);
+    }
+    .brand__name{font-weight:900; letter-spacing:.2px}
+    .brand__sub{font-size:12px;color:var(--muted)}
+
+    .top-actions{display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end}
+    .search{
+      display:flex; align-items:center; gap:10px;
+      padding:10px 12px;
+      border-radius:14px;
+      background: rgba(255,255,255,.06);
+      border:1px solid var(--border);
+      min-width:min(360px, 100%);
+    }
+    .search__ico{opacity:.8}
+    .search__input{
+      width:100%;
+      background:transparent; border:none; outline:none; color:var(--text);
+      font-size:14px;
+    }
+    .search__input::placeholder{color:rgba(234,242,255,.45)}
+
+    .btn{
+      appearance:none; border:1px solid transparent;
+      border-radius:14px;
+      padding:11px 14px;
+      font-weight:800;
+      cursor:pointer;
+      transition: transform .12s ease, box-shadow .12s ease, background .12s ease, border-color .12s ease;
+      user-select:none;
+      color:var(--text);
+      background: rgba(255,255,255,.06);
+      border-color: var(--border);
+    }
+    .btn:active{transform: translateY(1px)}
+    .btn:focus{outline:none}
+    .btn:focus-visible{box-shadow:0 0 0 4px rgba(96,165,250,.18)}
+
+    .btn--primary{
+      background: linear-gradient(180deg, var(--green), var(--green2));
+      border-color: rgba(34,197,94,.35);
+      color:#062113;
+      box-shadow: 0 12px 34px rgba(34,197,94,.22);
+    }
+    .btn--primary:hover{box-shadow: 0 16px 44px rgba(34,197,94,.30)}
+    .btn--ghost:hover{background: rgba(255,255,255,.09)}
+
+    .btn__ico{margin-left:8px; opacity:.9}
+    .pill{
+      margin-left:8px;
+      padding:4px 9px;
+      border-radius:999px;
+      background: rgba(0,0,0,.25);
+      border:1px solid rgba(255,255,255,.12);
+      font-size:12px;
+    }
+
+    .layout{
+      display:grid;
+      grid-template-columns: 1fr 420px;
+      gap:18px;
+      padding:18px 0 28px;
+    }
+    @media (max-width: 980px){
+      .layout{grid-template-columns:1fr; }
+      .search{min-width:0}
+    }
+
+    .section-head{
+      display:flex; align-items:flex-end; justify-content:space-between;
+      gap:12px; margin:10px 0 12px;
+    }
+    .title{margin:0; font-size:18px; letter-spacing:.2px}
+
+    .chips{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end}
+    .chip{
+      padding:8px 10px; border-radius:999px;
+      background: rgba(255,255,255,.05);
+      border:1px solid var(--border);
+      color:var(--text);
+      cursor:pointer;
+      font-weight:800; font-size:12px;
+    }
+    .chip.is-active{
+      border-color: rgba(96,165,250,.35);
+      box-shadow: 0 0 0 4px rgba(96,165,250,.12);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap:12px;
+    }
+    @media (max-width: 860px){ .grid{grid-template-columns: repeat(2, 1fr);} }
+    @media (max-width: 520px){ .grid{grid-template-columns: 1fr;} }
+
+    .pcard{
+      background: var(--card);
+      border:1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: 0 16px 40px rgba(0,0,0,.20);
+      padding:14px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .pcard__top{display:flex; align-items:flex-start; justify-content:space-between; gap:10px;}
+    .pname{font-weight:900; font-size:16px; margin:0}
+    .psub{color:var(--muted); font-size:12px; margin-top:4px}
+    .tag{
+      padding:6px 10px;
+      border-radius:999px;
+      background: rgba(96,165,250,.12);
+      border:1px solid rgba(96,165,250,.22);
+      font-weight:900;
+      font-size:12px;
+    }
+    .pmeta{
+      display:flex; align-items:center; justify-content:space-between;
+      border-top:1px dashed rgba(255,255,255,.12);
+      padding-top:10px;
+    }
+    .price{font-weight:1000; font-size:18px}
+    .row-actions{display:flex; gap:8px; align-items:center}
+    .qty{
+      width:58px;
+      padding:10px 10px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background: rgba(0,0,0,.18);
+      color:var(--text);
+      font-weight:900;
+    }
+    .small{padding:10px 12px; border-radius:14px; font-weight:900}
+
+    .orders{
+      background: rgba(255,255,255,.05);
+      border:1px solid var(--border);
+      border-radius: 22px;
+      padding:14px;
+      box-shadow: var(--shadow);
+      height: fit-content;
+      position: sticky;
+      top: 82px;
+    }
+    @media (max-width: 980px){ .orders{position:relative; top:auto;} }
+
+    .seg{
+      display:flex; gap:6px;
+      background: rgba(0,0,0,.18);
+      border:1px solid rgba(255,255,255,.10);
+      padding:6px;
+      border-radius:16px;
+    }
+    .seg__btn{
+      padding:8px 10px;
+      border-radius:12px;
+      border:1px solid transparent;
+      background: transparent;
+      color:var(--muted);
+      cursor:pointer;
+      font-weight:900;
+      font-size:12px;
+    }
+    .seg__btn.is-active{
+      background: rgba(255,255,255,.08);
+      border-color: rgba(255,255,255,.12);
+      color:var(--text);
+    }
+
+    .orders__list{display:flex; flex-direction:column; gap:10px; margin-top:10px}
+    .ocard{
+      padding:12px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.16);
+      cursor:pointer;
+      transition: transform .12s ease, background .12s ease, border-color .12s ease;
+    }
+    .ocard:hover{transform: translateY(-1px); background: rgba(0,0,0,.22)}
+    .ocard__head{display:flex; justify-content:space-between; gap:10px}
+    .oid{font-weight:1000}
+    .osub{color:var(--muted); font-size:12px; margin-top:4px}
+    .oline{display:flex; justify-content:space-between; margin-top:10px; color:var(--muted); font-size:13px}
+    .strong{color:var(--text); font-weight:1000}
+
+    .badge{
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      font-weight:1000;
+      font-size:12px;
+    }
+    .badge.paid{border-color: rgba(34,197,94,.25); background: rgba(34,197,94,.12); color:#95ffd0}
+    .badge.unpaid{border-color: rgba(245,158,11,.30); background: rgba(245,158,11,.12); color:#ffe1a3}
+
+    .orders__footer{
+      margin-top:12px;
+      border-top:1px solid rgba(255,255,255,.10);
+      padding-top:12px;
+      display:flex; flex-direction:column; gap:10px;
+    }
+    .mini{display:flex; justify-content:space-between; align-items:center}
+    .mini__label{color:var(--muted); font-size:12px}
+    .mini__value{font-weight:1000}
+    .w100{width:100%}
+
+    /* Drawer */
+    .drawer{position:fixed; inset:0; display:none; z-index:50;}
+    .drawer.is-open{display:block}
+    .drawer__backdrop{position:absolute; inset:0; background: rgba(2,6,23,.60); backdrop-filter: blur(10px)}
+    .drawer__panel{
+      position:absolute; right:0; top:0; bottom:0;
+      width:min(420px, calc(100% - 24px));
+      background: rgba(12,20,36,.80);
+      border-left:1px solid rgba(255,255,255,.10);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      display:flex; flex-direction:column;
+    }
+    .drawer__head{
+      padding:14px;
+      display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+    }
+    .drawer__title{font-weight:1000}
+    .drawer__sub{font-size:12px; color:var(--muted); margin-top:4px}
+    .icon-btn{
+      width:40px; height:40px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color:var(--text);
+      cursor:pointer;
+    }
+    .drawer__body{padding:12px 14px; overflow:auto; display:flex; flex-direction:column; gap:10px}
+    .citem{
+      display:flex; justify-content:space-between; gap:10px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
+      border-radius:16px;
+      padding:10px;
+    }
+    .citem__name{font-weight:1000}
+    .citem__sub{font-size:12px; color:var(--muted); margin-top:4px}
+    .citem__right{text-align:right}
+    .citem__qty{color:var(--muted); font-size:12px; margin-top:4px}
+    .drawer__foot{padding:14px; border-top:1px solid rgba(255,255,255,.10); display:flex; flex-direction:column; gap:10px}
+    .totals{border:1px solid rgba(255,255,255,.10); background: rgba(0,0,0,.18); border-radius:16px; padding:12px}
+    .totals__row{display:flex; justify-content:space-between; padding:6px 0}
+    .totals__row.muted{color:var(--muted)}
+    .totals__row.grand{border-top:1px dashed rgba(255,255,255,.12); margin-top:6px; padding-top:10px}
+
+    /* Modal */
+    .modal{position:fixed; inset:0; display:none; z-index:60;}
+    .modal.is-open{display:block}
+    .modal__backdrop{position:absolute; inset:0; background: rgba(2,6,23,.62); backdrop-filter: blur(12px)}
+    .modal__dialog{
+      position:relative;
+      width:min(980px, calc(100% - 24px));
+      margin: 8vh auto 0;
+      background: rgba(12,20,36,.82);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    @media (max-width: 520px){ .modal__dialog{margin-top: 10vh;} }
+
+    .modal__head{
+      display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
+      padding:14px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.16);
+    }
+    .modal__headLeft{display:flex; align-items:center; gap:12px}
+    .inv-badge{
+      font-weight:1100;
+      letter-spacing:.12em;
+      font-size:12px;
+      padding:8px 10px;
+      border-radius:14px;
+      background: rgba(96,165,250,.12);
+      border:1px solid rgba(96,165,250,.24);
+    }
+    .modal__title{margin:0; font-size:16px}
+    .modal__sub{margin-top:4px; font-size:12px; color:var(--muted)}
+    .modal__headRight{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+
+    .modal__body{padding:14px}
+    .inv-grid{
+      display:grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap:10px;
+      margin-bottom:12px;
+    }
+    @media (max-width: 980px){ .inv-grid{grid-template-columns: repeat(2,1fr);} }
+    @media (max-width: 560px){ .inv-grid{grid-template-columns: 1fr;} }
+
+    .inv-card{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);
+      border-radius:18px;
+      padding:12px;
+    }
+    .inv-card__title{font-weight:1000; margin-bottom:10px}
+    .kv{display:flex; flex-direction:column; gap:8px}
+    .kv > div{display:flex; justify-content:space-between; gap:10px}
+    .kv span{color:var(--muted); font-size:12px}
+    .kv b{font-weight:1000; font-size:12px}
+
+    .status{
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      font-weight:1000;
+    }
+    .status.paid{border-color: rgba(34,197,94,.25); background: rgba(34,197,94,.12); color:#95ffd0}
+    .status.unpaid{border-color: rgba(245,158,11,.30); background: rgba(245,158,11,.12); color:#ffe1a3}
+
+    .table-wrap{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.16);
+      border-radius:18px;
+      overflow:hidden;
+    }
+    .table{width:100%; border-collapse:separate; border-spacing:0}
+    .table thead th{
+      text-align:left;
+      font-size:12px;
+      padding:12px;
+      color: rgba(234,242,255,.85);
+      background: rgba(255,255,255,.06);
+      border-bottom:1px solid rgba(255,255,255,.10);
+    }
+    .table td{
+      padding:12px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      font-size:13px;
+    }
+    .table tbody tr:hover{background: rgba(255,255,255,.04)}
+    .right{text-align:right}
+
+    .summary{
+      padding:12px;
+      display:flex;
+      justify-content:flex-end;
+    }
+    .summary__box{
+      width:min(360px, 100%);
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);
+      border-radius:16px;
+      padding:12px;
+    }
+    .summary__row{display:flex; justify-content:space-between; padding:6px 0}
+    .summary__row.muted{color:var(--muted)}
+    .summary__row.grand{
+      border-top:1px dashed rgba(255,255,255,.12);
+      margin-top:6px; padding-top:10px;
+      font-size:14px;
+    }
+
+    .modal__foot{
+      padding:12px 14px;
+      border-top:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.16);
+      display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;
+    }
+    .note{display:flex; align-items:center; gap:8px; color:var(--muted); font-size:12px}
+    .dot{width:8px;height:8px;border-radius:999px;background: rgba(96,165,250,.8)}
+    .foot-actions{display:flex; gap:8px; flex-wrap:wrap}
+  </style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="container topbar__row">
+    <div class="brand">
+      <div class="brand__logo">🛒</div>
+      <div class="brand__text">
+        <div class="brand__name">Danisoft Store</div>
+        <div class="brand__sub">Orders · Invoice · Cart</div>
+      </div>
+    </div>
+
+    <div class="top-actions">
+      <div class="search">
+        <span class="search__ico">⌕</span>
+        <input id="q" class="search__input" placeholder="Search: order id / name / group...">
+      </div>
+
+      <button class="btn btn--ghost" id="btnCart">
+        <span class="btn__ico">🧺</span>
+        Cart
+        <span class="pill" id="cartCount">4</span>
+      </button>
+
+      <button class="btn btn--primary" id="btnCheckout">
+        Checkout
+        <span class="btn__ico">→</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="container layout">
+  <!-- Products -->
+  <section>
+    <div class="section-head">
+      <h2 class="title">Products</h2>
+      <div class="chips" id="categoryChips">
+        <button class="chip is-active" data-cat="all">All</button>
+        <button class="chip" data-cat="JS-1">JS-1</button>
+        <button class="chip" data-cat="JS-2">JS-2</button>
+        <button class="chip" data-cat="UI">UI</button>
+      </div>
+    </div>
+
+    <div class="grid" id="products"><div class="pcard">
+      <div class="pcard__top">
+        <div>
+          <p class="pname">Narek</p>
+          <div class="psub">Group: <b>JS-1</b> • Month: <b>January</b></div>
+        </div>
+        <span class="tag">JS-1</span>
+      </div>
+
+      <div class="pmeta">
+        <div>
+          <div class="psub">Price</div>
+          <div class="price">$55000.00</div>
+        </div>
+
+        <div class="row-actions">
+          <input class="qty" type="number" min="1" value="1">
+          <button class="btn btn--primary small">Add</button>
+        </div>
+      </div>
+    </div><div class="pcard">
+      <div class="pcard__top">
+        <div>
+          <p class="pname">Anna</p>
+          <div class="psub">Group: <b>JS-1</b> • Month: <b>February</b></div>
+        </div>
+        <span class="tag">JS-1</span>
+      </div>
+
+      <div class="pmeta">
+        <div>
+          <div class="psub">Price</div>
+          <div class="price">$55000.00</div>
+        </div>
+
+        <div class="row-actions">
+          <input class="qty" type="number" min="1" value="1">
+          <button class="btn btn--primary small">Add</button>
+        </div>
+      </div>
+    </div><div class="pcard">
+      <div class="pcard__top">
+        <div>
+          <p class="pname">Gevorg</p>
+          <div class="psub">Group: <b>JS-2</b> • Month: <b>February</b></div>
+        </div>
+        <span class="tag">JS-2</span>
+      </div>
+
+      <div class="pmeta">
+        <div>
+          <div class="psub">Price</div>
+          <div class="price">$70000.00</div>
+        </div>
+
+        <div class="row-actions">
+          <input class="qty" type="number" min="1" value="1">
+          <button class="btn btn--primary small">Add</button>
+        </div>
+      </div>
+    </div><div class="pcard">
+      <div class="pcard__top">
+        <div>
+          <p class="pname">UI Pack</p>
+          <div class="psub">Group: <b>UI</b> • Month: <b>March</b></div>
+        </div>
+        <span class="tag">UI</span>
+      </div>
+
+      <div class="pmeta">
+        <div>
+          <div class="psub">Price</div>
+          <div class="price">$25000.00</div>
+        </div>
+
+        <div class="row-actions">
+          <input class="qty" type="number" min="1" value="1">
+          <button class="btn btn--primary small">Add</button>
+        </div>
+      </div>
+    </div><div class="pcard">
+      <div class="pcard__top">
+        <div>
+          <p class="pname">React Pro</p>
+          <div class="psub">Group: <b>JS-2</b> • Month: <b>April</b></div>
+        </div>
+        <span class="tag">JS-2</span>
+      </div>
+
+      <div class="pmeta">
+        <div>
+          <div class="psub">Price</div>
+          <div class="price">$90000.00</div>
+        </div>
+
+        <div class="row-actions">
+          <input class="qty" type="number" min="1" value="1">
+          <button class="btn btn--primary small">Add</button>
+        </div>
+      </div>
+    </div><div class="pcard">
+      <div class="pcard__top">
+        <div>
+          <p class="pname">Node API</p>
+          <div class="psub">Group: <b>JS-2</b> • Month: <b>May</b></div>
+        </div>
+        <span class="tag">JS-2</span>
+      </div>
+
+      <div class="pmeta">
+        <div>
+          <div class="psub">Price</div>
+          <div class="price">$85000.00</div>
+        </div>
+
+        <div class="row-actions">
+          <input class="qty" type="number" min="1" value="1">
+          <button class="btn btn--primary small">Add</button>
+        </div>
+      </div>
+    </div></div>
+  </section>
+
+  <!-- Orders -->
+  <aside class="orders">
+    <div class="section-head">
+      <h2 class="title">Orders</h2>
+      <div class="seg">
+        <button class="seg__btn is-active" data-filter="all">All</button>
+        <button class="seg__btn" data-filter="paid">Paid</button>
+        <button class="seg__btn" data-filter="unpaid">Unpaid</button>
+      </div>
+    </div>
+
+    <div class="orders__list" id="orders"><div class="ocard">
+      <div class="ocard__head">
+        <div>
+          <div class="oid">ORD-1772350588979</div>
+          <div class="osub">Anna • 2026-02-28 23:36</div>
+        </div>
+        <span class="badge paid">Paid</span>
+      </div>
+
+      <div class="oline">
+        <span>Items: <b class="strong">3</b></span>
+        <span>Total: <b class="strong">$379500.00</b></span>
+      </div>
+    </div><div class="ocard">
+      <div class="ocard__head">
+        <div>
+          <div class="oid">ORD-1772350688805</div>
+          <div class="osub">Narek • 2026-02-28 23:38</div>
+        </div>
+        <span class="badge unpaid">Unpaid</span>
+      </div>
+
+      <div class="oline">
+        <span>Items: <b class="strong">3</b></span>
+        <span>Total: <b class="strong">$242000.00</b></span>
+      </div>
+    </div></div>
+
+    <div class="orders__footer">
+      <div class="mini">
+        <div class="mini__label">Cart subtotal</div>
+        <div class="mini__value" id="cartSubtotal">$235000.00</div>
+      </div>
+      <button class="btn btn--primary w100" id="btnQuickInvoice">View sample invoice</button>
+    </div>
+  </aside>
+</main>
+
+<!-- CART DRAWER -->
+<div class="drawer" id="cartDrawer" aria-hidden="true">
+  <div class="drawer__backdrop" data-close=""></div>
+  <div class="drawer__panel" role="dialog" aria-modal="true">
+    <div class="drawer__head">
+      <div>
+        <div class="drawer__title">Your cart</div>
+        <div class="drawer__sub" id="cartHint">Add items from products.</div>
+      </div>
+      <button class="icon-btn" data-close="" aria-label="Close cart">✕</button>
+    </div>
+
+    <div class="drawer__body" id="cartItems"><div class="citem">
+      <div>
+        <div class="citem__name">Gevorg</div>
+        <div class="citem__sub">JS-2 • February</div>
+      </div>
+      <div class="citem__right">
+        <div><b>$70000.00</b></div>
+        <div class="citem__qty">Qty: 1</div>
+        <div style="margin-top:8px; display:flex; gap:6px; justify-content:flex-end;">
+          <button class="btn btn--ghost small" data-dec="3">-</button>
+          <button class="btn btn--ghost small" data-inc="3">+</button>
+          <button class="btn btn--ghost small" data-rm="3">Remove</button>
+        </div>
+      </div>
+    </div><div class="citem">
+      <div>
+        <div class="citem__name">Anna</div>
+        <div class="citem__sub">JS-1 • February</div>
+      </div>
+      <div class="citem__right">
+        <div><b>$55000.00</b></div>
+        <div class="citem__qty">Qty: 1</div>
+        <div style="margin-top:8px; display:flex; gap:6px; justify-content:flex-end;">
+          <button class="btn btn--ghost small" data-dec="2">-</button>
+          <button class="btn btn--ghost small" data-inc="2">+</button>
+          <button class="btn btn--ghost small" data-rm="2">Remove</button>
+        </div>
+      </div>
+    </div><div class="citem">
+      <div>
+        <div class="citem__name">Narek</div>
+        <div class="citem__sub">JS-1 • January</div>
+      </div>
+      <div class="citem__right">
+        <div><b>$55000.00</b></div>
+        <div class="citem__qty">Qty: 2</div>
+        <div style="margin-top:8px; display:flex; gap:6px; justify-content:flex-end;">
+          <button class="btn btn--ghost small" data-dec="1">-</button>
+          <button class="btn btn--ghost small" data-inc="1">+</button>
+          <button class="btn btn--ghost small" data-rm="1">Remove</button>
+        </div>
+      </div>
+    </div></div>
+
+    <div class="drawer__foot">
+      <div class="totals">
+        <div class="totals__row">
+          <span>Subtotal</span>
+          <b id="drawerSubtotal">$235000.00</b>
+        </div>
+        <div class="totals__row muted">
+          <span>Tax (10%)</span>
+          <b id="drawerTax">$23500.00</b>
+        </div>
+        <div class="totals__row grand">
+          <span>Total</span>
+          <b id="drawerTotal">$258500.00</b>
+        </div>
+      </div>
+      <button class="btn btn--primary w100" id="btnPlaceOrder">Place Order</button>
+      <button class="btn btn--ghost w100" id="btnClearCart">Clear cart</button>
+    </div>
+  </div>
+</div>
+
+<!-- INVOICE MODAL -->
+<div class="modal" id="invoiceModal" aria-hidden="true">
+  <div class="modal__backdrop" data-close=""></div>
+
+  <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="invTitle">
+    <div class="modal__head">
+      <div class="modal__headLeft">
+        <div class="inv-badge">INVOICE</div>
+        <div>
+          <h3 class="modal__title" id="invTitle">Order details</h3>
+          <div class="modal__sub" id="invSub">Click an order to view full information</div>
+        </div>
+      </div>
+
+      <div class="modal__headRight">
+        <button class="btn btn--ghost" id="btnCopyId">Copy ID</button>
+        <button class="btn btn--ghost" id="btnPrint">Print</button>
+        <button class="icon-btn" data-close="" aria-label="Close modal">✕</button>
+      </div>
+    </div>
+
+    <div class="modal__body">
+      <div class="inv-grid">
+        <!-- left -->
+        <div class="inv-card">
+          <div class="inv-card__title">Customer</div>
+          <div class="kv">
+            <div><span>Name</span><b id="cName">—</b></div>
+            <div><span>Phone</span><b id="cPhone">—</b></div>
+            <div><span>Address</span><b id="cAddress">—</b></div>
+          </div>
+        </div>
+
+        <div class="inv-card">
+          <div class="inv-card__title">Order</div>
+          <div class="kv">
+            <div><span>Order ID</span><b id="oId">—</b></div>
+            <div><span>Date</span><b id="oDate">—</b></div>
+            <div><span>Status</span><b><span class="status" id="oStatus">—</span></b></div>
+          </div>
+        </div>
+
+        <div class="inv-card">
+          <div class="inv-card__title">Payment</div>
+          <div class="kv">
+            <div><span>Method</span><b id="pMethod">—</b></div>
+            <div><span>Paid</span><b id="pPaid">—</b></div>
+            <div><span>Transaction</span><b id="pTxn">—</b></div>
+          </div>
+        </div>
+
+        <div class="inv-card">
+          <div class="inv-card__title">Delivery</div>
+          <div class="kv">
+            <div><span>Type</span><b id="dType">—</b></div>
+            <div><span>Window</span><b id="dWindow">—</b></div>
+            <div><span>Notes</span><b id="dNotes">—</b></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="table" id="itemsTable">
+          <thead>
+          <tr>
+            <th style="width:52px;">#</th>
+            <th>Item</th>
+            <th style="width:120px;">Group</th>
+            <th style="width:90px;" class="right">Qty</th>
+            <th style="width:130px;" class="right">Price</th>
+            <th style="width:140px;" class="right">Total</th>
+          </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+
+        <div class="summary">
+          <div class="summary__box">
+            <div class="summary__row"><span>Subtotal</span><b id="sSubtotal">$0.00</b></div>
+            <div class="summary__row muted"><span>Discount</span><b id="sDiscount">$0.00</b></div>
+            <div class="summary__row muted"><span>Tax</span><b id="sTax">$0.00</b></div>
+            <div class="summary__row grand"><span>Grand total</span><b id="sGrand">$0.00</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal__foot">
+      <div class="note">
+        <span class="dot"></span>
+        Tip: ESC / click outside to close. This layout is made for real “store-like” order UX.
+      </div>
+      <div class="foot-actions">
+        <button class="btn btn--ghost" data-close="">Close</button>
+        <button class="btn btn--primary" id="btnMarkPaid">Mark as paid</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  const money = (n) => `$${Number(n).toFixed(2)}`;
+  const uid = () => `ORD-${Date.now()}${Math.floor(Math.random()*90+10)}`;
+
+  const state = {
+    cat: "all",
+    filter: "all",
+    q: "",
+    cart: [],
+    products: [
+      { id: 1, name: "Narek", group: "JS-1", month: "January", price: 55000, cat: "JS-1" },
+      { id: 2, name: "Anna", group: "JS-1", month: "February", price: 55000, cat: "JS-1" },
+      { id: 3, name: "Gevorg", group: "JS-2", month: "February", price: 70000, cat: "JS-2" },
+      { id: 4, name: "UI Pack", group: "UI", month: "March", price: 25000, cat: "UI" },
+      { id: 5, name: "React Pro", group: "JS-2", month: "April", price: 90000, cat: "JS-2" },
+      { id: 6, name: "Node API", group: "JS-2", month: "May", price: 85000, cat: "JS-2" },
+    ],
+    orders: [
+      {
+        id: "ORD-1772350588979",
+        date: "2026-02-28 23:36",
+        paid: true,
+        customer: { name:"Anna", phone:"+374 00 00 00", address:"Yerevan, Armenia" },
+        payment: { method:"Card", txn:"TXN-9A31K2" },
+        delivery: { type:"Pickup", window:"Today 18:00-21:00", notes:"Call before arrival" },
+        discount: 0,
+        taxRate: 0.1,
+        items: [
+          { name:"Narek", group:"JS-1", qty:3, price:55000 },
+          { name:"Anna", group:"JS-1", qty:2, price:55000 },
+          { name:"Gevorg", group:"JS-2", qty:1, price:70000 },
+        ]
+      },
+      {
+        id: "ORD-1772350688805",
+        date: "2026-02-28 23:38",
+        paid: false,
+        customer: { name:"Narek", phone:"+374 11 22 33", address:"Komitas, Yerevan" },
+        payment: { method:"Cash", txn:"—" },
+        delivery: { type:"Delivery", window:"Tomorrow 12:00-15:00", notes:"Leave at reception" },
+        discount: 5000,
+        taxRate: 0.1,
+        items: [
+          { name:"React Pro", group:"JS-2", qty:1, price:90000 },
+          { name:"Node API", group:"JS-2", qty:1, price:85000 },
+          { name:"UI Pack", group:"UI", qty:2, price:25000 },
+        ]
+      }
+    ],
+    currentInvoiceId: null,
+  };
+  const elProducts=document.getElementById("products"),elOrders=document.getElementById("orders"),elQ=document.getElementById("q"),cartDrawer=document.getElementById("cartDrawer"),cartItems=document.getElementById("cartItems"),invoiceModal=document.getElementById("invoiceModal"),itemsTbody=document.querySelector("#itemsTable tbody");function openOverlay(t){t.classList.add("is-open"),t.setAttribute("aria-hidden","false"),document.body.style.overflow="hidden"}function closeOverlay(t){t.classList.remove("is-open"),t.setAttribute("aria-hidden","true"),document.body.style.overflow=""}function cartSubtotal(){return state.cart.reduce(((t,e)=>t+e.price*e.qty),0)}function syncCartUI(){const t=state.cart.reduce(((t,e)=>t+e.qty),0);document.getElementById("cartCount").textContent=t,document.getElementById("cartSubtotal").textContent=money(cartSubtotal()),cartItems.innerHTML="",0===state.cart.length?cartItems.innerHTML='<div style="color:rgba(234,242,255,.7);padding:10px;">\n      Cart is empty. Add products from left.\n    </div>':state.cart.forEach((t=>{const e=document.createElement("div");e.className="citem",e.innerHTML=`\n        <div>\n          <div class="citem__name">${t.name}</div>\n          <div class="citem__sub">${t.group} • ${t.month}</div>\n        </div>\n        <div class="citem__right">\n          <div><b>${money(t.price)}</b></div>\n          <div class="citem__qty">Qty: ${t.qty}</div>\n          <div style="margin-top:8px; display:flex; gap:6px; justify-content:flex-end;">\n            <button class="btn btn--ghost small" data-dec="${t.id}">-</button>\n            <button class="btn btn--ghost small" data-inc="${t.id}">+</button>\n            <button class="btn btn--ghost small" data-rm="${t.id}">Remove</button>\n          </div>\n        </div>\n      `,cartItems.appendChild(e)}));const e=cartSubtotal(),n=.1*e,d=e+n;document.getElementById("drawerSubtotal").textContent=money(e),document.getElementById("drawerTax").textContent=money(n),document.getElementById("drawerTotal").textContent=money(d)}function addToCart(t,e){const n=state.cart.find((e=>e.id===t.id));n?n.qty+=e:state.cart.push({...t,qty:e}),syncCartUI()}function renderProducts(){const t=state.q.trim().toLowerCase(),e=state.products.filter((e=>{const n="all"===state.cat||e.cat===state.cat,d=!t||`${e.name} ${e.group} ${e.month}`.toLowerCase().includes(t);return n&&d}));elProducts.innerHTML="",e.forEach((t=>{const e=document.createElement("div");e.className="pcard",e.innerHTML=`\n      <div class="pcard__top">\n        <div>\n          <p class="pname">${t.name}</p>\n          <div class="psub">Group: <b>${t.group}</b> • Month: <b>${t.month}</b></div>\n        </div>\n        <span class="tag">${t.cat}</span>\n      </div>\n\n      <div class="pmeta">\n        <div>\n          <div class="psub">Price</div>\n          <div class="price">${money(t.price)}</div>\n        </div>\n\n        <div class="row-actions">\n          <input class="qty" type="number" min="1" value="1" />\n          <button class="btn btn--primary small">Add</button>\n        </div>\n      </div>\n    `;const n=e.querySelector(".qty");e.querySelector(".btn--primary").addEventListener("click",(()=>addToCart(t,Math.max(1,Number(n.value||1))))),elProducts.appendChild(e)}))}function orderTotals(t){const e=t.items.reduce(((t,e)=>t+e.price*e.qty),0),n=Number(t.discount||0),d=Math.max(0,(e-n)*(t.taxRate??.1));return{subtotal:e,discount:n,tax:d,grand:Math.max(0,e-n+d)}}function renderOrders(){const t=state.q.trim().toLowerCase(),e=state.orders.filter((e=>{const n="all"===state.filter||("paid"===state.filter?e.paid:!e.paid),d=`${e.id} ${e.customer.name} ${e.items.map((t=>t.name)).join(" ")}`.toLowerCase(),a=!t||d.includes(t);return n&&a}));elOrders.innerHTML="",e.forEach((t=>{const{grand:e}=orderTotals(t),n=document.createElement("div");n.className="ocard",n.innerHTML=`\n      <div class="ocard__head">\n        <div>\n          <div class="oid">${t.id}</div>\n          <div class="osub">${t.customer.name} • ${t.date}</div>\n        </div>\n        <span class="badge ${t.paid?"paid":"unpaid"}">${t.paid?"Paid":"Unpaid"}</span>\n      </div>\n\n      <div class="oline">\n        <span>Items: <b class="strong">${t.items.length}</b></span>\n        <span>Total: <b class="strong">${money(e)}</b></span>\n      </div>\n    `,n.addEventListener("click",(()=>openInvoice(t.id))),elOrders.appendChild(n)}))}function openInvoice(t){const e=state.orders.find((e=>e.id===t));if(!e)return;state.currentInvoiceId=t,document.getElementById("invSub").textContent=`${e.customer.name} • ${e.date} • ${e.paid?"Paid":"Unpaid"}`,document.getElementById("cName").textContent=e.customer.name,document.getElementById("cPhone").textContent=e.customer.phone,document.getElementById("cAddress").textContent=e.customer.address,document.getElementById("oId").textContent=e.id,document.getElementById("oDate").textContent=e.date;const n=document.getElementById("oStatus");n.textContent=e.paid?"Paid":"Unpaid",n.className="status "+(e.paid?"paid":"unpaid"),document.getElementById("pMethod").textContent=e.payment.method,document.getElementById("pPaid").textContent=e.paid?"Yes":"No",document.getElementById("pTxn").textContent=e.payment.txn,document.getElementById("dType").textContent=e.delivery.type,document.getElementById("dWindow").textContent=e.delivery.window,document.getElementById("dNotes").textContent=e.delivery.notes,itemsTbody.innerHTML="",e.items.forEach(((t,e)=>{const n=document.createElement("tr"),d=t.price*t.qty;n.innerHTML=`\n      <td>${e+1}</td>\n      <td><b>${t.name}</b></td>\n      <td>${t.group}</td>\n      <td class="right">${t.qty}</td>\n      <td class="right">${money(t.price)}</td>\n      <td class="right"><b>${money(d)}</b></td>\n    `,itemsTbody.appendChild(n)}));const{subtotal:d,discount:a,tax:r,grand:s}=orderTotals(e);document.getElementById("sSubtotal").textContent=money(d),document.getElementById("sDiscount").textContent=money(a),document.getElementById("sTax").textContent=money(r),document.getElementById("sGrand").textContent=money(s),document.getElementById("btnMarkPaid").textContent=e.paid?"Paid ✅":"Mark as paid",openOverlay(invoiceModal)}function placeOrderFromCart(){if(0===state.cart.length)return;const t={id:uid(),date:(new Date).toISOString().slice(0,16).replace("T"," "),paid:!1,customer:{name:"Guest",phone:"—",address:"—"},payment:{method:"Card",txn:`TXN-${Math.random().toString(16).slice(2,8).toUpperCase()}`},delivery:{type:"Delivery",window:"Tomorrow 12:00-15:00",notes:"—"},discount:0,taxRate:.1,items:state.cart.map((t=>({name:t.name,group:t.group,qty:t.qty,price:t.price})))};state.orders.unshift(t),state.cart=[],syncCartUI(),renderOrders(),closeOverlay(cartDrawer),openInvoice(t.id)}document.addEventListener("click",(t=>{if(t.target.closest("[data-close]")){const e=t.target.closest(".modal,.drawer");e&&closeOverlay(e)}})),document.addEventListener("keydown",(t=>{"Escape"===t.key&&(invoiceModal.classList.contains("is-open")&&closeOverlay(invoiceModal),cartDrawer.classList.contains("is-open")&&closeOverlay(cartDrawer))})),cartItems.addEventListener("click",(t=>{const e=t.target.closest("[data-inc]")?.getAttribute("data-inc"),n=t.target.closest("[data-dec]")?.getAttribute("data-dec"),d=t.target.closest("[data-rm]")?.getAttribute("data-rm");if(e){state.cart.find((t=>String(t.id)===String(e))).qty++,syncCartUI()}if(n){const t=state.cart.find((t=>String(t.id)===String(n)));t.qty=Math.max(1,t.qty-1),syncCartUI()}d&&(state.cart=state.cart.filter((t=>String(t.id)!==String(d))),syncCartUI())})),document.getElementById("btnCart").addEventListener("click",(()=>{syncCartUI(),openOverlay(cartDrawer)})),document.getElementById("btnCheckout").addEventListener("click",(()=>{syncCartUI(),openOverlay(cartDrawer)})),document.getElementById("btnClearCart").addEventListener("click",(()=>{state.cart=[],syncCartUI()})),document.getElementById("btnPlaceOrder").addEventListener("click",placeOrderFromCart),document.getElementById("btnQuickInvoice").addEventListener("click",(()=>{openInvoice(state.orders[0].id)})),document.getElementById("btnCopyId").addEventListener("click",(async()=>{const t=state.currentInvoiceId||"";try{await navigator.clipboard.writeText(t)}catch(t){}})),document.getElementById("btnPrint").addEventListener("click",(()=>window.print())),document.getElementById("btnMarkPaid").addEventListener("click",(()=>{const t=state.currentInvoiceId,e=state.orders.find((e=>e.id===t));e&&(e.paid=!0,renderOrders(),openInvoice(e.id))})),elQ.addEventListener("input",(t=>{state.q=t.target.value,renderProducts(),renderOrders()})),document.getElementById("categoryChips").addEventListener("click",(t=>{const e=t.target.closest(".chip");e&&(state.cat=e.dataset.cat,[...document.querySelectorAll(".chip")].forEach((t=>t.classList.remove("is-active"))),e.classList.add("is-active"),renderProducts())})),document.querySelector(".seg").addEventListener("click",(t=>{const e=t.target.closest(".seg__btn");e&&(state.filter=e.dataset.filter,[...document.querySelectorAll(".seg__btn")].forEach((t=>t.classList.remove("is-active"))),e.classList.add("is-active"),renderOrders())})),renderProducts(),renderOrders(),syncCartUI();
+</script>
+
+<script>
+  (function() {
+    var ws = new WebSocket('ws://' + window.location.host +
+            '/jb-server-page?reloadMode=RELOAD_ON_SAVE&'+
+            'referrer=' + encodeURIComponent(window.location.pathname));
+    ws.onmessage = function (msg) {
+      if (msg.data === 'reload') {
+        window.location.reload();
+      }
+      if (msg.data.startsWith('update-css ')) {
+        var messageId = msg.data.substring(11);
+        var links = document.getElementsByTagName('link');
+        for (var i = 0; i < links.length; i++) {
+          var link = links[i];
+          if (link.rel !== 'stylesheet') continue;
+          var clonedLink = link.cloneNode(true);
+          var newHref = link.href.replace(/(&|\?)jbUpdateLinksId=\d+/, "$1jbUpdateLinksId=" + messageId);
+          if (newHref !== link.href) {
+            clonedLink.href = newHref;
+          }
+          else {
+            var indexOfQuest = newHref.indexOf('?');
+            if (indexOfQuest >= 0) {
+              // to support ?foo#hash
+              clonedLink.href = newHref.substring(0, indexOfQuest + 1) + 'jbUpdateLinksId=' + messageId + '&' +
+                      newHref.substring(indexOfQuest + 1);
+            }
+            else {
+              clonedLink.href += '?' + 'jbUpdateLinksId=' + messageId;
+            }
+          }
+          link.replaceWith(clonedLink);
+        }
+      }
+    };
+  })();
+</script></body>
+
+</html>

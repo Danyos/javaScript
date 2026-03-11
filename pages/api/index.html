@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple JOIN Shop Example</title>
+
+    <style>
+        body{
+            font-family: Arial;
+            background:#f5f7fb;
+            margin:20px;
+        }
+
+        h1{
+            margin-bottom:10px;
+        }
+
+        .tabs button{
+            padding:8px 14px;
+            margin-right:8px;
+            border:none;
+            background:#2C74B3;
+            color:white;
+            cursor:pointer;
+            border-radius:6px;
+        }
+
+        .tabs button.active{
+            background:#0f2b46;
+        }
+
+        .grid{
+            display:grid;
+            grid-template-columns: repeat(auto-fill,minmax(200px,1fr));
+            gap:15px;
+            margin-top:20px;
+        }
+
+        .card{
+            background:white;
+            border-radius:10px;
+            padding:12px;
+            border:1px solid #ddd;
+        }
+
+        .card h3{
+            margin:0 0 6px 0;
+            font-size:14px;
+        }
+
+        .paid{ background:#d4edda; }
+        .unpaid{ background:#f8d7da; }
+        .unknown{ background:#fff3cd; }
+
+        .price{
+            font-weight:bold;
+            margin-top:6px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>SQL JOIN Simple Shop</h1>
+
+<div class="tabs">
+    <button onclick="show('inner')" class="active">INNER</button>
+    <button onclick="show('left')">LEFT</button>
+    <button onclick="show('right')">RIGHT</button>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<script>
+
+    // ----------------------
+    // MOCK DATA
+    // ----------------------
+
+    const students = [
+        {id:1, name:"Narek"},
+        {id:2, name:"Anna"},
+        {id:3, name:"Gevorg"},
+        {id:4, name:"Meri"}
+    ];
+
+    const payments = [
+        {student_id:1, amount:55000},
+        {student_id:2, amount:55000},
+        {student_id:5, amount:55000} // unknown student
+    ];
+
+    // ----------------------
+    // JOIN SIMULATION
+    // ----------------------
+
+    function innerJoin(){
+        return students
+            .filter(s => payments.find(p => p.student_id === s.id))
+            .map(s => {
+                const pay = payments.find(p => p.student_id === s.id);
+                return {
+                    name:s.name,
+                    amount:pay.amount,
+                    status:"paid"
+                }
+            });
+    }
+
+    function leftJoin(){
+        return students.map(s=>{
+            const pay = payments.find(p=>p.student_id === s.id);
+            return {
+                name:s.name,
+                amount: pay ? pay.amount : null,
+                status: pay ? "paid" : "unpaid"
+            }
+        });
+    }
+
+    function rightJoin(){
+        return payments.map(p=>{
+            const student = students.find(s=>s.id === p.student_id);
+            return {
+                name: student ? student.name : "Unknown",
+                amount:p.amount,
+                status: student ? "paid" : "unknown"
+            }
+        });
+    }
+
+    // ----------------------
+    // RENDER
+    // ----------------------
+
+    function render(data){
+        const grid = document.getElementById("grid");
+        grid.innerHTML = "";
+
+        data.forEach(item=>{
+            const div = document.createElement("div");
+            div.className = "card " + item.status;
+
+            div.innerHTML = `
+      <h3>${item.name}</h3>
+      <div class="price">
+        ${item.amount ? item.amount + " դրամ" : "Չի վճարել"}
+      </div>
+      <small>Status: ${item.status}</small>
+    `;
+
+            grid.appendChild(div);
+        });
+    }
+
+    function show(type){
+        document.querySelectorAll(".tabs button")
+            .forEach(b=>b.classList.remove("active"));
+        event.target.classList.add("active");
+
+        if(type==="inner") render(innerJoin());
+        if(type==="left") render(leftJoin());
+        if(type==="right") render(rightJoin());
+    }
+
+    // initial
+    render(innerJoin());
+
+</script>
+
+</body>
+</html>

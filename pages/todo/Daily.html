@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Daily Focus Cards</title>
+    <style>
+        :root{
+            --bg:#0b1220;
+            --card:#0f1b33;
+            --card2:#0d1730;
+            --border:rgba(255,255,255,.10);
+            --text:#e9eefb;
+            --muted:rgba(233,238,251,.65);
+            --shadow: 0 18px 40px rgba(0,0,0,.35);
+            --radius:18px;
+        }
+        *{box-sizing:border-box}
+        body{
+            margin:0;
+            font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+            background: radial-gradient(1200px 700px at 20% 10%, rgba(90,135,255,.22), transparent 55%),
+            radial-gradient(900px 600px at 80% 20%, rgba(55,230,200,.18), transparent 55%),
+            var(--bg);
+            color:var(--text);
+            min-height:100vh;
+            padding:28px;
+        }
+        .wrap{
+            max-width:1100px;
+            margin:0 auto;
+        }
+        header{
+            display:flex;
+            align-items:flex-end;
+            justify-content:space-between;
+            gap:16px;
+            margin-bottom:18px;
+        }
+        h1{
+            margin:0;
+            font-size:28px;
+            letter-spacing:.3px;
+        }
+        .subtitle{
+            margin:6px 0 0;
+            color:var(--muted);
+            font-size:14px;
+        }
+        .panel{
+            background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+            border:1px solid var(--border);
+            border-radius:var(--radius);
+            box-shadow: var(--shadow);
+            padding:16px;
+            margin-bottom:18px;
+        }
+
+        .form{
+            display:grid;
+            grid-template-columns: 1.6fr .7fr .7fr .7fr auto;
+            gap:10px;
+            align-items:end;
+        }
+        label{
+            display:block;
+            font-size:12px;
+            color:var(--muted);
+            margin:0 0 6px;
+        }
+        input, select{
+            width:100%;
+            background: rgba(10,18,35,.6);
+            color: var(--text);
+            border:1px solid var(--border);
+            border-radius:14px;
+            padding:10px 12px;
+            outline:none;
+        }
+        input::placeholder{color: rgba(233,238,251,.45)}
+        input:focus, select:focus{border-color: rgba(130,170,255,.6)}
+        .btns{
+            display:flex;
+            gap:10px;
+            justify-content:flex-end;
+            align-items:center;
+        }
+        button{
+            border:1px solid var(--border);
+            background: rgba(255,255,255,.06);
+            color:var(--text);
+            border-radius:14px;
+            padding:10px 12px;
+            cursor:pointer;
+            transition:.2s;
+            white-space:nowrap;
+        }
+        button:hover{transform: translateY(-1px); background: rgba(255,255,255,.09)}
+        .primary{
+            background: linear-gradient(135deg, rgba(90,135,255,.55), rgba(55,230,200,.35));
+            border-color: rgba(255,255,255,.16);
+        }
+
+        .stats{
+            display:flex;
+            gap:10px;
+            flex-wrap:wrap;
+            align-items:center;
+            justify-content:space-between;
+        }
+        .pill{
+            display:inline-flex;
+            gap:8px;
+            align-items:center;
+            padding:8px 12px;
+            border:1px solid var(--border);
+            border-radius:999px;
+            background: rgba(255,255,255,.05);
+            color: var(--muted);
+            font-size:13px;
+        }
+        .pill b{color:var(--text); font-weight:700}
+
+        .board{
+            display:grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap:14px;
+        }
+        .col{
+            background: rgba(255,255,255,.04);
+            border:1px solid var(--border);
+            border-radius:var(--radius);
+            padding:12px;
+            min-height:320px;
+        }
+        .col h3{
+            margin:4px 0 10px;
+            font-size:14px;
+            color: var(--muted);
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+        }
+        .count{
+            font-size:12px;
+            padding:4px 10px;
+            border:1px solid var(--border);
+            border-radius:999px;
+            background: rgba(255,255,255,.05);
+            color: var(--text);
+        }
+
+        .card{
+            background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.04));
+            border:1px solid var(--border);
+            border-radius:16px;
+            padding:12px;
+            margin-bottom:10px;
+        }
+        .card-top{
+            display:flex;
+            justify-content:space-between;
+            gap:10px;
+            align-items:flex-start;
+        }
+        .title{
+            font-size:14px;
+            line-height:1.25;
+            margin:0;
+        }
+        .meta{
+            display:flex;
+            gap:8px;
+            flex-wrap:wrap;
+            margin-top:10px;
+        }
+        .tag{
+            font-size:12px;
+            padding:4px 10px;
+            border-radius:999px;
+            border:1px solid var(--border);
+            background: rgba(255,255,255,.05);
+            color: var(--muted);
+        }
+        .tag.energy-low{background: rgba(55,230,200,.12); color: rgba(55,230,200,.95); border-color: rgba(55,230,200,.25)}
+        .tag.energy-med{background: rgba(255,200,90,.12); color: rgba(255,200,90,.95); border-color: rgba(255,200,90,.25)}
+        .tag.energy-high{background: rgba(255,90,130,.12); color: rgba(255,90,130,.95); border-color: rgba(255,90,130,.25)}
+        .actions{
+            display:flex;
+            gap:8px;
+            margin-top:12px;
+        }
+        .actions button{
+            flex:1;
+            padding:8px 10px;
+            border-radius:12px;
+            font-size:12px;
+        }
+        .danger{
+            background: rgba(255,90,130,.12);
+            border-color: rgba(255,90,130,.25);
+            color: rgba(255,170,190,.95);
+        }
+
+        .hint{
+            color: var(--muted);
+            font-size:13px;
+            margin-top:10px;
+        }
+
+        .highlight{
+            outline: 2px solid rgba(90,135,255,.55);
+            box-shadow: 0 0 0 6px rgba(90,135,255,.14);
+        }
+
+        @media (max-width: 900px){
+            .form{grid-template-columns: 1fr 1fr 1fr; }
+            .btns{grid-column: 1 / -1; justify-content:stretch}
+            .btns button{flex:1}
+            .board{grid-template-columns:1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <header>
+        <div>
+            <h1>Daily Focus Cards</h1>
+            <p class="subtitle">Todo-ի նման, բայց “քարտերով” ու էներգիա/դժվարությունով ✅</p>
+        </div>
+        <div class="pill" title="Pick Next-ը ընտրում է ամենացածր դժվարություն + low էներգիա (եթե կա)">
+            🎯 <span>Next: </span><b id="nextText">No tasks</b>
+        </div>
+    </header>
+
+    <section class="panel">
+        <div class="form">
+            <div>
+                <label for="taskTitle">Task (գրիր գործը)</label>
+                <input id="taskTitle" placeholder="օր․ «10 րոպե grammar practice»" maxlength="80">
+            </div>
+
+            <div>
+                <label for="energy">Energy</label>
+                <select id="energy">
+                    <option value="low">Low</option>
+                    <option value="med" selected="">Med</option>
+                    <option value="high">High</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="difficulty">Difficulty</label>
+                <select id="difficulty">
+                    <option value="1">1 (easy)</option>
+                    <option value="2">2</option>
+                    <option value="3" selected="">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5 (hard)</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="minutes">Minutes</label>
+                <input id="minutes" type="number" min="5" max="240" value="25">
+            </div>
+
+            <div class="btns">
+                <button class="primary" id="addBtn">➕ Add</button>
+                <button id="pickBtn">✨ Pick Next</button>
+            </div>
+        </div>
+
+        <div class="stats" style="margin-top:12px;">
+            <div class="pill">📌 Total: <b id="totalCount">3</b></div>
+            <div class="pill">🟦 To do: <b id="todoCount">1</b></div>
+            <div class="pill">🟨 Doing: <b id="doingCount">1</b></div>
+            <div class="pill">🟩 Done: <b id="doneCount">1</b></div>
+        </div>
+
+        <div class="hint">Tip: “Move” կոճակը մեկ սեղմումով տեղափոխում է To do → Doing → Done։</div>
+    </section>
+
+    <section class="board">
+        <div class="col" data-status="todo">
+            <h3>🟦 To do <span class="count" id="cTodo">1</span></h3>
+            <div class="list" id="listTodo">
+                <div class="card" data-id="49c5a7e47e6b919bc7bc211c">
+                    <div class="card-top">
+                        <p class="title">hello</p>
+                    </div>
+
+                    <div class="meta">
+                        <span class="tag energy-med">Medium energy</span>
+                        <span class="tag">Difficulty: 3/5</span>
+                        <span class="tag">25 min</span>
+                    </div>
+
+                    <div class="actions">
+                        <button data-action="move" data-id="49c5a7e47e6b919bc7bc211c">
+                            ➡️ Move
+                        </button>
+                        <button class="danger" data-action="delete" data-id="49c5a7e47e6b919bc7bc211c">
+                            🗑 Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col" data-status="doing">
+            <h3>🟨 Doing <span class="count" id="cDoing">1</span></h3>
+            <div class="list" id="listDoing">
+                <div class="card" data-id="869abece858919bc7bc5625">
+                    <div class="card-top">
+                        <p class="title">one</p>
+                    </div>
+
+                    <div class="meta">
+                        <span class="tag energy-high">High energy</span>
+                        <span class="tag">Difficulty: 1/5</span>
+                        <span class="tag">25 min</span>
+                    </div>
+
+                    <div class="actions">
+                        <button data-action="move" data-id="869abece858919bc7bc5625">
+                            ➡️ Move
+                        </button>
+                        <button class="danger" data-action="delete" data-id="869abece858919bc7bc5625">
+                            🗑 Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col" data-status="done">
+            <h3>🟩 Done <span class="count" id="cDone">1</span></h3>
+            <div class="list" id="listDone">
+                <div class="card" data-id="a81dad55872cb19bc7bbe589">
+                    <div class="card-top">
+                        <p class="title">aaaa</p>
+                    </div>
+
+                    <div class="meta">
+                        <span class="tag energy-high">High energy</span>
+                        <span class="tag">Difficulty: 3/5</span>
+                        <span class="tag">25 min</span>
+                    </div>
+
+                    <div class="actions">
+                        <button disabled="" data-action="move" data-id="a81dad55872cb19bc7bbe589">
+                            ✅ Done
+                        </button>
+                        <button class="danger" data-action="delete" data-id="a81dad55872cb19bc7bbe589">
+                            🗑 Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+    const $=(t,e=document)=>e.querySelector(t),$$=(t,e=document)=>[...e.querySelectorAll(t)],STORAGE_KEY="daily_focus_cards_v1",state={items:load()??[]};function uid(){return Math.random().toString(16).slice(2)+Date.now().toString(16)}function load(){try{const t=localStorage.getItem(STORAGE_KEY);return t?JSON.parse(t):null}catch{return null}}function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state.items))}function addItem(){const t=$("#taskTitle").value.trim(),e=$("#energy").value,n=Number($("#difficulty").value),i=Number($("#minutes").value);t?(state.items.unshift({id:uid(),title:t,energy:e,difficulty:n,minutes:i,status:"todo",createdAt:Date.now()}),$("#taskTitle").value="",save(),render()):$("#taskTitle").focus()}function moveItem(t){const e=state.items.find((e=>e.id===t));if(!e)return;const n=["todo","doing","done"],i=n.indexOf(e.status);e.status=n[Math.min(i+1,n.length-1)],save(),render()}function deleteItem(t){state.items=state.items.filter((e=>e.id!==t)),save(),render()}function energyLabel(t){return"low"===t?"Low energy":"med"===t?"Medium energy":"High energy"}function pickNext(){const t=state.items.filter((t=>"todo"===t.status));if(0===t.length)return $("#nextText").textContent="No tasks",void clearHighlights();const e=t.filter((t=>"low"===t.energy)),n=(e.length?e:t).slice().sort(((t,e)=>t.difficulty-e.difficulty||t.minutes-e.minutes||e.createdAt-t.createdAt))[0];$("#nextText").textContent=n.title,highlightCard(n.id)}function clearHighlights(){$$(".card").forEach((t=>t.classList.remove("highlight")))}function highlightCard(t){clearHighlights();const e=document.querySelector(`[data-id="${t}"]`);e&&(e.classList.add("highlight"),e.scrollIntoView({behavior:"smooth",block:"center"}))}function cardTemplate(t){const e="low"===t.energy?"energy-low":"med"===t.energy?"energy-med":"energy-high",n="done"===t.status?"✅ Done":"➡️ Move";return`\n        <div class="card" data-id="${t.id}">\n          <div class="card-top">\n            <p class="title">${escapeHtml(t.title)}</p>\n          </div>\n\n          <div class="meta">\n            <span class="tag ${e}">${energyLabel(t.energy)}</span>\n            <span class="tag">Difficulty: ${t.difficulty}/5</span>\n            <span class="tag">${t.minutes} min</span>\n          </div>\n\n          <div class="actions">\n            <button ${"done"===t.status?"disabled":""} data-action="move" data-id="${t.id}">\n              ${n}\n            </button>\n            <button class="danger" data-action="delete" data-id="${t.id}">\n              🗑 Delete\n            </button>\n          </div>\n        </div>\n      `}function render(){const t={todo:$("#listTodo"),doing:$("#listDoing"),done:$("#listDone")};Object.values(t).forEach((t=>t.innerHTML=""));for(const e of state.items)t[e.status].insertAdjacentHTML("afterbegin",cardTemplate(e));const e=state.items.length,n=state.items.filter((t=>"todo"===t.status)).length,i=state.items.filter((t=>"doing"===t.status)).length,a=state.items.filter((t=>"done"===t.status)).length;$("#totalCount").textContent=e,$("#todoCount").textContent=n,$("#doingCount").textContent=i,$("#doneCount").textContent=a,$("#cTodo").textContent=n,$("#cDoing").textContent=i,$("#cDone").textContent=a,0===e&&($("#nextText").textContent="—")}function escapeHtml(t){return t.replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;")}$("#addBtn").addEventListener("click",addItem),$("#pickBtn").addEventListener("click",pickNext),$("#taskTitle").addEventListener("keydown",(t=>{"Enter"===t.key&&addItem()})),document.addEventListener("click",(t=>{const e=t.target.closest("button[data-action]");if(!e)return;const n=e.dataset.id,i=e.dataset.action;"move"===i&&moveItem(n),"delete"===i&&deleteItem(n)})),render();
+</script>
+</body>
+</html>

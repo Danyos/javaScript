@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Study Sprint Timer</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+            background: #0b1220;
+            color: #e9eefc;
+            display: grid;
+            place-items: center;
+            min-height: 100vh;
+            padding: 18px;
+        }
+
+        .card{
+            width: min(520px, 100%);
+            background: #111a2e;
+            border: 1px solid #1f2a44;
+            border-radius: 16px;
+            padding: 18px;
+            box-shadow: 0 12px 30px rgba(0,0,0,.35);
+        }
+
+        h1 { margin: 0 0 6px; font-size: 26px; }
+        .sub { margin: 0 0 16px; opacity: .8; }
+
+        .row{
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            align-items: end;
+        }
+
+        .field span{
+            display: block;
+            font-size: 12px;
+            opacity: .75;
+            margin-bottom: 6px;
+        }
+        input{
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid #2a385b;
+            background: #0d1527;
+            color: #e9eefc;
+            outline: none;
+        }
+        input:focus { border-color: #4d7cff; }
+
+        .timeBox{
+            border: 1px solid #2a385b;
+            background: #0d1527;
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+        }
+        .time{ font-size: 34px; font-weight: 800; letter-spacing: 1px; }
+        .status{ margin-top: 4px; font-size: 12px; opacity: .8; }
+
+        .progress{
+            margin: 14px 0;
+            height: 12px;
+            background: #0d1527;
+            border: 1px solid #2a385b;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+        .bar{
+            height: 100%;
+            width: 0%;
+            background: #4d7cff;
+            transition: width .2s linear;
+        }
+
+        .actions{
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+        }
+
+        .btn{
+            padding: 12px 10px;
+            border-radius: 12px;
+            border: 1px solid #2a385b;
+            background: #121c33;
+            color: #e9eefc;
+            cursor: pointer;
+        }
+        .btn:disabled{ opacity: .5; cursor: not-allowed; }
+        .primary{ background: #4d7cff; border-color: #4d7cff; color: #081022; font-weight: 800; }
+        .danger{ background: #ff4d6d; border-color: #ff4d6d; color: #14050a; font-weight: 800; }
+
+        .tips{
+            margin: 14px 0 0;
+            padding-left: 18px;
+            opacity: .8;
+            font-size: 13px;
+        }
+
+    </style>
+</head>
+<body>
+<main class="card">
+    <h1>Study Sprint ⏱️</h1>
+    <p class="sub">Learn setInterval structure: state → render → control</p>
+
+    <div class="row">
+        <label class="field">
+            <span>Minutes</span>
+            <input id="minutesInput" type="number" min="1" max="180" value="25" />
+        </label>
+
+        <div class="timeBox">
+            <div id="timeText" class="time">25:00</div>
+            <div id="statusText" class="status">Ready</div>
+        </div>
+    </div>
+
+    <div class="progress">
+        <div id="progressBar" class="bar"></div>
+    </div>
+
+    <div class="actions">
+        <button id="startBtn" class="btn primary">Start</button>
+        <button id="pauseBtn" class="btn" disabled>Pause</button>
+        <button id="resetBtn" class="btn danger" disabled>Reset</button>
+    </div>
+
+    <ul class="tips">
+        <li>Start → ստեղծում է interval</li>
+        <li>Pause → clearInterval</li>
+        <li>Reset → վերադարձնում state-ը</li>
+    </ul>
+</main>
+
+<script>
+    const $=t=>document.querySelector(t),ui={minutesInput:$("#minutesInput"),timeText:$("#timeText"),statusText:$("#statusText"),progressBar:$("#progressBar"),startBtn:$("#startBtn"),pauseBtn:$("#pauseBtn"),resetBtn:$("#resetBtn")};let timerId=null;const state={totalSeconds:1500,remainingSeconds:1500,isRunning:!1};function formatTime(t){const e=Math.floor(t/60),n=t%60;return`${String(e).padStart(2,"0")}:${String(n).padStart(2,"0")}`}function clamp(t,e,n){return Math.min(n,Math.max(e,t))}function render(){ui.timeText.textContent=formatTime(state.remainingSeconds);const t=0===state.remainingSeconds;ui.statusText.textContent=t?"✅ Done":state.isRunning?"Running...":"Ready";const e=state.totalSeconds-state.remainingSeconds,n=0===state.totalSeconds?0:e/state.totalSeconds*100;ui.progressBar.style.width=`${clamp(n,0,100)}%`,ui.startBtn.disabled=state.isRunning||t,ui.pauseBtn.disabled=!state.isRunning,ui.resetBtn.disabled=!t&&state.remainingSeconds===state.totalSeconds&&!state.isRunning,ui.minutesInput.disabled=state.isRunning}function stopInterval(){null!==timerId&&(clearInterval(timerId),timerId=null)}function tick(){state.remainingSeconds>0&&(state.remainingSeconds--,render()),0===state.remainingSeconds&&(state.isRunning=!1,stopInterval(),render())}function startTimer(){state.isRunning||0!==state.remainingSeconds&&(state.isRunning=!0,timerId=setInterval(tick,1e3),render())}function pauseTimer(){state.isRunning&&(state.isRunning=!1,stopInterval(),render())}function resetTimer(){pauseTimer();const t=clamp(Number(ui.minutesInput.value)||1,1,180);state.totalSeconds=60*t,state.remainingSeconds=state.totalSeconds,render()}ui.startBtn.addEventListener("click",startTimer),ui.pauseBtn.addEventListener("click",pauseTimer),ui.resetBtn.addEventListener("click",resetTimer),ui.minutesInput.addEventListener("change",(()=>{state.isRunning||resetTimer()})),render();
+</script>
+</body>
+</html>

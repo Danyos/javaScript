@@ -1,0 +1,1048 @@
+<!doctype html>
+<html lang="hy">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Students Analytics Dashboard — Advanced</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg1:#f7f7ff;
+      --bg2:#eef2ff;
+      --card:rgba(255,255,255,.9);
+      --ink:#0f172a;
+      --muted:#64748b;
+      --accent:#6366f1;
+      --accent2:#22c55e;
+      --danger:#ef4444;
+      --warn:#f59e0b;
+      --shadow: 0 18px 45px rgba(2,6,23,.10);
+      --shadow2: 0 10px 30px rgba(2,6,23,.08);
+      --radius: 18px;
+    }
+
+    body{
+      min-height: 100vh;
+      background: radial-gradient(1200px 600px at 10% 10%, var(--bg2), transparent 60%),
+      radial-gradient(900px 500px at 90% 10%, #fde7f3, transparent 55%),
+      linear-gradient(180deg, var(--bg1), #ffffff 65%);
+      color: var(--ink);
+    }
+
+    .glass{
+      background: var(--card);
+      border: 1px solid rgba(15,23,42,.08);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      backdrop-filter: blur(10px);
+    }
+
+    .soft{
+      box-shadow: var(--shadow2);
+      border-radius: 16px;
+      border: 1px solid rgba(15,23,42,.06);
+      background: rgba(255,255,255,.95);
+    }
+
+    .brand-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:.5rem;
+      padding:.45rem .75rem;
+      border-radius: 999px;
+      background: rgba(99,102,241,.12);
+      color: #4338ca;
+      font-weight: 700;
+    }
+
+    .kpi{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      padding: 14px 16px;
+    }
+    .kpi .label{ color: var(--muted); font-size: .9rem; }
+    .kpi .value{ font-size: 1.35rem; font-weight: 900; letter-spacing: -.02em; }
+
+    .dot{
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 6px rgba(99,102,241,.12);
+    }
+    .dot.green{ background: var(--accent2); box-shadow: 0 0 0 6px rgba(34,197,94,.12); }
+    .dot.red{ background: var(--danger); box-shadow: 0 0 0 6px rgba(239,68,68,.12); }
+    .dot.warn{ background: var(--warn); box-shadow: 0 0 0 6px rgba(245,158,11,.16); }
+
+    .table thead th{
+      color:#334155;
+      font-weight:800;
+      border-bottom: 1px solid rgba(15,23,42,.08);
+      white-space: nowrap;
+    }
+    .table td{
+      vertical-align: middle;
+      color:#0f172a;
+      border-top: 1px solid rgba(15,23,42,.06);
+      white-space: nowrap;
+    }
+
+    .pill{
+      padding: .25rem .6rem;
+      border-radius: 999px;
+      font-size: .82rem;
+      font-weight: 800;
+      border: 1px solid rgba(15,23,42,.08);
+      background: rgba(2,6,23,.02);
+      color:#334155;
+      display:inline-flex;
+      align-items:center;
+      gap:.35rem;
+    }
+    .pill.studying{ background: rgba(34,197,94,.10); color:#166534; border-color: rgba(34,197,94,.25); }
+    .pill.graduated{ background: rgba(99,102,241,.12); color:#3730a3; border-color: rgba(99,102,241,.25); }
+    .pill.dropped{ background: rgba(239,68,68,.10); color:#991b1b; border-color: rgba(239,68,68,.25); }
+
+    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    .small-muted{ color: var(--muted); font-size: .9rem; }
+    .section-title{ font-weight: 950; letter-spacing: -.02em; }
+
+    .btn-accent{ background: var(--accent); border-color: var(--accent); font-weight: 800; }
+    .btn-accent:hover{ filter: brightness(.95); }
+
+    .form-control, .form-select{ border-radius: 14px; border: 1px solid rgba(15,23,42,.10); }
+
+    .sticky-tools{ position: sticky; top: 14px; }
+
+    .toast-zone{
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      z-index: 9999;
+      display: grid;
+      gap: 10px;
+      width: min(420px, calc(100vw - 32px));
+    }
+
+    .btn-icon{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+    }
+
+    .truncate{ max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  </style>
+</head>
+
+<body>
+<div class="container py-4">
+  <!-- Header -->
+  <div class="glass p-4 mb-4">
+    <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3">
+      <div>
+        <div class="brand-badge mb-2">
+          <span class="dot"></span>
+          Students Analytics
+        </div>
+        <h1 class="h3 section-title mb-1">Ուսանողների վերլուծության վահանակ (Advanced)</h1>
+        <div class="small-muted">
+          Ամսաթվերը՝ <span class="mono">YYYY-MM-DD</span>. Կա localStorage պահում, CRUD, ֆիլտրեր, սորտավորում, CSV export, analytics։
+        </div>
+      </div>
+      <div class="text-md-end">
+        <div class="small-muted">Այսօրվա օր</div>
+        <div class="fw-bold mono" id="todayText">—</div>
+      </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="row g-3 mt-3">
+      <div class="col-12 col-md-3">
+        <div class="soft kpi">
+          <div>
+            <div class="label">Ուսանողների քանակ</div>
+            <div class="value" id="kpiTotal">—</div>
+          </div>
+          <span class="dot"></span>
+        </div>
+      </div>
+      <div class="col-12 col-md-3">
+        <div class="soft kpi">
+          <div>
+            <div class="label">Ավարտածների թիվ</div>
+            <div class="value" id="kpiGraduated">—</div>
+          </div>
+          <span class="dot"></span>
+        </div>
+      </div>
+      <div class="col-12 col-md-3">
+        <div class="soft kpi">
+          <div>
+            <div class="label">Սովորողների թիվ</div>
+            <div class="value" id="kpiStudying">—</div>
+          </div>
+          <span class="dot green"></span>
+        </div>
+      </div>
+      <div class="col-12 col-md-3">
+        <div class="soft kpi">
+          <div>
+            <div class="label">Դուրս եկածների թիվ</div>
+            <div class="value" id="kpiDropped">—</div>
+          </div>
+          <span class="dot red"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-3 mt-1">
+      <div class="col-12 col-md-3">
+        <div class="soft kpi">
+          <div>
+            <div class="label">Միջին ուսման տևողություն</div>
+            <div class="value" id="kpiAvgDuration">—</div>
+          </div>
+          <span class="dot"></span>
+        </div>
+      </div>
+      <div class="col-12 col-md-3">
+        <div class="soft kpi">
+          <div>
+            <div class="label">Ավարտածների տոկոսը</div>
+            <div class="value" id="kpiGradRate">—</div>
+          </div>
+          <span class="dot"></span>
+        </div>
+      </div>
+      <div class="col-12 col-md-3">
+        <div class="soft kpi">
+          <div>
+            <div class="label">Ամենաերկար ուսում</div>
+            <div class="value" id="kpiLongest">—</div>
+          </div>
+          <span class="dot warn"></span>
+        </div>
+      </div>
+      <div class="col-12 col-md-3">
+        <div class="soft kpi">
+          <div>
+            <div class="label">Ամենակարճ ուսում</div>
+            <div class="value" id="kpiShortest">—</div>
+          </div>
+          <span class="dot warn"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Tools -->
+    <div class="col-12 col-lg-4">
+      <div class="glass p-3 sticky-tools">
+        <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
+          <h2 class="h5 section-title mb-0">Գործիքներ</h2>
+          <div class="d-flex gap-2">
+            <button id="btnOpenCreate" class="btn btn-accent btn-sm">+ Ավելացնել</button>
+            <button id="btnSeed" class="btn btn-outline-secondary btn-sm">Seed</button>
+          </div>
+        </div>
+
+        <div class="small-muted mb-3">CRUD + localStorage + ֆիլտր/սորտ/CSV։ Ամսաթվերը՝ <span class="mono">YYYY-MM-DD</span></div>
+
+        <div class="mb-3">
+          <label class="form-label small-muted">Որոնում անունով</label>
+          <input id="searchInput" class="form-control" placeholder="օր․ Aram, Mariam..." />
+        </div>
+
+        <div class="row g-2 mb-3">
+          <div class="col-6">
+            <label class="form-label small-muted">Մասնագիտություն</label>
+            <select id="profSelect" class="form-select">
+              <option value="">Բոլորը</option>
+            </select>
+          </div>
+          <div class="col-6">
+            <label class="form-label small-muted">Կարգավիճակ</label>
+            <select id="statusSelect" class="form-select">
+              <option value="">Բոլորը</option>
+              <option value="studying">Սովորող</option>
+              <option value="graduated">Ավարտած</option>
+              <option value="dropped">Դուրս եկած</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row g-2 mb-3">
+          <div class="col-6">
+            <label class="form-label small-muted">Սկիզբ՝ սկսած</label>
+            <input id="startFrom" type="date" class="form-control" />
+          </div>
+          <div class="col-6">
+            <label class="form-label small-muted">Սկիզբ՝ մինչև</label>
+            <input id="startTo" type="date" class="form-control" />
+          </div>
+        </div>
+
+        <div class="row g-2 mb-3">
+          <div class="col-6">
+            <label class="form-label small-muted">Ավարտ՝ սկսած</label>
+            <input id="endFrom" type="date" class="form-control" />
+          </div>
+          <div class="col-6">
+            <label class="form-label small-muted">Ավարտ՝ մինչև</label>
+            <input id="endTo" type="date" class="form-control" />
+          </div>
+        </div>
+
+        <div class="row g-2 mb-3">
+          <div class="col-12">
+            <label class="form-label small-muted">Սորտավորում</label>
+            <select id="sortSelect" class="form-select">
+              <option value="start_desc">Սկիզբ՝ վերջերսից</option>
+              <option value="start_asc">Սկիզբ՝ հներից</option>
+              <option value="end_desc">Ավարտ՝ վերջերսից</option>
+              <option value="duration_desc">Ուսման տևողություն՝ մեծից փոքր</option>
+              <option value="duration_asc">Ուսման տևողություն՝ փոքրից մեծ</option>
+              <option value="name_asc">Անուն՝ A → Z</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="d-grid gap-2">
+          <button id="btnRecalc" class="btn btn-accent">Վերահաշվել / Թարմացնել</button>
+          <button id="btnExport" class="btn btn-outline-primary">Export CSV (Shown)</button>
+          <button id="btnReset" class="btn btn-outline-secondary">Reset</button>
+        </div>
+
+        <hr class="my-4">
+
+        <div class="small-muted mb-2">Արագ ինսայթներ</div>
+        <div class="soft p-3">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <div class="fw-bold">Տոպ-մասնագիտություն</div>
+            <div id="topProfText" class="mono small-muted">—</div>
+          </div>
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="fw-bold">Վերջին 30 օրում ավարտած</div>
+            <div id="last30GradText" class="mono small-muted">—</div>
+          </div>
+        </div>
+
+        <div class="mt-3 small-muted">
+          <span class="fw-bold">Տվյալների պահում</span>՝ ավտոմատ localStorage-ում։
+        </div>
+      </div>
+    </div>
+
+    <!-- Table + Insights -->
+    <div class="col-12 col-lg-8">
+      <div class="glass p-3">
+        <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-2 mb-3">
+          <div>
+            <h2 class="h5 section-title mb-1">Աղյուսակ (ուսանողներ)</h2>
+            <div class="small-muted">Սկիզբ/ավարտ (YYYY-MM-DD), կարգավիճակ, ուսման տևողություն (օր/ամիս/տարի), գործողություններ…</div>
+          </div>
+          <div class="small-muted">
+            Ցուցադրված՝ <span class="fw-bold" id="shownCount">—</span>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table align-middle mb-0">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Անուն</th>
+                <th>Մասնագիտություն</th>
+                <th class="text-end">Սկիզբ</th>
+                <th class="text-end">Ավարտ</th>
+                <th>Կարգավիճակ</th>
+                <th class="text-end">Տևողություն</th>
+                <th class="text-end">Ավարտից անցած (օր)</th>
+                <th class="text-end">Գործողություն</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="row g-4 mt-1">
+        <div class="col-12">
+          <div class="glass p-3">
+            <h2 class="h5 section-title mb-2">Խմբավորում ըստ մեկնարկի տասնամյակների</h2>
+            <div class="small-muted mb-3">Օր․ 2010s, 2020s ... (քանակներ)</div>
+            <div id="decadeGroups" class="d-flex flex-wrap gap-2"></div>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <div class="glass p-3">
+            <h2 class="h5 section-title mb-2">Ֆունկցիոնալ մաս (ինչ կա ներսում)</h2>
+            <ul class="small-muted mb-0">
+              <li><span class="fw-bold">CRUD</span>՝ add/edit/delete ուսանող, validation + toast հաղորդագրություններ</li>
+              <li><span class="fw-bold">localStorage</span>՝ պահում/վերականգնում, reset + seed տվյալներ</li>
+              <li><span class="fw-bold">Date Filters</span>՝ start/end range (YYYY-MM-DD)</li>
+              <li><span class="fw-bold">Duration</span>՝ հաշվվում է օր/ամիս/տարի (precise)</li>
+              <li><span class="fw-bold">CSV Export</span>՝ հենց ցուցադրված շարքերից</li>
+              <li><span class="fw-bold">Edge-cases</span>՝ endDate null, start > end, incomplete fields, empty lists</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Create/Edit -->
+<div class="modal fade" id="studentModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:18px; overflow:hidden;">
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold" id="modalTitle">Ավելացնել ուսանող</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="formId" />
+
+        <div class="row g-2">
+          <div class="col-12">
+            <label class="form-label small-muted">Անուն</label>
+            <input id="formName" class="form-control" placeholder="օր․ Aram" />
+          </div>
+          <div class="col-12">
+            <label class="form-label small-muted">Մասնագիտություն</label>
+            <input id="formProfession" class="form-control" placeholder="օր․ Frontend" />
+          </div>
+          <div class="col-6">
+            <label class="form-label small-muted">Սկիզբ (YYYY-MM-DD)</label>
+            <input id="formStart" type="date" class="form-control" />
+          </div>
+          <div class="col-6">
+            <label class="form-label small-muted">Ավարտ (optional)</label>
+            <input id="formEnd" type="date" class="form-control" />
+          </div>
+          <div class="col-12">
+            <label class="form-label small-muted">Կարգավիճակ</label>
+            <select id="formStatus" class="form-select">
+              <option value="studying">Սովորող</option>
+              <option value="graduated">Ավարտած</option>
+              <option value="dropped">Դուրս եկած</option>
+            </select>
+            <div class="form-text small-muted">Եթե ընտրես «Ավարտած» կամ «Դուրս եկած», խորհուրդ է տրվում endDate ունենալ։</div>
+          </div>
+        </div>
+
+        <div class="alert alert-warning mt-3 mb-0 d-none" id="formWarn"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Փակել</button>
+        <button type="button" class="btn btn-accent" id="btnSaveStudent">Պահել</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-zone" id="toastZone"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // ============================================
+  // Storage
+  // ============================================
+  const STORAGE_KEY = "students_analytics_v2";
+
+  function loadFromStorage(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return null;
+      const parsed = JSON.parse(raw);
+      if(!Array.isArray(parsed)) return null;
+      return parsed;
+    }catch(e){
+      return null;
+    }
+  }
+
+  function saveToStorage(list){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+  }
+
+  // ============================================
+  // Seed data (dates: YYYY-MM-DD)
+  // ============================================
+  const seedStudents = [
+    { id: 1,  name: "Aram",   profession: "Frontend",  startDate: "2019-11-01", endDate: "2023-02-10", status: "graduated" },
+    { id: 2,  name: "Mariam", profession: "Backend",   startDate: "2021-03-15", endDate: "",           status: "studying" },
+    { id: 3,  name: "David",  profession: "Fullstack", startDate: "2020-06-02", endDate: "2024-01-20", status: "graduated" },
+    { id: 4,  name: "Anna",   profession: "UI/UX",     startDate: "2022-10-05", endDate: "",           status: "studying" },
+    { id: 5,  name: "Hayk",   profession: "Frontend",  startDate: "2018-01-20", endDate: "2022-07-30", status: "graduated" },
+    { id: 6,  name: "Lilit",  profession: "Frontend",  startDate: "2023-09-01", endDate: "",           status: "studying" },
+    { id: 7,  name: "Gor",    profession: "Backend",   startDate: "2020-02-01", endDate: "2021-05-10", status: "dropped" },
+    { id: 8,  name: "Narek",  profession: "Fullstack", startDate: "2017-04-12", endDate: "2020-12-25", status: "graduated" },
+    { id: 9,  name: "Mane",   profession: "QA",        startDate: "2024-04-01", endDate: "",           status: "studying" },
+    { id: 10, name: "Suren",  profession: "Frontend",  startDate: "2016-09-15", endDate: "2019-10-01", status: "graduated" },
+    { id: 11, name: "Ani",    profession: "Data",      startDate: "2022-01-10", endDate: "2025-05-05", status: "graduated" },
+    { id: 12, name: "Tigran", profession: "DevOps",    startDate: "2021-12-01", endDate: "",           status: "studying" },
+  ];
+
+  let students = loadFromStorage() ?? structuredClone(seedStudents);
+
+  // ============================================
+  // Helpers
+  // ============================================
+  const el = (id) => document.getElementById(id);
+  const MS_DAY = 864e5;
+
+  function pad2(n){ return String(n).padStart(2, "0"); }
+
+  function todayISO(){
+    const d = new Date();
+    d.setHours(12,0,0,0);
+    return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+  }
+
+  function parseISO(iso){
+    if(!iso) return null;
+    // iso: YYYY-MM-DD
+    const [y,m,d] = iso.split("-").map(Number);
+    if(!y || !m || !d) return null;
+    return new Date(y, m-1, d, 12, 0, 0);
+  }
+
+  function fmtISO(iso){
+    return iso ? iso : "—";
+  }
+
+  function diffDays(a, b){
+    return Math.floor((b - a) / MS_DAY);
+  }
+
+  function clampNonNegative(n){
+    return Math.max(0, n);
+  }
+
+  function durationParts(startDate, endDate){
+    // endDate inclusive/exclusive doesn't matter here; we use day diff
+    const days = clampNonNegative(diffDays(startDate, endDate));
+    const months = days / 30.4375;
+    const years = days / 365.2425;
+    return { days, months, years };
+  }
+
+  function decadeLabelFromDate(date){
+    const y = date.getFullYear();
+    return `${Math.floor(y / 10) * 10}s`;
+  }
+
+  function normalizeStatus(record){
+    // business rule: if status=studying => endDate can be empty
+    // if status != studying and endDate empty => still allowed (task edge-case), but KPIs treat as that status
+    const s = (record.status || "studying").toLowerCase();
+    if(["studying","graduated","dropped"].includes(s)) return s;
+    return "studying";
+  }
+
+  function buildComputedRows(list, todayDate){
+    return list.map(s => {
+      const start = parseISO(s.startDate);
+      const end = parseISO(s.endDate);
+      const status = normalizeStatus(s);
+
+      const effectiveEnd = (status === "studying" || !end) ? todayDate : end;
+      const parts = start ? durationParts(start, effectiveEnd) : { days: 0, months: 0, years: 0 };
+
+      const daysSinceEnd = (end && status !== "studying") ? clampNonNegative(diffDays(end, todayDate)) : null;
+      const startDecade = start ? decadeLabelFromDate(start) : "—";
+
+      return {
+        ...s,
+        status,
+        startObj: start,
+        endObj: end,
+        startDecade,
+        durationDays: parts.days,
+        durationMonths: parts.months,
+        durationYears: parts.years,
+        daysSinceEnd,
+      };
+    });
+  }
+
+  function statusPill(status){
+    if(status === "graduated") return '<span class="pill graduated">● Ավարտած</span>';
+    if(status === "dropped") return '<span class="pill dropped">● Դուրս եկած</span>';
+    return '<span class="pill studying">● Սովորող</span>';
+  }
+
+  function showToast(type, title, text){
+    const zone = el("toastZone");
+    const id = "t" + Math.random().toString(16).slice(2);
+
+    const cls = type === "success" ? "alert-success" : type === "danger" ? "alert-danger" : "alert-secondary";
+
+    const div = document.createElement("div");
+    div.className = `alert ${cls} soft mb-0`;
+    div.id = id;
+    div.innerHTML = `
+      <div class="d-flex align-items-start justify-content-between gap-2">
+        <div>
+          <div class="fw-bold">${title}</div>
+          <div class="small-muted">${text}</div>
+        </div>
+        <button class="btn btn-outline-secondary btn-sm btn-icon" aria-label="close">✕</button>
+      </div>
+    `;
+
+    div.querySelector("button").addEventListener("click", () => div.remove());
+    zone.appendChild(div);
+
+    setTimeout(() => {
+      const node = document.getElementById(id);
+      if(node) node.remove();
+    }, 3400);
+  }
+
+  function nextId(list){
+    return (list.reduce((m, x) => Math.max(m, Number(x.id)||0), 0) || 0) + 1;
+  }
+
+  // ============================================
+  // Analytics
+  // ============================================
+  function graduationRate(rows){
+    if(!rows.length) return 0;
+    const grads = rows.filter(r => r.status === "graduated").length;
+    return (grads / rows.length) * 100;
+  }
+
+  function topProfession(rows){
+    const map = rows.reduce((acc, r) => {
+      const key = r.profession || "—";
+      acc[key] = (acc[key] || 0) + 1;
+      return acc;
+    }, {});
+
+    const entries = Object.entries(map).sort((a,b) => b[1]-a[1]);
+    if(!entries.length) return "—";
+    const [p,c] = entries[0];
+    return `${p} (${c})`;
+  }
+
+  function countGraduatedLastDays(rows, todayDate, days){
+    const from = new Date(todayDate.getTime() - days*MS_DAY);
+    return rows.filter(r => {
+      if(r.status !== "graduated") return false;
+      if(!r.endObj) return false;
+      return r.endObj >= from && r.endObj <= todayDate;
+    }).length;
+  }
+
+  function formatDurationRow(r){
+    // show "Xy Ym" style
+    const y = r.durationYears;
+    const m = r.durationMonths;
+    const days = r.durationDays;
+
+    // friendly
+    const yy = Math.floor(y);
+    const mm = Math.floor((m - yy*12));
+
+    if(days === 0) return "0d";
+    if(yy <= 0) return `${Math.max(1, Math.round(m))}mo`;
+    return `${yy}y ${Math.max(0, mm)}mo`;
+  }
+
+  // ============================================
+  // UI: dropdowns + groups
+  // ============================================
+  function fillProfessionSelect(rows){
+    const profs = Array.from(new Set(rows.map(r => r.profession).filter(Boolean)))
+      .sort((a,b) => a.localeCompare(b));
+
+    el("profSelect").innerHTML = `<option value="">Բոլորը</option>` +
+      profs.map(p => `<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`).join("");
+  }
+
+  function renderDecades(rows){
+    const counts = rows.reduce((acc, r) => {
+      const key = r.startDecade;
+      acc[key] = (acc[key] || 0) + 1;
+      return acc;
+    }, {});
+
+    const items = Object.entries(counts)
+      .filter(([k]) => k !== "—")
+      .sort((a,b) => parseInt(a[0],10) - parseInt(b[0],10));
+
+    el("decadeGroups").innerHTML = items
+      .map(([dec, count]) => `<span class="pill"><span class="mono">${dec}</span> · ${count}</span>`)
+      .join("") || `<span class="small-muted">—</span>`;
+  }
+
+  function escapeHtml(str){
+    return String(str)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#39;");
+  }
+
+  // ============================================
+  // Filters + Sort
+  // ============================================
+  function inRange(dateObj, fromIso, toIso){
+    if(!dateObj) return false;
+    const from = parseISO(fromIso);
+    const to = parseISO(toIso);
+
+    if(from && dateObj < from) return false;
+    if(to && dateObj > to) return false;
+    return true;
+  }
+
+  function applyFiltersAndSort(rows){
+    const q = el("searchInput").value.trim().toLowerCase();
+    const prof = el("profSelect").value;
+    const status = el("statusSelect").value;
+
+    const startFrom = el("startFrom").value;
+    const startTo = el("startTo").value;
+    const endFrom = el("endFrom").value;
+    const endTo = el("endTo").value;
+
+    const sort = el("sortSelect").value;
+
+    let filtered = [...rows];
+
+    if(q) filtered = filtered.filter(r => (r.name || "").toLowerCase().includes(q));
+    if(prof) filtered = filtered.filter(r => r.profession === prof);
+    if(status) filtered = filtered.filter(r => r.status === status);
+
+    if(startFrom || startTo){
+      filtered = filtered.filter(r => inRange(r.startObj, startFrom, startTo));
+    }
+
+    if(endFrom || endTo){
+      // end range applied only for those who have endObj
+      filtered = filtered.filter(r => r.endObj && inRange(r.endObj, endFrom, endTo));
+    }
+
+    switch(sort){
+      case "name_asc":
+        filtered.sort((a,b) => (a.name||"").localeCompare(b.name||""));
+        break;
+      case "start_asc":
+        filtered.sort((a,b) => (a.startObj?.getTime() ?? Infinity) - (b.startObj?.getTime() ?? Infinity));
+        break;
+      case "start_desc":
+        filtered.sort((a,b) => (b.startObj?.getTime() ?? -Infinity) - (a.startObj?.getTime() ?? -Infinity));
+        break;
+      case "end_desc":
+        filtered.sort((a,b) => (b.endObj?.getTime() ?? -Infinity) - (a.endObj?.getTime() ?? -Infinity));
+        break;
+      case "duration_asc":
+        filtered.sort((a,b) => a.durationDays - b.durationDays);
+        break;
+      case "duration_desc":
+        filtered.sort((a,b) => b.durationDays - a.durationDays);
+        break;
+    }
+
+    return filtered;
+  }
+
+  // ============================================
+  // Render
+  // ============================================
+  let lastShown = [];
+
+  function renderKPIs(rows){
+    const total = rows.length;
+    const graduated = rows.filter(r => r.status === "graduated").length;
+    const studying = rows.filter(r => r.status === "studying").length;
+    const dropped = rows.filter(r => r.status === "dropped").length;
+
+    const avgDays = rows.reduce((sum, r) => sum + r.durationDays, 0) / (total || 1);
+    const avgYears = avgDays / 365.2425;
+
+    // longest/shortest
+    const sortedByDur = [...rows].sort((a,b) => a.durationDays - b.durationDays);
+    const shortest = sortedByDur[0];
+    const longest = sortedByDur[sortedByDur.length-1];
+
+    el("kpiTotal").textContent = total;
+    el("kpiGraduated").textContent = graduated;
+    el("kpiStudying").textContent = studying;
+    el("kpiDropped").textContent = dropped;
+
+    el("kpiAvgDuration").textContent = total ? avgYears.toFixed(2) + "y" : "—";
+    el("kpiGradRate").textContent = total ? graduationRate(rows).toFixed(1) + "%" : "—";
+
+    el("kpiShortest").textContent = shortest ? `${shortest.name} (${formatDurationRow(shortest)})` : "—";
+    el("kpiLongest").textContent = longest ? `${longest.name} (${formatDurationRow(longest)})` : "—";
+  }
+
+  function renderInsights(rows, todayDate){
+    el("topProfText").textContent = topProfession(rows);
+    el("last30GradText").textContent = countGraduatedLastDays(rows, todayDate, 30);
+  }
+
+  function renderTable(rows){
+    el("shownCount").textContent = rows.length;
+
+    el("tbody").innerHTML = rows.map((r, idx) => {
+      const end = fmtISO(r.endDate);
+      const since = (r.daysSinceEnd ?? "—");
+
+      return `
+        <tr>
+          <td class="mono text-muted">${idx+1}</td>
+          <td class="fw-bold"><span class="truncate d-inline-block">${escapeHtml(r.name)}</span></td>
+          <td><span class="pill"><span class="mono">${escapeHtml(r.profession || "—")}</span></span></td>
+          <td class="text-end mono">${fmtISO(r.startDate)}</td>
+          <td class="text-end mono">${end}</td>
+          <td>${statusPill(r.status)}</td>
+          <td class="text-end mono">${formatDurationRow(r)}</td>
+          <td class="text-end mono">${since}</td>
+          <td class="text-end">
+            <button class="btn btn-outline-secondary btn-sm btn-icon" data-action="edit" data-id="${r.id}" title="Edit">✎</button>
+            <button class="btn btn-outline-danger btn-sm btn-icon" data-action="delete" data-id="${r.id}" title="Delete">🗑</button>
+          </td>
+        </tr>
+      `;
+    }).join("");
+
+    // actions
+    el("tbody").querySelectorAll("button[data-action]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const id = Number(btn.dataset.id);
+        const act = btn.dataset.action;
+        if(act === "edit") openEdit(id);
+        if(act === "delete") removeStudent(id);
+      });
+    });
+  }
+
+  // ============================================
+  // CSV Export
+  // ============================================
+  function exportToCSV(rows){
+    const headers = ["id","name","profession","startDate","endDate","status","durationDays","daysSinceEnd"];
+    const lines = [headers.join(",")];
+
+    for(const r of rows){
+      const line = [
+        r.id,
+        `"${String(r.name).replaceAll('"','""')}"`,
+        `"${String(r.profession).replaceAll('"','""')}"`,
+        r.startDate,
+        r.endDate || "",
+        r.status,
+        r.durationDays,
+        r.daysSinceEnd ?? ""
+      ].join(",");
+      lines.push(line);
+    }
+
+    const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "students_export.csv";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  // ============================================
+  // CRUD
+  // ============================================
+  const modalEl = document.getElementById("studentModal");
+  const studentModal = new bootstrap.Modal(modalEl);
+
+  function resetForm(){
+    el("formId").value = "";
+    el("formName").value = "";
+    el("formProfession").value = "";
+    el("formStart").value = "";
+    el("formEnd").value = "";
+    el("formStatus").value = "studying";
+    el("formWarn").classList.add("d-none");
+    el("formWarn").textContent = "";
+  }
+
+  function openCreate(){
+    resetForm();
+    el("modalTitle").textContent = "Ավելացնել ուսանող";
+    studentModal.show();
+  }
+
+  function openEdit(id){
+    const s = students.find(x => Number(x.id) === Number(id));
+    if(!s){
+      showToast("danger","Սխալ","Ուսանողը չի գտնվել");
+      return;
+    }
+
+    resetForm();
+    el("modalTitle").textContent = "Փոփոխել ուսանող";
+
+    el("formId").value = s.id;
+    el("formName").value = s.name;
+    el("formProfession").value = s.profession;
+    el("formStart").value = s.startDate;
+    el("formEnd").value = s.endDate || "";
+    el("formStatus").value = s.status;
+
+    studentModal.show();
+  }
+
+  function validateForm(data){
+    const warn = [];
+
+    if(!data.name || data.name.trim().length < 2) warn.push("Անունը պետք է լինի առնվազն 2 տառ։");
+    if(!data.profession || data.profession.trim().length < 2) warn.push("Մասնագիտությունը պարտադիր է։");
+
+    const start = parseISO(data.startDate);
+    if(!start) warn.push("Սկիզբը պարտադիր է (YYYY-MM-DD)։");
+
+    const end = parseISO(data.endDate);
+    if(end && start && end < start) warn.push("Ավարտը չի կարող լինել սկսվելուց շուտ։");
+
+    if((data.status === "graduated" || data.status === "dropped") && !data.endDate){
+      warn.push("Ընտրված կարգավիճակի համար լավ կլինի endDate նշվի (edge-case): Չնայած թույլ ենք տալիս, բայց analytics-ը կդառնա տարօրինակ։");
+    }
+
+    return warn;
+  }
+
+  function upsertStudent(){
+    const idVal = el("formId").value;
+    const data = {
+      id: idVal ? Number(idVal) : nextId(students),
+      name: el("formName").value.trim(),
+      profession: el("formProfession").value.trim(),
+      startDate: el("formStart").value,
+      endDate: el("formEnd").value,
+      status: el("formStatus").value,
+    };
+
+    const warns = validateForm(data);
+    if(warns.length){
+      el("formWarn").classList.remove("d-none");
+      el("formWarn").innerHTML = warns.map(x => `• ${escapeHtml(x)}`).join("<br>");
+      // block only if critical missing start or name
+      const critical = warns.some(w => w.includes("պարտադիր"));
+      if(critical) return;
+    }else{
+      el("formWarn").classList.add("d-none");
+      el("formWarn").textContent = "";
+    }
+
+    // sanitize status
+    data.status = normalizeStatus(data);
+
+    // if status is studying and endDate exists -> keep endDate as is (useful for trial / expected end)
+
+    const existsIndex = students.findIndex(x => Number(x.id) === Number(data.id));
+    if(existsIndex >= 0){
+      students[existsIndex] = data;
+      showToast("success","Պահվեց","Ուսանողը թարմացվեց" );
+    }else{
+      students.push(data);
+      showToast("success","Ավելացվեց","Նոր ուսանող ավելացվեց" );
+    }
+
+    saveToStorage(students);
+    studentModal.hide();
+    recalc();
+  }
+
+  function removeStudent(id){
+    const s = students.find(x => Number(x.id) === Number(id));
+    if(!s) return;
+
+    const ok = confirm(`Ջնջե՞լ ${s.name}-ին`);
+    if(!ok) return;
+
+    students = students.filter(x => Number(x.id) !== Number(id));
+    saveToStorage(students);
+    showToast("success","Ջնջվեց", "Տվյալը հեռացվեց" );
+    recalc();
+  }
+
+  // ============================================
+  // Reset + Seed
+  // ============================================
+  function resetAll(){
+    el("searchInput").value = "";
+    el("profSelect").value = "";
+    el("statusSelect").value = "";
+    el("startFrom").value = "";
+    el("startTo").value = "";
+    el("endFrom").value = "";
+    el("endTo").value = "";
+    el("sortSelect").value = "start_desc";
+    recalc();
+  }
+
+  function seedData(){
+    students = structuredClone(seedStudents);
+    saveToStorage(students);
+    showToast("success","Seed","Տվյալները թարմացվեցին seed-ով" );
+    resetAll();
+  }
+
+  // ============================================
+  // Main
+  // ============================================
+  function recalc(){
+    const today = parseISO(todayISO());
+    el("todayText").textContent = todayISO();
+
+    const computed = buildComputedRows(students, today);
+
+    fillProfessionSelect(computed);
+    renderDecades(computed);
+    renderKPIs(computed);
+    renderInsights(computed, today);
+
+    lastShown = applyFiltersAndSort(computed);
+    renderTable(lastShown);
+
+    // keep selection if current prof no longer exists
+    const profVal = el("profSelect").value;
+    if(profVal && !computed.some(r => r.profession === profVal)) el("profSelect").value = "";
+  }
+
+  // events
+  el("btnOpenCreate").addEventListener("click", openCreate);
+  el("btnSaveStudent").addEventListener("click", upsertStudent);
+
+  el("btnRecalc").addEventListener("click", recalc);
+  el("btnExport").addEventListener("click", () => exportToCSV(lastShown));
+  el("btnReset").addEventListener("click", resetAll);
+  el("btnSeed").addEventListener("click", seedData);
+
+  ["searchInput","profSelect","statusSelect","startFrom","startTo","endFrom","endTo","sortSelect"].forEach(id => {
+    el(id).addEventListener("input", recalc);
+    el(id).addEventListener("change", recalc);
+  });
+
+  // initial
+  saveToStorage(students);
+  recalc();
+</script>
+</body>
+</html>

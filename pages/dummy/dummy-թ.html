@@ -1,0 +1,819 @@
+<!doctype html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Pastel Shop • DummyJSON (No Modal)</title>
+    <style>
+        :root{
+            --bg:#f7f8fc;
+            --panel:#ffffff;
+            --text:#111827;
+            --muted:#6b7280;
+            --line:#e5e7eb;
+            --shadow: 0 18px 50px rgba(15,23,42,.10);
+            --r:18px;
+
+            --mint:#22c55e;
+            --sky:#38bdf8;
+            --pink:#fb7185;
+            --amber:#f59e0b;
+            --violet:#a78bfa;
+        }
+        *{ box-sizing:border-box; }
+        body{
+            margin:0;
+            font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+            background:
+                    radial-gradient(1000px 600px at 15% 10%, rgba(56,189,248,.18), transparent 60%),
+                    radial-gradient(1000px 600px at 85% 15%, rgba(167,139,250,.18), transparent 60%),
+                    radial-gradient(1000px 600px at 50% 90%, rgba(34,197,94,.12), transparent 60%),
+                    var(--bg);
+            color:var(--text);
+            min-height:100vh;
+        }
+        .wrap{ max-width:1200px; margin:0 auto; padding:22px; }
+
+        /* Header */
+        .top{
+            background: var(--panel);
+            border:1px solid var(--line);
+            box-shadow: var(--shadow);
+            border-radius: calc(var(--r) + 6px);
+            padding:14px;
+            display:flex;
+            gap:12px;
+            align-items:center;
+            justify-content:space-between;
+            flex-wrap:wrap;
+            position: sticky;
+            top: 14px;
+            z-index: 10;
+            backdrop-filter: blur(10px);
+        }
+        .brand{
+            display:flex; gap:12px; align-items:center;
+            min-width: 220px;
+        }
+        .badge{
+            width:46px; height:46px;
+            border-radius: 16px;
+            display:grid; place-items:center;
+            background: linear-gradient(135deg, rgba(56,189,248,.95), rgba(167,139,250,.95));
+            color:#0b1020;
+            font-weight:900;
+            box-shadow: 0 14px 30px rgba(56,189,248,.18);
+        }
+        .brand h1{ margin:0; font-size:16px; letter-spacing:.2px; }
+        .brand p{ margin:2px 0 0; color:var(--muted); font-size:12px; }
+
+        .tools{
+            display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+            justify-content:flex-end;
+            flex:1;
+        }
+        .field{
+            display:flex; align-items:center; gap:10px;
+            background:#f9fafb;
+            border:1px solid var(--line);
+            border-radius: 14px;
+            padding:10px 12px;
+            min-height:42px;
+        }
+        .field input{
+            border:none; outline:none; background:transparent;
+            min-width: 240px;
+            color:var(--text);
+        }
+        .field input::placeholder{ color:#9ca3af; }
+        .field select{
+            border:none; outline:none; background:transparent;
+            cursor:pointer; color:var(--text);
+        }
+        .chip{
+            font-size:12px;
+            padding:6px 10px;
+            border-radius: 999px;
+            border:1px solid var(--line);
+            background:#fff;
+            color:var(--muted);
+            white-space:nowrap;
+        }
+        .btn{
+            border:1px solid var(--line);
+            background:#fff;
+            padding:10px 12px;
+            border-radius: 14px;
+            cursor:pointer;
+            transition:.15s transform, .15s background;
+        }
+        .btn:hover{ transform: translateY(-1px); background:#f9fafb; }
+        .btn.primary{
+            border:none;
+            background: linear-gradient(135deg, rgba(34,197,94,.95), rgba(56,189,248,.95));
+            color:#081318;
+            font-weight:900;
+        }
+
+        @media (max-width: 720px){
+            .field input{ min-width: 160px; }
+        }
+
+        /* Categories chips row */
+        .cats{
+            margin-top:14px;
+            background: var(--panel);
+            border:1px solid var(--line);
+            border-radius: var(--r);
+            box-shadow: var(--shadow);
+            padding:12px;
+            display:flex;
+            gap:10px;
+            flex-wrap:wrap;
+            align-items:center;
+        }
+        .cat{
+            border:1px solid var(--line);
+            background:#fff;
+            padding:8px 10px;
+            border-radius: 999px;
+            font-size:12px;
+            cursor:pointer;
+            color:var(--muted);
+            transition:.15s;
+            max-width: 240px;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+        }
+        .cat:hover{ background:#f9fafb; transform: translateY(-1px); }
+        .cat.active{
+            color:#0b1020;
+            border-color: rgba(56,189,248,.35);
+            box-shadow: 0 10px 20px rgba(56,189,248,.10);
+            background: linear-gradient(180deg, rgba(56,189,248,.10), rgba(167,139,250,.08));
+        }
+
+        /* Main grid */
+        .panel{
+            margin-top:14px;
+            background: var(--panel);
+            border:1px solid var(--line);
+            border-radius: var(--r);
+            box-shadow: var(--shadow);
+            overflow:hidden;
+        }
+        .panelHead{
+            padding:12px 14px;
+            border-bottom:1px solid var(--line);
+            display:flex; align-items:center; justify-content:space-between;
+            gap:10px; flex-wrap:wrap;
+        }
+        .meta{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+
+        .grid{
+            padding:14px;
+            display:grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap:12px;
+        }
+        @media (max-width: 1050px){ .grid{ grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 640px){ .grid{ grid-template-columns: 1fr; } }
+
+        .card{
+            border:1px solid var(--line);
+            border-radius: 18px;
+            overflow:hidden;
+            background:#fff;
+            transition:.15s transform, .15s box-shadow;
+            display:flex;
+            flex-direction:column;
+        }
+        .card:hover{
+            transform: translateY(-2px);
+            box-shadow: 0 18px 35px rgba(15,23,42,.10);
+        }
+        .img{
+            height: 170px;
+            background: #f3f4f6;
+            position:relative;
+            overflow:hidden;
+        }
+        .img img{ width:100%; height:100%; object-fit:cover; display:block; }
+        .tagRow{
+            position:absolute;
+            left:10px; right:10px; top:10px;
+            display:flex; align-items:center; justify-content:space-between; gap:8px;
+        }
+        .pill{
+            font-size:12px;
+            padding:6px 10px;
+            border-radius: 999px;
+            border:1px solid rgba(255,255,255,.55);
+            background: rgba(255,255,255,.78);
+            backdrop-filter: blur(6px);
+            color:#111827;
+            box-shadow: 0 10px 20px rgba(0,0,0,.08);
+            white-space:nowrap;
+        }
+
+        .body{
+            padding:12px;
+            display:flex;
+            flex-direction:column;
+            gap:8px;
+            flex:1;
+        }
+        .title{
+            margin:0;
+            font-size:14px;
+            font-weight:900;
+            line-height:1.25;
+            display:-webkit-box;
+            -webkit-line-clamp:2;
+            -webkit-box-orient:vertical;
+            overflow:hidden;
+            min-height: 36px;
+        }
+        .desc{
+            margin:0;
+            color:var(--muted);
+            font-size:12px;
+            line-height:1.45;
+            display:-webkit-box;
+            -webkit-line-clamp:2;
+            -webkit-box-orient:vertical;
+            overflow:hidden;
+            min-height: 34px;
+        }
+        .row{
+            margin-top:auto;
+            display:flex; align-items:center; justify-content:space-between; gap:10px;
+            padding-top:8px;
+            border-top:1px dashed var(--line);
+        }
+        .price{
+            font-weight:950;
+            font-size:16px;
+        }
+        .mini{
+            font-size:12px;
+            padding:6px 10px;
+            border-radius:999px;
+            border:1px solid var(--line);
+            color:var(--muted);
+            background:#fff;
+        }
+        .actions{
+            display:flex; gap:8px; flex-wrap:wrap;
+            margin-top:10px;
+        }
+        .btn2{
+            flex:1;
+            border:1px solid var(--line);
+            background:#f9fafb;
+            padding:10px 12px;
+            border-radius: 14px;
+            cursor:pointer;
+            transition:.15s;
+            font-weight:800;
+        }
+        .btn2:hover{ transform: translateY(-1px); background:#fff; }
+        .btn2.open{
+            border:none;
+            background: linear-gradient(135deg, rgba(56,189,248,.95), rgba(167,139,250,.95));
+            color:#0b1020;
+        }
+
+        /* Inline details */
+        .details{
+            border-top:1px solid var(--line);
+            background: linear-gradient(180deg, #ffffff, #fafafa);
+            display:none;
+            padding:12px;
+            gap:10px;
+        }
+        .details.open{ display:grid; }
+        .kv{
+            display:flex; gap:8px; flex-wrap:wrap; align-items:center;
+        }
+        .kv .k{
+            font-size:12px;
+            color:var(--muted);
+            border:1px solid var(--line);
+            background:#fff;
+            padding:6px 10px;
+            border-radius:999px;
+        }
+        .details .long{
+            margin:0;
+            color:#374151;
+            font-size:13px;
+            line-height:1.55;
+        }
+        .srow{
+            display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+            margin-top:6px;
+        }
+        .cta{
+            border:none;
+            background: linear-gradient(135deg, rgba(34,197,94,.95), rgba(56,189,248,.95));
+            color:#061318;
+            font-weight:950;
+            padding:10px 12px;
+            border-radius: 14px;
+            cursor:pointer;
+        }
+        .ghost{
+            border:1px solid var(--line);
+            background:#fff;
+            padding:10px 12px;
+            border-radius: 14px;
+            cursor:pointer;
+            font-weight:900;
+        }
+
+        /* Pagination */
+        .footer{
+            padding:12px 14px;
+            border-top:1px solid var(--line);
+            display:flex; align-items:center; justify-content:space-between;
+            gap:10px; flex-wrap:wrap;
+            background: #fbfcff;
+        }
+        .footer .small{ color:var(--muted); font-size:12px; }
+        .limit{
+            border:1px solid var(--line);
+            background:#fff;
+            border-radius: 14px;
+            padding:9px 10px;
+            cursor:pointer;
+        }
+
+        /* Skeleton */
+        .sk{ position:relative; overflow:hidden; }
+        .sk::after{
+            content:"";
+            position:absolute; inset:0;
+            background: linear-gradient(90deg, transparent, rgba(15,23,42,.06), transparent);
+            transform: translateX(-100%);
+            animation: sh 1.1s infinite;
+        }
+        @keyframes sh{ 100%{ transform: translateX(100%); } }
+
+        .toast{
+            position: fixed;
+            right: 18px;
+            bottom: 18px;
+            background:#fff;
+            border:1px solid var(--line);
+            border-radius: 16px;
+            padding: 12px 14px;
+            box-shadow: var(--shadow);
+            display:none;
+            max-width: 360px;
+            z-index: 20;
+        }
+        .toast.show{ display:block; }
+        .toast b{ font-size:13px; }
+        .toast p{ margin:4px 0 0; color:var(--muted); font-size:12px; line-height:1.35; }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <header class="top">
+        <div class="brand">
+            <div class="badge">PS</div>
+            <div>
+                <h1>Pastel Shop UI</h1>
+                <p>Cards + inline details (ոչ մոդալ)</p>
+            </div>
+        </div>
+
+        <div class="tools">
+            <div class="field">
+                <span class="chip">🔎 Search</span>
+                <input id="q" placeholder="օր. phone, laptop..." />
+            </div>
+
+            <div class="field">
+                <span class="chip">↕ Sort</span>
+                <select id="sortBy">
+                    <option value="">Default</option>
+                    <option value="title">Title</option>
+                    <option value="price">Price</option>
+                </select>
+                <select id="order">
+                    <option value="asc">ASC</option>
+                    <option value="desc">DESC</option>
+                </select>
+            </div>
+
+            <button class="btn" id="reset">Reset</button>
+            <button class="btn primary" id="reload">Reload</button>
+        </div>
+    </header>
+
+    <div class="cats" id="cats">
+        <span class="chip" id="catInfo">Loading categories…</span>
+    </div>
+
+    <section class="panel">
+        <div class="panelHead">
+            <div class="meta">
+                <span class="chip" id="info">Loading…</span>
+                <span class="chip" id="endpoint">/products</span>
+            </div>
+            <div class="meta">
+                <span class="chip" id="page">page: –</span>
+            </div>
+        </div>
+
+        <div class="grid" id="grid"></div>
+
+        <div class="footer">
+            <div class="meta">
+                <button class="btn" id="prev">← Prev</button>
+                <button class="btn" id="next">Next →</button>
+                <span class="small" id="range">–</span>
+            </div>
+            <div class="meta">
+                <span class="small">Limit</span>
+                <select id="limit" class="limit">
+                    <option value="9">9</option>
+                    <option value="12">12</option>
+                    <option value="18">18</option>
+                    <option value="30" selected>30</option>
+                </select>
+                <span class="chip" id="skip">skip: 0</span>
+            </div>
+        </div>
+    </section>
+</div>
+
+<div class="toast" id="toast">
+    <b id="tTitle">—</b>
+    <p id="tText">—</p>
+</div>
+
+<script>
+    const API = "https://dummyjson.com/products";
+
+    const el = {
+        q: document.getElementById("q"),
+        sortBy: document.getElementById("sortBy"),
+        order: document.getElementById("order"),
+        reset: document.getElementById("reset"),
+        reload: document.getElementById("reload"),
+
+        cats: document.getElementById("cats"),
+        catInfo: document.getElementById("catInfo"),
+
+        grid: document.getElementById("grid"),
+        info: document.getElementById("info"),
+        endpoint: document.getElementById("endpoint"),
+        page: document.getElementById("page"),
+        range: document.getElementById("range"),
+        skip: document.getElementById("skip"),
+
+        prev: document.getElementById("prev"),
+        next: document.getElementById("next"),
+        limit: document.getElementById("limit"),
+
+        toast: document.getElementById("toast"),
+        tTitle: document.getElementById("tTitle"),
+        tText: document.getElementById("tText"),
+    };
+
+    const state = {
+        cat: "",
+        q: "",
+        sortBy: "",
+        order: "asc",
+        limit: 30,
+        skip: 0,
+        total: 0,
+        openId: null,
+        lastEndpoint: "/products",
+        catList: []
+    };
+
+    const fmt = (n) => new Intl.NumberFormat("en-US").format(n);
+    const money = (n) => "$" + new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 }).format(n);
+
+    function safe(s){
+        return String(s ?? "").replace(/[<>&"]/g, (c)=>({ "<":"&lt;", ">":"&gt;", "&":"&amp;", '"':"&quot;" }[c]));
+    }
+    function debounce(fn, ms=350){
+        let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args), ms); };
+    }
+    async function apiJson(url){
+        const res = await fetch(url);
+        if(!res.ok) throw new Error("Request failed: " + res.status);
+        return res.json();
+    }
+    function toast(title, text){
+        el.tTitle.textContent = title;
+        el.tText.textContent = text;
+        el.toast.classList.add("show");
+        clearTimeout(toast._t);
+        toast._t = setTimeout(()=>el.toast.classList.remove("show"), 2300);
+    }
+
+    function buildUrl(){
+        const params = new URLSearchParams();
+        params.set("limit", String(state.limit));
+        params.set("skip", String(state.skip));
+        params.set("select", "id,title,price,description,thumbnail,category,discountPercentage,rating,stock,brand");
+
+        if(state.sortBy){
+            params.set("sortBy", state.sortBy);
+            params.set("order", state.order || "asc");
+        }
+
+        if(state.q.trim()){
+            state.lastEndpoint = `/products/search?q=${encodeURIComponent(state.q.trim())}`;
+            return `${API}/search?q=${encodeURIComponent(state.q.trim())}&${params.toString()}`;
+        }
+        if(state.cat){
+            state.lastEndpoint = `/products/category/${state.cat}`;
+            return `${API}/category/${encodeURIComponent(state.cat)}?${params.toString()}`;
+        }
+        state.lastEndpoint = "/products";
+        return `${API}?${params.toString()}`;
+    }
+
+    function setLoading(){
+        el.grid.innerHTML = "";
+        const n = Math.min(12, Math.max(6, state.limit));
+        for(let i=0;i<n;i++){
+            const c = document.createElement("div");
+            c.className = "card sk";
+            c.innerHTML = `
+          <div class="img"></div>
+          <div class="body">
+            <h3 class="title" style="height:16px;background:#f3f4f6;border-radius:10px"></h3>
+            <p class="desc" style="height:12px;background:#f3f4f6;border-radius:10px"></p>
+            <div class="row">
+              <div class="price" style="height:16px;width:45%;background:#f3f4f6;border-radius:10px"></div>
+              <div class="mini" style="height:12px;width:30%;background:#f3f4f6;border-radius:999px"></div>
+            </div>
+          </div>
+        `;
+            el.grid.appendChild(c);
+        }
+        el.info.textContent = "Loading products…";
+    }
+
+    function updateMeta(){
+        el.endpoint.textContent = state.lastEndpoint;
+        el.skip.textContent = "skip: " + state.skip;
+
+        const from = state.total ? (state.skip + 1) : 0;
+        const to = Math.min(state.skip + state.limit, state.total);
+        el.range.textContent = `Showing ${from}-${to} of ${fmt(state.total)}`;
+
+        const page = state.limit ? Math.floor(state.skip / state.limit) + 1 : 1;
+        const pages = state.limit ? Math.max(1, Math.ceil(state.total / state.limit)) : 1;
+        el.page.textContent = `page: ${page} / ${pages}`;
+
+        el.prev.disabled = state.skip <= 0;
+        el.next.disabled = (state.skip + state.limit) >= state.total;
+        el.prev.style.opacity = el.prev.disabled ? .6 : 1;
+        el.next.style.opacity = el.next.disabled ? .6 : 1;
+
+        const label = state.q.trim()
+            ? `Search "${state.q.trim()}" • Total ${fmt(state.total)}`
+            : (state.cat ? `Category "${state.cat}" • Total ${fmt(state.total)}` : `All products • Total ${fmt(state.total)}`);
+        el.info.textContent = label;
+    }
+
+    function renderCats(){
+        el.cats.innerHTML = "";
+        const make = (name, value) => {
+            const b = document.createElement("button");
+            b.className = "cat" + (state.cat === value ? " active" : "");
+            b.type = "button";
+            b.textContent = name;
+            b.onclick = () => {
+                state.cat = value;
+                state.q = "";
+                el.q.value = "";
+                state.skip = 0;
+                state.openId = null;
+                renderCats();
+                loadProducts();
+            };
+            return b;
+        };
+
+        el.cats.appendChild(make("All", ""));
+        for(const c of state.catList){
+            el.cats.appendChild(make(c, c));
+        }
+    }
+
+    function closeAllDetails(){
+        el.grid.querySelectorAll(".details.open").forEach(d => d.classList.remove("open"));
+        el.grid.querySelectorAll(".btn2.open").forEach(b => {
+            b.classList.remove("open");
+            b.textContent = "Details";
+        });
+    }
+
+    async function toggleDetails(cardEl, product){
+        const btn = cardEl.querySelector(".btn2");
+        const box = cardEl.querySelector(".details");
+        const isOpen = box.classList.contains("open");
+
+        closeAllDetails();
+
+        if(isOpen){
+            state.openId = null;
+            return;
+        }
+
+        state.openId = product.id;
+        btn.classList.add("open");
+        btn.textContent = "Close";
+
+        // if not loaded full info, fetch single product
+        if(!box.dataset.loaded){
+            box.innerHTML = `<div class="sk" style="height:90px;border-radius:14px;background:#f3f4f6"></div>`;
+            box.classList.add("open");
+
+            try{
+                const p = await apiJson(`${API}/${product.id}`);
+                const disc = p.discountPercentage != null ? `-${Math.round(p.discountPercentage)}%` : "—";
+
+                box.innerHTML = `
+            <div class="kv">
+              <span class="k"><b>Brand:</b> ${safe(p.brand || "—")}</span>
+              <span class="k"><b>Rating:</b> ★ ${Number(p.rating ?? 0).toFixed(1)}</span>
+              <span class="k"><b>Stock:</b> ${safe(p.stock ?? "—")}</span>
+              <span class="k"><b>Discount:</b> ${safe(disc)}</span>
+            </div>
+            <p class="long">${safe(p.description || "—")}</p>
+            <div class="srow">
+              <button class="cta" type="button">Add to cart</button>
+              <button class="ghost" type="button">Save</button>
+            </div>
+          `;
+                box.dataset.loaded = "1";
+
+                box.querySelector(".cta").onclick = () => toast("Added ✅", `${p.title} (demo)`);
+                box.querySelector(".ghost").onclick = () => toast("Saved ⭐", `${p.title} (demo)`);
+
+            }catch(e){
+                box.innerHTML = `<p class="long">Error: ${safe(e.message)}</p>`;
+            }
+        }
+
+        box.classList.add("open");
+    }
+
+    function renderProducts(list){
+        el.grid.innerHTML = "";
+
+        if(!list.length){
+            el.grid.innerHTML = `<div class="chip">No results</div>`;
+            return;
+        }
+
+        for(const p of list){
+            const card = document.createElement("div");
+            card.className = "card";
+            const disc = p.discountPercentage ? `-${Math.round(p.discountPercentage)}%` : "";
+            const rating = p.rating != null ? `★ ${Number(p.rating).toFixed(1)}` : "";
+
+            card.innerHTML = `
+          <div class="img">
+            <img src="${safe(p.thumbnail)}" alt="${safe(p.title)}" loading="lazy">
+            <div class="tagRow">
+              ${disc ? `<span class="pill" style="border-color:rgba(251,113,133,.35)">${disc}</span>` : `<span></span>`}
+              ${rating ? `<span class="pill" style="border-color:rgba(245,158,11,.35)">${rating}</span>` : `<span></span>`}
+            </div>
+          </div>
+
+          <div class="body">
+            <h3 class="title">${safe(p.title)}</h3>
+            <p class="desc">${safe(p.description || "")}</p>
+
+            <div class="row">
+              <div class="price">${money(p.price)}</div>
+              <div class="mini">${safe(p.category)}</div>
+            </div>
+
+            <div class="actions">
+              <button class="btn2" type="button">Details</button>
+            </div>
+          </div>
+
+          <div class="details" aria-live="polite"></div>
+        `;
+
+            card.querySelector(".btn2").onclick = () => toggleDetails(card, p);
+            el.grid.appendChild(card);
+        }
+    }
+
+    async function loadCategories(){
+        let list = [];
+        try{
+            list = await apiJson("https://dummyjson.com/products/category-list");
+        }catch(e){
+            const alt = await apiJson("https://dummyjson.com/products/categories");
+            list = alt.map(x => typeof x === "string" ? x : (x.slug ?? x.name ?? String(x)));
+        }
+        state.catList = list;
+        renderCats();
+    }
+
+    async function loadProducts(){
+        setLoading();
+        try{
+            const url = buildUrl();
+            const data = await apiJson(url);
+
+            const products = data.products || [];
+            state.total = Number(data.total ?? products.length ?? 0);
+
+            renderProducts(products);
+            updateMeta();
+        }catch(e){
+            el.grid.innerHTML = `<div class="chip">Error: ${safe(e.message)}</div>`;
+            el.info.textContent = "Failed to load";
+        }
+    }
+
+    // events
+    el.q.addEventListener("input", debounce(() => {
+        state.q = el.q.value;
+        state.cat = "";
+        state.skip = 0;
+        state.openId = null;
+        renderCats();
+        loadProducts();
+    }, 420));
+
+    el.sortBy.addEventListener("change", () => {
+        state.sortBy = el.sortBy.value;
+        state.skip = 0;
+        loadProducts();
+    });
+    el.order.addEventListener("change", () => {
+        state.order = el.order.value;
+        state.skip = 0;
+        loadProducts();
+    });
+
+    el.limit.addEventListener("change", () => {
+        state.limit = Number(el.limit.value);
+        state.skip = 0;
+        state.openId = null;
+        loadProducts();
+    });
+
+    el.prev.addEventListener("click", () => {
+        state.skip = Math.max(0, state.skip - state.limit);
+        state.openId = null;
+        loadProducts();
+    });
+    el.next.addEventListener("click", () => {
+        state.skip = Math.min(Math.max(0, state.total - state.limit), state.skip + state.limit);
+        state.openId = null;
+        loadProducts();
+    });
+
+    el.reset.addEventListener("click", () => {
+        state.cat = "";
+        state.q = "";
+        state.sortBy = "";
+        state.order = "asc";
+        state.limit = 30;
+        state.skip = 0;
+        state.openId = null;
+
+        el.q.value = "";
+        el.sortBy.value = "";
+        el.order.value = "asc";
+        el.limit.value = "30";
+
+        renderCats();
+        loadProducts();
+        toast("Reset 🔄", "Default վիճակ");
+    });
+
+    el.reload.addEventListener("click", () => {
+        loadProducts();
+        toast("Reload ✅", "Թարմացվեց");
+    });
+
+    // init
+    (async function init(){
+        await loadCategories();
+        await loadProducts();
+    })();
+</script>
+</body>
+</html>

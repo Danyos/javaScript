@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="hy">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Shop Demo — Filter + Cart (Bootstrap)</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+
+    <style>
+        body { background:#f6f7fb; }
+        .card-img-top{
+            height:160px; object-fit:contain; padding:12px; background:#fff;
+        }
+        .pill{ font-size:.85rem; }
+        .sticky-side{
+            position: sticky; top: 16px;
+        }
+        .price{ font-weight:700; }
+        .muted{ color:#6c7a90; }
+        .empty{
+            border:2px dashed #d8dbe6; background:#fff; border-radius:16px; padding:18px;
+        }
+    </style>
+</head>
+
+<body>
+<nav class="navbar bg-white border-bottom">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="#">Shop Demo</a>
+
+        <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-outline-primary position-relative" data-bs-toggle="modal" data-bs-target="#cartModal">
+                🛒 Cart
+                <span id="cartBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
+            </button>
+        </div>
+    </div>
+</nav>
+
+<main class="container my-4">
+    <div class="row g-3">
+        <!-- LEFT: Filters -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm sticky-side">
+                <div class="card-body">
+                    <h5 class="mb-3">Filters</h5>
+
+                    <label class="form-label muted">Category</label>
+                    <div id="categoryWrap" class="d-flex flex-wrap gap-2 mb-3">
+                        <button class="btn btn-sm btn-primary pill" data-cat="All">
+                            All
+                        </button>
+
+                        <button class="btn btn-sm btn-outline-primary pill" data-cat="Phones">
+                            Phones
+                        </button>
+
+                        <button class="btn btn-sm btn-outline-primary pill" data-cat="Laptops">
+                            Laptops
+                        </button>
+
+                        <button class="btn btn-sm btn-outline-primary pill" data-cat="Accessories">
+                            Accessories
+                        </button>
+                    </div>
+
+                    <label class="form-label muted">Search</label>
+                    <input id="q" class="form-control mb-3" placeholder="Type product name...">
+
+                    <label class="form-label muted">Sort by price</label>
+                    <select id="sort" class="form-select mb-3">
+                        <option value="none">No sorting</option>
+                        <option value="asc">Low → High</option>
+                        <option value="desc">High → Low</option>
+                    </select>
+
+                    <div class="d-grid gap-2">
+                        <button id="resetBtn" class="btn btn-light">Reset</button>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cartModal">
+                            Open Cart
+                        </button>
+                    </div>
+
+                    <hr class="my-3">
+                    <div class="d-flex justify-content-between">
+                        <span class="muted">Products shown:</span>
+                        <strong id="shownCount">9</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT: Products -->
+        <div class="col-lg-8">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <h4 class="m-0">Products</h4>
+                <small class="muted">Bootstrap + JS + localStorage</small>
+            </div>
+
+            <div id="grid" class="row g-3">
+                <div class="col-md-6">
+                    <div class="card shadow-sm h-100">
+                        <img class="card-img-top" src="https://dummyimage.com/600x400/0f2b46/ffffff&amp;text=iPhone+14" alt="iPhone 14">
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="fw-bold">iPhone 14</div>
+                                    <div class="muted small">Phones</div>
+                                </div>
+                                <div class="price">$799</div>
+                            </div>
+
+                            <div class="mt-3 d-flex gap-2">
+                                <button class="btn btn-primary w-100" data-add="1">
+                                    Add to cart
+                                </button>
+                                <button class="btn btn-outline-secondary" data-minus="1" title="Remove 1">
+                                    −
+                                </button>
+                            </div>
+
+                            <div class="mt-2 small muted">
+                                In cart: <strong>0</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card shadow-sm h-100">
+                        <img class="card-img-top" src="https://dummyimage.com/600x400/2c74b3/ffffff&amp;text=Galaxy+S23" alt="Galaxy S23">
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="fw-bold">Galaxy S23</div>
+                                    <div class="muted small">Phones</div>
+                                </div>
+                                <div class="price">$699</div>
+                            </div>
+
+                            <div class="mt-3 d-flex gap-2">
+                                <button class="btn btn-primary w-100" data-add="2">
+                                    Add to cart
+                                </button>
+                                <button class="btn btn-outline-secondary" data-minus="2" title="Remove 1">
+                                    −
+                                </button>
+                            </div>
+
+                            <div class="mt-2 small muted">
+                                In cart: <strong>0</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card shadow-sm h-100">
+                        <img class="card-img-top" src="https://dummyimage.com/600x400/1e88e5/ffffff&amp;text=Pixel+8" alt="Pixel 8">
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="fw-bold">Pixel 8</div>
+                                    <div class="muted small">Phones</div>
+                                </div>
+                                <div class="price">$599</div>
+                            </div>
+
+                            <div class="mt-3 d-flex gap-2">
+                                <button class="btn btn-primary w-100" data-add="3">
+                                    Add to cart
+                                </button>
+                                <button class="btn btn-outline-secondary" data-minus="3" title="Remove 1">
+                                    −
+                                </button>
+                            </div>
+
+                            <div class="mt-2 small muted">
+                                In cart: <strong>0</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card shadow-sm h-100">
+                        <img class="card-img-top" src="https://dummyimage.com/600x400/212529/ffffff&amp;text=MacBook+Air" alt="MacBook Air">
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="fw-bold">MacBook Air</div>
+                                    <div class="muted small">Laptops</div>
+                                </div>
+                                <div class="price">$999</div>
+                            </div>
+
+                            <div class="mt-3 d-flex gap-2">
+                                <button class="btn btn-primary w-100" data-add="10">
+                                    Add to cart
+                                </button>
+                                <button class="btn btn-outline-secondary" data-minus="10" title="Remove 1">
+                                    −
+                                </button>
+                            </div>
+
+                            <div class="mt-2 small muted">
+                                In cart: <strong>0</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card shadow-sm h-100">
+                        <img class="card-img-top" src="https://dummyimage.com/600x400/343a40/ffffff&amp;text=Dell+XPS+13" alt="Dell XPS 13">
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="fw-bold">Dell XPS 13</div>
+                                    <div class="muted small">Laptops</div>
+                                </div>
+                                <div class="price">$1099</div>
+                            </div>
+
+                            <div class="mt-3 d-flex gap-2">
+                                <button class="btn btn-primary w-100" data-add="11">
+                                    Add to cart
+                                </button>
+                                <button class="btn btn-outline-secondary" data-minus="11" title="Remove 1">
+                                    −
+                                </button>
+                            </div>
+
+                            <div class="mt-2 small muted">
+                                In cart: <strong>0</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card shadow-sm h-100">
+                        <img class="card-img-top" src="https://dummyimage.com/600x400/495057/ffffff&amp;text=ThinkPad" alt="Lenovo ThinkPad">
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="fw-bold">Lenovo ThinkPad</div>
+                                    <div class="muted small">Laptops</div>
+                                </div>
+                                <div class="price">$899</div>
+                            </div>
+
+                            <div class="mt-3 d-flex gap-2">
+                                <button class="btn btn-primary w-100" data-add="12">
+                                    Add to cart
+                                </button>
+                                <button class="btn btn-outline-secondary" data-minus="12" title="Remove 1">
+                                    −
+                                </button>
+                            </div>
+
+                            <div class="mt-2 small muted">
+                                In cart: <strong>0</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card shadow-sm h-100">
+                        <img class="card-img-top" src="https://dummyimage.com/600x400/6c757d/ffffff&amp;text=USB-C+Charger" alt="USB-C Charger 65W">
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="fw-bold">USB-C Charger 65W</div>
+                                    <div class="muted small">Accessories</div>
+                                </div>
+                                <div class="price">$39</div>
+                            </div>
+
+                            <div class="mt-3 d-flex gap-2">
+                                <button class="btn btn-primary w-100" data-add="20">
+                                    Add to cart
+                                </button>
+                                <button class="btn btn-outline-secondary" data-minus="20" title="Remove 1">
+                                    −
+                                </button>
+                            </div>
+
+                            <div class="mt-2 small muted">
+                                In cart: <strong>0</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card shadow-sm h-100">
+                        <img class="card-img-top" src="https://dummyimage.com/600x400/adb5bd/000000&amp;text=Wireless+Mouse" alt="Wireless Mouse">
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="fw-bold">Wireless Mouse</div>
+                                    <div class="muted small">Accessories</div>
+                                </div>
+                                <div class="price">$25</div>
+                            </div>
+
+                            <div class="mt-3 d-flex gap-2">
+                                <button class="btn btn-primary w-100" data-add="21">
+                                    Add to cart
+                                </button>
+                                <button class="btn btn-outline-secondary" data-minus="21" title="Remove 1">
+                                    −
+                                </button>
+                            </div>
+
+                            <div class="mt-2 small muted">
+                                In cart: <strong>0</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card shadow-sm h-100">
+                        <img class="card-img-top" src="https://dummyimage.com/600x400/ced4da/000000&amp;text=Headphones" alt="Headphones">
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="fw-bold">Headphones</div>
+                                    <div class="muted small">Accessories</div>
+                                </div>
+                                <div class="price">$79</div>
+                            </div>
+
+                            <div class="mt-3 d-flex gap-2">
+                                <button class="btn btn-primary w-100" data-add="22">
+                                    Add to cart
+                                </button>
+                                <button class="btn btn-outline-secondary" data-minus="22" title="Remove 1">
+                                    −
+                                </button>
+                            </div>
+
+                            <div class="mt-2 small muted">
+                                In cart: <strong>0</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="noResults" class="empty mt-3 d-none">
+                <div class="fw-bold mb-1">No results</div>
+                <div class="muted">Try changing category or search query.</div>
+            </div>
+        </div>
+    </div>
+</main>
+<!-- Cart Modal -->
+<div class="modal fade" id="cartModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Your Cart</h5>
+                <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <div id="cartEmpty" class="empty d-none">
+                    <div class="fw-bold mb-1">Cart is empty</div>
+                    <div class="muted">Add some products from the list.</div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th class="text-end">Price</th>
+                            <th class="text-center" style="width:180px;">Qty</th>
+                            <th class="text-end">Subtotal</th>
+                            <th class="text-end"></th>
+                        </tr>
+                        </thead>
+                        <tbody id="cartBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="modal-footer d-flex justify-content-between">
+                <div>
+                    <div class="muted">Total:</div>
+                    <div class="fs-4 fw-bold" id="cartTotal">$0</div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button id="clearCartBtn" class="btn btn-outline-danger">Clear</button>
+                    <button id="checkoutBtn" class="btn btn-success">Checkout (demo)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // -------------------------------
+    // 1) Demo data (you can replace)
+    // -------------------------------
+    const PRODUCTS = [
+        {
+            id: 1,
+            name: "iPhone 14",
+            category: "Phones",
+            price: 799,
+            img: "https://dummyimage.com/600x400/0f2b46/ffffff&text=iPhone+14"
+        },
+        {
+            id: 2,
+            name: "Galaxy S23",
+            category: "Phones",
+            price: 699,
+            img: "https://dummyimage.com/600x400/2c74b3/ffffff&text=Galaxy+S23"
+        },
+        {
+            id: 3,
+            name: "Pixel 8",
+            category: "Phones",
+            price: 599,
+            img: "https://dummyimage.com/600x400/1e88e5/ffffff&text=Pixel+8"
+        },
+
+        {
+            id: 10,
+            name: "MacBook Air",
+            category: "Laptops",
+            price: 999,
+            img: "https://dummyimage.com/600x400/212529/ffffff&text=MacBook+Air"
+        },
+        {
+            id: 11,
+            name: "Dell XPS 13",
+            category: "Laptops",
+            price: 1099,
+            img: "https://dummyimage.com/600x400/343a40/ffffff&text=Dell+XPS+13"
+        },
+        {
+            id: 12,
+            name: "Lenovo ThinkPad",
+            category: "Laptops",
+            price: 899,
+            img: "https://dummyimage.com/600x400/495057/ffffff&text=ThinkPad"
+        },
+
+        {
+            id: 20,
+            name: "USB-C Charger 65W",
+            category: "Accessories",
+            price: 39,
+            img: "https://dummyimage.com/600x400/6c757d/ffffff&text=USB-C+Charger"
+        },
+        {
+            id: 21,
+            name: "Wireless Mouse",
+            category: "Accessories",
+            price: 25,
+            img: "https://dummyimage.com/600x400/adb5bd/000000&text=Wireless+Mouse"
+        },
+        {
+            id: 22,
+            name: "Headphones",
+            category: "Accessories",
+            price: 79,
+            img: "https://dummyimage.com/600x400/ced4da/000000&text=Headphones"
+        }
+    ];
+    const STORAGE_KEY="demo_cart_v1",state={category:"All",q:"",sort:"none",cart:loadCart()},grid=document.getElementById("grid"),noResults=document.getElementById("noResults"),shownCount=document.getElementById("shownCount"),categoryWrap=document.getElementById("categoryWrap"),qInput=document.getElementById("q"),sortSelect=document.getElementById("sort"),resetBtn=document.getElementById("resetBtn"),cartBadge=document.getElementById("cartBadge"),cartBody=document.getElementById("cartBody"),cartTotal=document.getElementById("cartTotal"),cartEmpty=document.getElementById("cartEmpty"),clearCartBtn=document.getElementById("clearCartBtn"),checkoutBtn=document.getElementById("checkoutBtn");function renderCategories(){const t=["All",...new Set(PRODUCTS.map((t=>t.category)))];categoryWrap.innerHTML=t.map((t=>`\n        <button class="btn btn-sm ${state.category===t?"btn-primary":"btn-outline-primary"} pill"\n                data-cat="${escapeHtml(t)}">\n          ${escapeHtml(t)}\n        </button>\n      `)).join(""),categoryWrap.querySelectorAll("button").forEach((t=>{t.addEventListener("click",(()=>{state.category=t.dataset.cat,renderCategories(),renderProducts()}))}))}function syncInputsFromState(){qInput.value=state.q,sortSelect.value=state.sort,renderCategories()}function renderProducts(){const t=getFilteredProducts();shownCount.textContent=String(t.length),noResults.classList.toggle("d-none",0!==t.length),grid.innerHTML=t.map((t=>{const e=state.cart[t.id]||0;return`\n          <div class="col-md-6">\n            <div class="card shadow-sm h-100">\n              <img class="card-img-top" src="${t.img}" alt="${escapeHtml(t.name)}" />\n              <div class="card-body d-flex flex-column">\n                <div class="d-flex justify-content-between align-items-start">\n                  <div>\n                    <div class="fw-bold">${escapeHtml(t.name)}</div>\n                    <div class="muted small">${escapeHtml(t.category)}</div>\n                  </div>\n                  <div class="price">$${t.price}</div>\n                </div>\n\n                <div class="mt-3 d-flex gap-2">\n                  <button class="btn btn-primary w-100" data-add="${t.id}">\n                    Add to cart\n                  </button>\n                  <button class="btn btn-outline-secondary" data-minus="${t.id}" title="Remove 1">\n                    −\n                  </button>\n                </div>\n\n                <div class="mt-2 small muted">\n                  In cart: <strong>${e}</strong>\n                </div>\n              </div>\n            </div>\n          </div>\n        `})).join(""),grid.querySelectorAll("[data-add]").forEach((t=>{t.addEventListener("click",(()=>addToCart(Number(t.dataset.add),1)))})),grid.querySelectorAll("[data-minus]").forEach((t=>{t.addEventListener("click",(()=>addToCart(Number(t.dataset.minus),-1)))}))}function renderCart(){const t=cartItems();cartBadge.textContent=String(cartCount()),cartEmpty.classList.toggle("d-none",0!==t.length),cartBody.innerHTML=t.map((({product:t,qty:e})=>{const n=t.price*e;return`\n          <tr>\n            <td>\n              <div class="d-flex align-items-center gap-2">\n                <img src="${t.img}" alt="" style="width:46px;height:46px;object-fit:contain;background:#fff;border:1px solid #eee;border-radius:10px;padding:6px;">\n                <div>\n                  <div class="fw-semibold">${escapeHtml(t.name)}</div>\n                  <div class="small muted">${escapeHtml(t.category)}</div>\n                </div>\n              </div>\n            </td>\n            <td class="text-end">$${t.price}</td>\n            <td class="text-center">\n              <div class="btn-group" role="group">\n                <button class="btn btn-outline-secondary btn-sm" data-cart-dec="${t.id}">−</button>\n                <button class="btn btn-light btn-sm" disabled>${e}</button>\n                <button class="btn btn-outline-secondary btn-sm" data-cart-inc="${t.id}">+</button>\n              </div>\n            </td>\n            <td class="text-end fw-bold">$${n}</td>\n            <td class="text-end">\n              <button class="btn btn-outline-danger btn-sm" data-cart-remove="${t.id}">Remove</button>\n            </td>\n          </tr>\n        `})).join(""),cartTotal.textContent="$"+String(cartSum()),cartBody.querySelectorAll("[data-cart-inc]").forEach((t=>t.addEventListener("click",(()=>addToCart(Number(t.dataset.cartInc),1))))),cartBody.querySelectorAll("[data-cart-dec]").forEach((t=>t.addEventListener("click",(()=>addToCart(Number(t.dataset.cartDec),-1))))),cartBody.querySelectorAll("[data-cart-remove]").forEach((t=>t.addEventListener("click",(()=>removeFromCart(Number(t.dataset.cartRemove))))))}function getFilteredProducts(){let t=PRODUCTS.slice();if("All"!==state.category&&(t=t.filter((t=>t.category===state.category))),state.q){const e=state.q.toLowerCase();t=t.filter((t=>t.name.toLowerCase().includes(e)))}return"asc"===state.sort?t.sort(((t,e)=>t.price-e.price)):"desc"===state.sort&&t.sort(((t,e)=>e.price-t.price)),t}function addToCart(t,e){const n=(state.cart[t]||0)+e;n<=0?delete state.cart[t]:state.cart[t]=n,persistCart(),renderCart(),renderProducts()}function removeFromCart(t){delete state.cart[t],persistCart(),renderCart(),renderProducts()}function cartItems(){return Object.entries(state.cart).map((([t,e])=>{const n=PRODUCTS.find((e=>e.id===Number(t)));return n?{product:n,qty:e}:null})).filter(Boolean)}function cartCount(){return Object.values(state.cart).reduce(((t,e)=>t+e),0)}function cartSum(){return cartItems().reduce(((t,e)=>t+e.product.price*e.qty),0)}function loadCart(){try{const t=localStorage.getItem(STORAGE_KEY);if(!t)return{};const e=JSON.parse(t);return e&&"object"==typeof e?e:{}}catch{return{}}}function persistCart(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state.cart))}function escapeHtml(t){return String(t).replace(/[&<>"']/g,(t=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[t])))}renderCategories(),syncInputsFromState(),renderProducts(),renderCart(),qInput.addEventListener("input",(()=>{state.q=qInput.value.trim(),renderProducts()})),sortSelect.addEventListener("change",(()=>{state.sort=sortSelect.value,renderProducts()})),resetBtn.addEventListener("click",(()=>{state.category="All",state.q="",state.sort="none",syncInputsFromState(),renderProducts()})),clearCartBtn.addEventListener("click",(()=>{state.cart={},persistCart(),renderCart(),renderProducts()})),checkoutBtn.addEventListener("click",(()=>{if(0===cartCount())return alert("Cart is empty 😄");alert("Checkout demo ✅ (You can connect backend later)")}));
+</script>
+</body>
+</html>
